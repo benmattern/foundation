@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { FormEvent } from "react";
 import { supabase } from "./lib/supabaseClient";
 
 const navItems = [
@@ -23,6 +24,11 @@ type Source = {
 export default function App() {
   const [sources, setSources] = useState<Source[]>([]);
   const [loading, setLoading] = useState(true);
+  const [name, setName] = useState("");
+  const [url, setUrl] = useState("");
+  const [category, setCategory] = useState("");
+  const [notes, setNotes] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     async function loadSources() {
@@ -42,6 +48,34 @@ export default function App() {
 
     loadSources();
   }, []);
+
+  async function handleAddSource(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSaving(true);
+
+    const { data, error } = await supabase
+      .from("sources")
+      .insert({
+        name,
+        url,
+        category: category || null,
+        notes: notes || null,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error adding source:", error);
+    } else if (data) {
+      setSources([data, ...sources]);
+      setName("");
+      setUrl("");
+      setCategory("");
+      setNotes("");
+    }
+
+    setSaving(false);
+  }
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
@@ -91,6 +125,70 @@ export default function App() {
             </div>
           </section>
 
+          <section className="px-8 pb-6">
+            <form
+              onSubmit={handleAddSource}
+              className="rounded-xl border border-zinc-800 bg-zinc-900 p-6"
+            >
+              <h3 className="text-lg font-semibold">Add Source</h3>
+              <p className="mt-2 text-sm text-zinc-400">
+                Add a public feed, article source, API endpoint, or other data source for future ingestion.
+              </p>
+
+              <div className="mt-5 grid gap-4 md:grid-cols-2">
+                <label className="block">
+                  <span className="text-sm text-zinc-300">Source Name</span>
+                  <input
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                    className="mt-2 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                    placeholder="Example: Focus Taiwan"
+                    required
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="text-sm text-zinc-300">URL</span>
+                  <input
+                    value={url}
+                    onChange={(event) => setUrl(event.target.value)}
+                    className="mt-2 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                    placeholder="https://..."
+                    required
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="text-sm text-zinc-300">Category</span>
+                  <input
+                    value={category}
+                    onChange={(event) => setCategory(event.target.value)}
+                    className="mt-2 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                    placeholder="Taiwan, Semiconductors, Cyber, etc."
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="text-sm text-zinc-300">Notes</span>
+                  <input
+                    value={notes}
+                    onChange={(event) => setNotes(event.target.value)}
+                    className="mt-2 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                    placeholder="Why this source matters"
+                  />
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                disabled={saving}
+                className="mt-5 rounded-lg bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-950 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {saving ? "Saving..." : "Add Source"}
+              </button>
+            </form>
+          </section>          
+          
           <section className="px-8">
             <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
               <h3 className="text-lg font-semibold">Connected Sources</h3>
