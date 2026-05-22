@@ -8,6 +8,8 @@ import {
 import { SourceForm } from "../components/SourceForm";
 import { SourceList } from "../components/SourceList";
 
+import { PageHeader } from "../components/PageHeader";
+
 export default function SourcesPage() {
   const [sources, setSources] = useState<Source[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,12 +45,10 @@ export default function SourcesPage() {
 
   return (
     <>
-      <header className="mb-8">
-        <h1 className="text-5xl font-bold text-white">Sources</h1>
-        <p className="text-slate-400 mt-2 text-lg">
-          Add, review, and manage OSINT source records.
-        </p>
-      </header>
+      <PageHeader
+        title="Sources"
+        description="Add, review, and manage OSINT source records."
+      />
 
       {loading ? (
         <p className="text-slate-400">Loading sources...</p>

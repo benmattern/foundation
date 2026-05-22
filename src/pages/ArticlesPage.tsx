@@ -1,3 +1,12 @@
+import { PageHeader } from "../components/PageHeader";
+
 export default function ArticlesPage() {
-  return <div>Articles Page</div>;
+  return (
+    <div>
+      <PageHeader
+        title="Articles"
+        description="Read and manage your OSINT articles."
+      />
+    </div>
+  );
 }

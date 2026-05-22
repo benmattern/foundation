@@ -1,3 +1,12 @@
+import { PageHeader } from "../components/PageHeader";
+
 export default function EntitiesPage() {
-  return <div>Entities Page</div>;
+  return (
+    <div>
+      <PageHeader
+        title="Entities"
+        description="Manage your OSINT entities."
+      />
+    </div>
+  );
 }

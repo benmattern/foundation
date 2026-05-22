@@ -1,11 +1,13 @@
+import { NavLink } from "react-router-dom";
+
 const navItems = [
-  "Dashboard",
-  "Sources",
-  "Articles",
-  "Entities",
-  "Timeline",
-  "Notes",
-  "Settings",
+  { label: "Dashboard", to: "/" },
+  { label: "Sources", to: "/sources" },
+  { label: "Articles", to: "/articles" },
+  { label: "Entities", to: "/entities" },
+  { label: "Timeline", to: "/timeline" },
+  { label: "Notes", to: "/notes" },
+  { label: "Settings", to: "/settings" },
 ];
 
 export function Sidebar() {
@@ -13,11 +15,21 @@ export function Sidebar() {
     <aside className="w-64 bg-slate-950 text-white min-h-screen p-6">
       <h1 className="text-xl font-bold mb-8">FOUNDATION</h1>
 
-      <nav className="space-y-3 text-sm">
+      <nav className="space-y-2">
         {navItems.map((item) => (
-          <div key={item} className="text-slate-300 hover:text-white cursor-pointer">
-            {item}
-          </div>
+          <NavLink
+            key={item.to}
+            to={item.to}
+            className={({ isActive }) =>
+              `block rounded-lg px-3 py-2 transition ${
+                isActive
+                  ? "bg-slate-800 text-white"
+                  : "text-slate-400 hover:bg-slate-900 hover:text-white"
+              }`
+            }
+          >
+            {item.label}
+          </NavLink>
         ))}
       </nav>
     </aside>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Card } from "./ui/Card";
 
 type Props = {
   onCreateSource: (source: {
@@ -27,10 +28,9 @@ export function SourceForm({ onCreateSource }: Props) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow space-y-4"
-    >
+    <Card className="space-y-4">
+      <form onSubmit={handleSubmit}>
+        
       <h3 className="text-xl font-semibold text-white">Add Source</h3>
 
       <input
@@ -68,6 +68,8 @@ export function SourceForm({ onCreateSource }: Props) {
       >
         Add Source
       </button>
-    </form>
+      
+      </form>
+    </Card> 
   );
 }

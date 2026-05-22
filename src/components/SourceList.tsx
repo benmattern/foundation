@@ -1,4 +1,5 @@
 import type { Source } from "../types/source";
+import { Card } from "./ui/Card";
 
 type Props = {
   sources: Source[];
@@ -6,7 +7,7 @@ type Props = {
 
 export function SourceList({ sources }: Props) {
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow">
+    <Card>
       <h3 className="text-xl font-semibold text-white mb-6">Sources</h3>
 
       <div className="space-y-4">
@@ -37,6 +38,6 @@ export function SourceList({ sources }: Props) {
           </div>
         ))}
       </div>
-    </div>
+    </Card>
   );
 }
