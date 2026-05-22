@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import { supabase } from "./lib/supabaseClient";
+
 const navItems = [
   "Dashboard",
   "Sources",
@@ -8,7 +11,38 @@ const navItems = [
   "Settings",
 ];
 
+type Source = {
+  id: string;
+  name: string;
+  url: string;
+  category: string | null;
+  notes: string | null;
+  created_at: string;
+};
+
 export default function App() {
+  const [sources, setSources] = useState<Source[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadSources() {
+      const { data, error } = await supabase
+        .from("sources")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error loading sources:", error);
+      } else {
+        setSources(data ?? []);
+      }
+
+      setLoading(false);
+    }
+
+    loadSources();
+  }, []);
+
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
       <div className="flex min-h-screen">
@@ -35,15 +69,15 @@ export default function App() {
             <p className="text-sm uppercase tracking-[0.25em] text-zinc-500">
               Taiwan Strategic Environment
             </p>
-            <h2 className="mt-2 text-3xl font-semibold">
-              Dashboard
-            </h2>
+            <h2 className="mt-2 text-3xl font-semibold">Dashboard</h2>
           </header>
 
           <section className="grid gap-6 p-8 md:grid-cols-3">
             <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
               <p className="text-sm text-zinc-400">Sources</p>
-              <p className="mt-3 text-3xl font-bold">0</p>
+              <p className="mt-3 text-3xl font-bold">
+                {loading ? "..." : sources.length}
+              </p>
             </div>
 
             <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
@@ -59,12 +93,40 @@ export default function App() {
 
           <section className="px-8">
             <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-              <h3 className="text-lg font-semibold">Initial Workspace</h3>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">
-                Foundation will begin as a structured dashboard for collecting,
-                organizing, and analyzing public information related to Taiwan,
-                semiconductors, regional security, and strategic technology.
-              </p>
+              <h3 className="text-lg font-semibold">Connected Sources</h3>
+
+              <div className="mt-4 space-y-3">
+                {sources.map((source) => (
+                  <div
+                    key={source.id}
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-4"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <h4 className="font-medium">{source.name}</h4>
+                        <p className="mt-1 text-sm text-zinc-400">
+                          {source.url}
+                        </p>
+                      </div>
+                      <span className="rounded-full bg-zinc-800 px-3 py-1 text-xs text-zinc-300">
+                        {source.category ?? "Uncategorized"}
+                      </span>
+                    </div>
+
+                    {source.notes && (
+                      <p className="mt-3 text-sm text-zinc-500">
+                        {source.notes}
+                      </p>
+                    )}
+                  </div>
+                ))}
+
+                {!loading && sources.length === 0 && (
+                  <p className="text-sm text-zinc-400">
+                    No sources found yet.
+                  </p>
+                )}
+              </div>
             </div>
           </section>
         </main>
