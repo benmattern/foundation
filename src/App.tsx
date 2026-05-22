@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { supabase } from "./lib/supabaseClient";
 import type { Source } from "./types/source";
+import { getSources, createSource as createSourceRecord, } from "./services/sourceService";
 
 import { Sidebar } from "./components/Sidebar";
 import { DashboardHeader } from "./components/DashboardHeader";
@@ -13,18 +13,14 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   async function loadSources() {
-    const { data, error } = await supabase
-      .from("sources")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) {
+    try {
+      const data = await getSources();
+      setSources(data);
+    } catch (error) {
       console.error("Error loading sources:", error);
-    } else {
-      setSources(data ?? []);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   useEffect(() => {
@@ -37,21 +33,11 @@ export default function App() {
     category: string;
     notes: string;
   }) {
-    const { data, error } = await supabase
-      .from("sources")
-      .insert({
-        name: source.name,
-        url: source.url,
-        category: source.category || null,
-        notes: source.notes || null,
-      })
-      .select()
-      .single();
-
-    if (error) {
+    try {
+      const data = await createSourceRecord(source);
+      setSources((prev) => [data, ...prev]);
+    } catch (error) {
       console.error("Error adding source:", error);
-    } else if (data) {
-      setSources([data, ...sources]);
     }
   }
 
