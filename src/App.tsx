@@ -1,64 +1,27 @@
-import { useEffect, useState } from "react";
-import type { Source } from "./types/source";
-import { getSources, createSource as createSourceRecord, } from "./services/sourceService";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
 
-import { Sidebar } from "./components/Sidebar";
-import { DashboardHeader } from "./components/DashboardHeader";
-import { DashboardCards } from "./components/DashboardCards";
-import { SourceForm } from "./components/SourceForm";
-import { SourceList } from "./components/SourceList";
+import { DashboardLayout } from "./layouts/DashboardLayout";
+
+import DashboardPage from "./pages/DashboardPage";
+import SourcesPage from "./pages/SourcesPage";
+import ArticlesPage from "./pages/ArticlesPage";
+import EntitiesPage from "./pages/EntitiesPage";
 
 export default function App() {
-  const [sources, setSources] = useState<Source[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  async function loadSources() {
-    try {
-      const data = await getSources();
-      setSources(data);
-    } catch (error) {
-      console.error("Error loading sources:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    loadSources();
-  }, []);
-
-  async function createSource(source: {
-    name: string;
-    url: string;
-    category: string;
-    notes: string;
-  }) {
-    try {
-      const data = await createSourceRecord(source);
-      setSources((prev) => [data, ...prev]);
-    } catch (error) {
-      console.error("Error adding source:", error);
-    }
-  }
-
   return (
-    <div className="flex min-h-screen bg-slate-950 text-white">
-      <Sidebar />
-
-      <main className="flex-1 p-8">
-        <DashboardHeader />
-
-        <DashboardCards sourceCount={sources.length} />
-
-        {loading ? (
-          <p>Loading sources...</p>
-        ) : (
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            <SourceForm onCreateSource={createSource} />
-            <SourceList sources={sources} />
-          </div>
-        )}
-      </main>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<DashboardLayout />}>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/sources" element={<SourcesPage />} />
+          <Route path="/articles" element={<ArticlesPage />} />
+          <Route path="/entities" element={<EntitiesPage />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
