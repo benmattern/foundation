@@ -1,5 +1,6 @@
 import type { Source } from "../types/source";
 import { Card } from "./ui/Card";
+import { Link } from "react-router-dom";
 
 type Props = {
   sources: Source[];
@@ -12,9 +13,10 @@ export function SourceList({ sources }: Props) {
 
       <div className="space-y-4">
         {sources.map((source) => (
-          <div
+          <Link
             key={source.id}
-            className="border-b border-slate-800 pb-4"
+            to={`/sources/${source.id}`}
+            className="block border-b border-slate-800 pb-4 hover:bg-slate-800/40 rounded-lg p-3 transition"
           >
             <p className="font-medium text-white text-lg">
               {source.name}
@@ -35,7 +37,7 @@ export function SourceList({ sources }: Props) {
                 {source.notes}
               </p>
             )}
-          </div>
+          </Link>
         ))}
       </div>
     </Card>

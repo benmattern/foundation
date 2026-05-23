@@ -41,3 +41,17 @@ export async function createSource(
 
   return data;
 }
+
+export async function getSourceById(id: string): Promise<Source> {
+  const { data, error } = await supabase
+    .from("sources")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
