@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { Card } from "./ui/Card";
+import type { Source } from "../types/source";
 
 type Props = {
+  sources: Source[];
   onCreateArticle: (article: {
+    source_id: string | null;
     title: string;
     url: string;
     summary: string;
@@ -10,7 +13,8 @@ type Props = {
   }) => Promise<void>;
 };
 
-export function ArticleForm({ onCreateArticle }: Props) {
+export function ArticleForm({ sources, onCreateArticle }: Props) {
+  const [sourceId, setSourceId] = useState("");
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
   const [summary, setSummary] = useState("");
@@ -20,6 +24,7 @@ export function ArticleForm({ onCreateArticle }: Props) {
     e.preventDefault();
 
     await onCreateArticle({
+      source_id: sourceId || null,
       title,
       url,
       summary,
@@ -30,6 +35,7 @@ export function ArticleForm({ onCreateArticle }: Props) {
     setUrl("");
     setSummary("");
     setPublishedAt("");
+    setSourceId("");
   }
 
   return (
@@ -46,6 +52,23 @@ export function ArticleForm({ onCreateArticle }: Props) {
         </div>
 
         <div className="space-y-4">
+          
+          <select
+            className={`w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 ${
+              sourceId ? "text-white" : "text-slate-500"
+            }`}
+            value={sourceId}
+            onChange={(e) => setSourceId(e.target.value)}
+          >
+            <option value="">No source selected</option>
+
+            {sources.map((source) => (
+              <option key={source.id} value={source.id}>
+                {source.name}
+              </option>
+            ))}
+          </select>          
+          
           <input
             className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500"
             placeholder="Title"

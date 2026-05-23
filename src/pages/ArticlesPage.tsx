@@ -7,17 +7,25 @@ import {
   getArticles,
   createArticle as createArticleRecord,
 } from "../services/articleService";
+import type { Source } from "../types/source";
+import { getSources } from "../services/sourceService";
 
 export default function ArticlesPage() {
   const [articles, setArticles] = useState<Article[]>([]);
+  const [sources, setSources] = useState<Source[]>([]);
   const [loading, setLoading] = useState(true);
 
   async function loadArticles() {
     try {
-      const data = await getArticles();
-      setArticles(data);
+      const [articleData, sourceData] = await Promise.all([
+        getArticles(),
+        getSources(),
+      ]);
+
+      setArticles(articleData);
+      setSources(sourceData);
     } catch (error) {
-      console.error("Error loading articles:", error);
+      console.error("Error loading articles page data:", error);
     } finally {
       setLoading(false);
     }
@@ -28,16 +36,14 @@ export default function ArticlesPage() {
   }, []);
 
   async function createArticle(article: {
+    source_id: string | null;
     title: string;
     url: string;
     summary: string;
     published_at: string;
   }) {
     try {
-      const data = await createArticleRecord({
-        source_id: null,
-        ...article,
-      });
+      const data = await createArticleRecord(article);
 
       setArticles((prev) => [data, ...prev]);
     } catch (error) {
@@ -56,7 +62,10 @@ export default function ArticlesPage() {
         <p className="text-slate-400">Loading articles...</p>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <ArticleForm onCreateArticle={createArticle} />
+          <ArticleForm
+            sources={sources}
+            onCreateArticle={createArticle}
+          />
           <ArticleList articles={articles} />
         </div>
       )}
