@@ -11,6 +11,7 @@ import SourcesPage from "./pages/SourcesPage";
 import ArticlesPage from "./pages/ArticlesPage";
 import EntitiesPage from "./pages/EntitiesPage";
 import SourceDetailPage from "./pages/SourceDetailPage";
+import TagsPage from "./pages/TagsPage";
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/sources" element={<SourcesPage />} />
           <Route path="/sources/:id" element={<SourceDetailPage />} />
           <Route path="/articles" element={<ArticlesPage />} />
+          <Route path="/tags" element={<TagsPage />} />
           <Route path="/entities" element={<EntitiesPage />} />
         </Route>
       </Routes>

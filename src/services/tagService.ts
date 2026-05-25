@@ -10,18 +10,14 @@ export async function getTags(): Promise<Tag[]> {
   const { data, error } = await supabase
     .from("tags")
     .select("*")
-    .order("name");
+    .order("name", { ascending: true });
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 
   return data ?? [];
 }
 
-export async function createTag(
-  tag: CreateTagInput
-): Promise<Tag> {
+export async function createTag(tag: CreateTagInput): Promise<Tag> {
   const { data, error } = await supabase
     .from("tags")
     .insert({
@@ -31,20 +27,13 @@ export async function createTag(
     .select()
     .single();
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 
   return data;
 }
 
-export async function deleteTag(id: string) {
-  const { error } = await supabase
-    .from("tags")
-    .delete()
-    .eq("id", id);
+export async function deleteTag(id: string): Promise<void> {
+  const { error } = await supabase.from("tags").delete().eq("id", id);
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 }
