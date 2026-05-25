@@ -12,6 +12,8 @@ import {
   deleteTag as deleteTagRecord,
 } from "../services/tagService";
 
+import { Card } from "../components/ui/Card";
+
 export default function TagsPage() {
   const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
@@ -71,16 +73,16 @@ export default function TagsPage() {
         <p className="text-slate-400">Loading tags...</p>
       ) : (
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <div className="rounded-xl border border-slate-800 bg-slate-950 p-6">
+          <Card>
             <TagForm onCreateTag={createTag} />
-          </div>
+          </Card>
 
-          <div className="rounded-xl border border-slate-800 bg-slate-950 p-6">
+          <Card>
             <TagList
               tags={tags}
               onDeleteTag={deleteTag}
             />
-          </div>
+          </Card>
         </div>
       )}
     </div>

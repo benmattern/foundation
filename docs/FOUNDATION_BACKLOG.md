@@ -52,17 +52,17 @@ Transform articles into structured intelligence objects.
 - [x] Seed initial tags
 
 ### Types
-- [ ] Finalize tag.ts
+- [x] Finalize tag.ts
 
 ### Services
-- [ ] Finish tagService.ts
+- [x] Finish tagService.ts
 
 ### Components
-- [ ] Create TagForm.tsx
-- [ ] Create TagList.tsx
+- [x] Create TagForm.tsx
+- [x] Create TagList.tsx
 
 ### Pages
-- [ ] Create TagsPage.tsx
+- [x] Create TagsPage.tsx
 
 ### Relationships
 - [ ] Add article-tag relationship management

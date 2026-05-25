@@ -138,6 +138,10 @@ articles
 
 # tags
 
+## Current Implementation Status
+
+The tags and article_tags tables have been created. Standalone tag management is operational. Article-to-tag assignment is not yet implemented.
+
 ## Purpose
 Represents operational intelligence classifications/topics.
 

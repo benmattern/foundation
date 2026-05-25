@@ -86,7 +86,7 @@ Current status:
 - article_tags table created
 - seed tags added
 - tag.ts created
-- tagService.ts in progress
+- Standalone tag management is operational. Next step is article-tag relationship management.
 
 Next steps:
 1. Finish tagService.ts

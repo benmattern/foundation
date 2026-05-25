@@ -54,7 +54,7 @@ export function ArticleForm({ sources, onCreateArticle }: Props) {
         <div className="space-y-4">
           
           <select
-            className={`w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 ${
+            className={`w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
               sourceId ? "text-white" : "text-slate-500"
             }`}
             value={sourceId}
@@ -70,7 +70,7 @@ export function ArticleForm({ sources, onCreateArticle }: Props) {
           </select>          
           
           <input
-            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500"
+            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -78,7 +78,7 @@ export function ArticleForm({ sources, onCreateArticle }: Props) {
           />
 
           <input
-            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500"
+            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="URL"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
@@ -87,13 +87,13 @@ export function ArticleForm({ sources, onCreateArticle }: Props) {
 
           <input
             type="date"
-            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white"
+            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={publishedAt}
             onChange={(e) => setPublishedAt(e.target.value)}
           />
 
           <textarea
-            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 min-h-[180px]"
+            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Summary"
             value={summary}
             onChange={(e) => setSummary(e.target.value)}
@@ -101,7 +101,7 @@ export function ArticleForm({ sources, onCreateArticle }: Props) {
         </div>
 
         <button
-          className="rounded-xl bg-blue-600 hover:bg-blue-500 px-6 py-3 text-white font-medium transition"
+          className="rounded-lg bg-slate-200 px-4 py-2 font-medium text-slate-900 transition hover:bg-white"
         >
           Add Article
         </button>

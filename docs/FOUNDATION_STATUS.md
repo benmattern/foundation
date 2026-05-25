@@ -225,25 +225,28 @@ Sources
 
 # Current Work In Progress
 
-# Tags System
+## Tags
 
-## Current Status
-In progress.
-
-## Completed
-- tags SQL table created
+### Implemented
+- tags table created
 - article_tags join table created
 - seed tags added
-- tag.ts type file started
-- tagService.ts started
+- tag.ts created
+- tagService.ts created
+- TagForm component created
+- TagList component created
+- TagsPage created
+- Tags route added
+- Sidebar navigation added
+- Create/list/delete tags working
 
-## Next Steps
-1. Finish tagService.ts
-2. Build TagsPage.tsx
-3. Create TagForm component
-4. Create TagList component
-5. Add article-tag relationships
-6. Add filtering by tags
+### Current Status
+Standalone tag management is operational.
+
+### Next Steps
+- Add article-tag relationship management
+- Display tags on articles
+- Filter articles by tags
 
 ---
 

@@ -7,7 +7,11 @@ type Props = {
 
 export function TagList({ tags, onDeleteTag }: Props) {
   if (tags.length === 0) {
-    return <p className="text-slate-400">No tags yet.</p>;
+    return (
+      <div className="text-sm text-slate-400">
+        No tags yet. Create your first tag to begin classifying intelligence records.
+      </div>
+    );
   }
 
   return (
@@ -31,7 +35,7 @@ export function TagList({ tags, onDeleteTag }: Props) {
             <button
               type="button"
               onClick={() => onDeleteTag(tag.id)}
-              className="text-sm text-red-400 hover:text-red-300"
+              className="rounded-md border border-red-900/50 bg-red-950/30 px-3 py-1 text-sm text-red-300 transition hover:bg-red-900/40"
             >
               Delete
             </button>

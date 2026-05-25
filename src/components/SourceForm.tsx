@@ -74,7 +74,7 @@ export function SourceForm({ onCreateSource }: Props) {
 
         <div className="pt-2">
           <button
-            className="rounded-xl bg-blue-600 hover:bg-blue-500 px-6 py-3 text-white font-medium transition"
+            className="rounded-lg bg-slate-200 px-4 py-2 font-medium text-slate-900 transition hover:bg-white"
           >
             Add Source
           </button>
