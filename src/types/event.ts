@@ -2,6 +2,26 @@ import type { Article } from "./article";
 
 export type EventStatus = "draft" | "active" | "resolved" | "archived";
 
+export const eventStatusOptions: EventStatus[] = [
+  "draft",
+  "active",
+  "resolved",
+  "archived",
+];
+
+export const eventTypeOptions = [
+  "military",
+  "diplomatic",
+  "economic",
+  "technology",
+  "cyber",
+  "policy",
+  "election",
+  "maritime",
+  "supply_chain",
+  "other",
+];
+
 export type FoundationEvent = {
   id: string;
   title: string;

@@ -56,6 +56,7 @@ Current frontend architecture uses:
 - client-side page state for early filtering/search workflows
 - inline/page-level article management for early edit/delete workflows
 - event detail pages for analyst-created intelligence objects
+- client-side event filtering/search over loaded event records
 
 ### Current Folder Structure
 
@@ -173,9 +174,14 @@ Current functionality:
 - Unlink articles from events
 - Replace linked articles through service-layer delete-then-insert behavior
 - Track event status as draft, active, resolved, or archived
+- Search events by title and description
+- Filter events by status
+- Filter events by event type
+- Clear event filters
+- Display filtered event result count
+- Display filtered event empty state
 
 Not implemented:
-- Event search/filtering
 - Event tags
 - Event entity linking
 - Timeline visualization
@@ -196,6 +202,7 @@ Sources
        -> Filtering/Search v1
        -> Article Management v1
     <-> Events v1
+       -> Event Refinement v1
 ```
 
 Long-term relational direction:
@@ -222,11 +229,12 @@ Completed:
 5. Filtering & Search v1
 6. Article Management v1
 7. Event v1
+8. Event Refinement v1
 
 Next milestone:
-- Dashboard v1 / Event Refinement decision point
+- Dashboard v1 / Events v1.1 decision point
 
-Neither Dashboard v1 nor Event Refinement v1 has started.
+Neither Dashboard v1 nor Events v1.1 has started.
 
 ---
 
@@ -249,6 +257,8 @@ Service layer is intended to:
 Article service currently composes `ArticleWithTags` from articles, article_tags, and tags rather than relying on nested Supabase relationship selects.
 
 Event service currently composes events with linked articles from events, article_events, and articles. Events are analyst-created intelligence objects supported by article evidence.
+
+Event Refinement v1 keeps event filtering/search client-side in EventsPage and does not require eventService changes.
 
 ---
 
@@ -335,7 +345,7 @@ Examples:
 - More consistent type organization
 - Better form validation
 - Improved UI consistency
-- Event search/filtering and refinement scope
+- Events v1.1 refinement scope
 - Timeline schema design
 - Article creation and tag assignment are frontend-driven separate operations
 - Article update and tag replacement are frontend-driven separate operations

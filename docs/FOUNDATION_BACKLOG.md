@@ -168,7 +168,6 @@ Build a stable platform capable of:
 - [x] View event detail pages
 
 ## Still Open
-- [ ] Event search/filtering
 - [ ] Event tags
 - [ ] Event entity linking
 - [ ] Timeline visualization
@@ -178,17 +177,45 @@ Build a stable platform capable of:
 
 ---
 
+# Event Refinement v1
+
+## Completed Tasks
+- [x] Create EventFilters component
+- [x] Search event title
+- [x] Search event description
+- [x] Filter events by status
+- [x] Filter events by event type
+- [x] Clear event filters
+- [x] Display filtered event result count
+- [x] Display filtered event empty state
+- [x] Keep event filtering client-side for v1
+- [x] Add shared eventStatusOptions and eventTypeOptions constants
+- [x] Update EventForm to use shared event status/type constants
+
+## Still Open
+- [ ] Event tags
+- [ ] Event entity linking
+- [ ] Timeline visualization
+- [ ] Event AI suggestions
+- [ ] Event severity/confidence scoring
+- [ ] Event date ranges
+- [ ] Server-side event search/filtering
+- [ ] URL state
+- [ ] Saved event filters
+
+---
+
 # Immediate Backlog
 
 # Next Milestone
 
-## Dashboard v1 / Event Refinement Decision Point
+## Dashboard v1 / Events v1.1 Decision Point
 - [ ] Decide whether the next milestone is Dashboard v1
-- [ ] Decide whether the next milestone is Event Refinement v1
+- [ ] Decide whether the next milestone is Events v1.1
 - [ ] Define Dashboard v1 metrics and recent intelligence views if chosen
-- [ ] Define Event Refinement v1 search/filtering scope if chosen
+- [ ] Define Events v1.1 scope if chosen
 
-Neither Dashboard v1 nor Event Refinement v1 has started.
+Neither Dashboard v1 nor Events v1.1 has started.
 
 ---
 
@@ -228,11 +255,11 @@ Examples:
 
 ---
 
-# Future Event Refinement
+# Future Events v1.1
 
 ## Goal
 
-Refine discrete geopolitical, technological, and operational developments after Event v1.
+Refine discrete geopolitical, technological, and operational developments after Event Refinement v1.
 
 ## Planned Event Types
 - military exercises
@@ -246,7 +273,6 @@ Refine discrete geopolitical, technological, and operational developments after 
 
 ## Planned Refinements
 - [ ] Event timelines
-- [ ] Event filtering
 - [ ] Event tags
 - [ ] Event entity linking
 - [ ] Event AI suggestions

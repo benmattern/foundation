@@ -4,6 +4,7 @@ import type {
   EventStatus,
   FoundationEventWithArticles,
 } from "../types/event";
+import { eventStatusOptions, eventTypeOptions } from "../types/event";
 import { Card } from "./ui/Card";
 
 export type EventFormValues = {
@@ -15,26 +16,6 @@ export type EventFormValues = {
   location: string;
   article_ids: string[];
 };
-
-const statusOptions: EventStatus[] = [
-  "draft",
-  "active",
-  "resolved",
-  "archived",
-];
-
-const eventTypeOptions = [
-  "military",
-  "diplomatic",
-  "economic",
-  "technology",
-  "cyber",
-  "policy",
-  "election",
-  "maritime",
-  "supply_chain",
-  "other",
-];
 
 type Props = {
   articles: Article[];
@@ -164,7 +145,7 @@ export function EventForm({
               value={status}
               onChange={(event) => setStatus(event.target.value as EventStatus)}
             >
-              {statusOptions.map((option) => (
+              {eventStatusOptions.map((option) => (
                 <option key={option} value={option}>
                   {option}
                 </option>

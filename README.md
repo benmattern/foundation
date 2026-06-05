@@ -22,6 +22,11 @@ Implemented:
 - Article <-> Event relationships through `article_events`.
 - Link and unlink articles from events.
 - Event detail pages for analyst-created intelligence objects.
+- Event Refinement v1: client-side event search by title/description.
+- Event Refinement v1: event filtering by status and event type.
+- Event filter clear button, filtered result count, and filtered empty state.
+- `EventFilters` component.
+- Shared event status/type option constants.
 - Client-side article search by title and summary.
 - Client-side article filtering by one tag.
 - Client-side article filtering by one source.
@@ -31,7 +36,6 @@ Implemented:
 - Shared Card component and low-risk UI cleanup pass.
 
 Not implemented yet:
-- Event search/filtering.
 - Event tags.
 - Event entity linking.
 - Timeline visualization.
@@ -49,7 +53,7 @@ Not implemented yet:
 - Authentication, app auth flows, and RLS-managed access.
 - AI-assisted ingestion, summarization, tagging, or entity extraction.
 
-The next milestone is a decision point between Dashboard v1 and Event Refinement v1. Neither has started.
+The next milestone is a decision point between Dashboard v1 and Events v1.1. Neither has started.
 
 ## Tech Stack
 
@@ -125,7 +129,7 @@ Key files:
 
 Near term:
 - Dashboard v1: real article/tag/event counts and recent intelligence views.
-- Event Refinement v1: event search/filtering and workflow polish.
+- Events v1.1: additional event workflow polish after search/filtering.
 - Article detail page and advanced article workflows.
 
 Still open in Filtering/Search:

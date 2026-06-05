@@ -533,6 +533,83 @@ This keeps link mutation logic centralized in the service layer and avoids UI-si
 
 ---
 
+# Client-Side Event Filtering & Search v1
+
+## Decision
+Use client-side filtering/search for Event Refinement v1.
+
+Implemented filters:
+- search event title,
+- search event description,
+- filter by event status,
+- filter by event type,
+- clear filters,
+- filtered result count,
+- filtered empty state.
+
+## Reasoning
+Events are currently loaded as `FoundationEventWithArticles[]`, and the prototype dataset is expected to remain small enough for client-side filtering.
+
+This approach:
+- mirrors Article Filtering/Search v1,
+- avoids premature server-side query complexity,
+- avoids URL state and saved-filter architecture too early,
+- keeps eventService focused on loading and mutating event data,
+- and adds immediate analyst workflow value with low risk.
+
+Server-side event search/filtering can be revisited when event volume, pagination, full-text search, RLS, or performance constraints justify it.
+
+---
+
+# EventFilters Component
+
+## Decision
+Introduce `EventFilters` as a focused control component for Event Refinement v1.
+
+## Reasoning
+This mirrors the existing `ArticleFilters` pattern and keeps `EventsPage` responsible for orchestration while keeping filter controls reusable and presentation-focused.
+
+EventList remains focused on rendering event records and empty states rather than owning filtering behavior.
+
+---
+
+# Shared Event Option Constants
+
+## Decision
+Move event status/type option lists into shared constants in `src/types/event.ts`.
+
+Current constants:
+- `eventStatusOptions`
+- `eventTypeOptions`
+
+## Reasoning
+EventForm and EventFilters both need the same event status/type options.
+
+Shared constants:
+- prevent local option drift,
+- keep event-domain values close to event types,
+- and avoid creating a heavier configuration layer before the app needs one.
+
+These constants are application-level UI/type helpers, not database tables.
+
+---
+
+# Event Service Unchanged For Event Refinement v1
+
+## Decision
+Do not modify `eventService.ts` for Event Refinement v1.
+
+## Reasoning
+The refinement is entirely client-side:
+- EventsPage owns filter state,
+- EventFilters renders controls,
+- EventList renders filtered events,
+- and eventService continues loading composed event/article data.
+
+This preserves the service-layer boundary and avoids adding server-side filtering before there is an operational need.
+
+---
+
 # Intelligence Workflow Philosophy
 
 ## Decision

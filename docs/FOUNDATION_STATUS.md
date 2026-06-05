@@ -4,7 +4,7 @@
 
 FOUNDATION is currently in early Phase 1 development.
 
-The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, Article Management v1, and Event v1 with Article <-> Event relationships.
+The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, Article Management v1, Event v1 with Article <-> Event relationships, and Event Refinement v1.
 
 The current focus is:
 - establishing core intelligence data structures,
@@ -157,6 +157,7 @@ Sources
        -> Filtering/Search v1
        -> Article Management v1
     <-> Events v1
+       -> Event Refinement v1
 ```
 
 ---
@@ -209,9 +210,9 @@ Article tags can be added, removed, and replaced on existing articles through Ar
 - Unlink articles from events
 - Replace linked articles through service-layer delete-then-insert behavior
 - Event statuses supported: draft, active, resolved, archived
+- Event status/type options shared as application constants
 
 ## Not Yet Implemented
-- Event search/filtering
 - Event tags
 - Event entities
 - Timeline visualization
@@ -222,6 +223,37 @@ Article tags can be added, removed, and replaced on existing articles through Ar
 ## Current Status
 
 Complete for v1. Events are analyst-created intelligence objects supported by linked articles.
+
+---
+
+# Event Refinement v1
+
+## Implemented
+- EventFilters component
+- Client-side search by event title
+- Client-side search by event description
+- Client-side filter by event status
+- Client-side filter by event type
+- Clear event filters
+- Filtered event result count
+- Filtered event empty state
+- Shared `eventStatusOptions` and `eventTypeOptions` constants
+- EventForm uses shared event status/type constants
+
+## Not Yet Implemented
+- Event tags
+- Event entity linking
+- Timeline visualization
+- Event AI suggestions
+- Event severity/confidence scoring
+- Event date ranges
+- Server-side event search/filtering
+- URL state
+- Saved event filters
+
+## Current Status
+
+Complete for v1.
 
 ---
 
@@ -355,11 +387,12 @@ Sources
        -> Filtering/Search v1
        -> Article Management v1
     <-> Events v1
+       -> Event Refinement v1
 ```
 
 ## Next Milestone
 
-The next milestone is a decision point between Dashboard v1 and Event Refinement v1. Neither has started.
+The next milestone is a decision point between Dashboard v1 and Events v1.1. Neither has started.
 
 ## Expanded Long-Term Direction
 
@@ -378,7 +411,7 @@ Sources
 # Immediate Priorities
 
 Next priority:
-1. Dashboard v1 / Event Refinement decision point
+1. Dashboard v1 / Events v1.1 decision point
 2. Dashboard Improvements v1
 3. Article detail page / advanced article workflows
 
@@ -420,7 +453,7 @@ Open Filtering/Search follow-ups:
 - Data normalization
 - UI consistency
 - Empty shared UI primitives for Button, Input, Textarea, and EmptyState
-- Event search/filtering and refinement scope
+- Events v1.1 refinement scope
 - Timeline schema design
 - Form validation consistency
 - Better typing standardization across components

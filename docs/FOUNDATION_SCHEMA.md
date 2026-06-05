@@ -27,6 +27,7 @@ Sources
        -> Filtering/Search v1
        -> Article Management v1
     <-> Events v1
+       -> Event Refinement v1
 ```
 
 The schema is intentionally evolving in layers:
@@ -293,6 +294,7 @@ Current use:
 - EventList displays event summaries and linked article counts.
 - EventDetailPage displays event metadata and supporting articles.
 - EventForm uses article IDs to create or replace event/article links.
+- EventFilters performs client-side event status/type/search filtering over loaded `FoundationEventWithArticles[]`.
 
 ---
 
@@ -337,6 +339,35 @@ Current implementation uses the existing `articles` table and `article_tags` joi
 Article deletion relies on the existing `articles` table and the `article_tags.article_id -> articles.id on delete cascade` relationship.
 
 Article retagging is implemented in the service layer with delete-then-insert replacement of `article_tags` rows.
+
+---
+
+# Event Refinement v1
+
+Event Refinement v1 required no schema changes.
+
+Current implementation:
+- client-side only
+- searches event title
+- searches event description
+- filters by event status
+- filters by event type
+- supports clear filters
+- displays filtered event result count
+- displays filtered event empty state
+
+Shared event status/type options are application constants in `src/types/event.ts`, not database tables.
+
+Not implemented:
+- event tags
+- event entity linking
+- timeline visualization
+- event AI suggestions
+- event severity/confidence scoring
+- event date ranges
+- server-side event search/filtering
+- URL query params
+- saved event filters
 
 ---
 
@@ -582,10 +613,11 @@ Sources
        -> Filtering/Search v1
        -> Article Management v1
     <-> Events v1
+       -> Event Refinement v1
 ```
 
 Next milestone:
-- Dashboard v1 / Event Refinement decision point
+- Dashboard v1 / Events v1.1 decision point
 
 Entities, timelines, and advanced event refinements intentionally come later unless explicitly reprioritized.
 
@@ -703,8 +735,8 @@ until:
 The next schema-impacting direction has not started.
 
 Current candidate directions:
-1. Dashboard v1 / Event Refinement decision point
+1. Dashboard v1 / Events v1.1 decision point
 2. Dashboard Improvements v1
 3. Article detail page / advanced article workflows
 
-Filtering & Search v1 and Article Management v1 are complete and required no schema changes. Event v1 is implemented with `events` and `article_events`.
+Filtering & Search v1, Article Management v1, and Event Refinement v1 are complete and required no schema changes. Event v1 is implemented with `events` and `article_events`.

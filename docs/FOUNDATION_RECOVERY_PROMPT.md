@@ -18,6 +18,7 @@ Sources
        -> Filtering/Search v1
        -> Article Management v1
     <-> Events v1
+       -> Event Refinement v1
 ```
 
 The long-term direction is:
@@ -166,9 +167,14 @@ Standalone Tags CRUD, Article <-> Tag relationships, Filtering & Search v1, and 
 - Event article links are replaced through delete-then-insert service behavior
 - Event detail pages work
 - Event statuses are draft, active, resolved, and archived
+- EventFilters exists
+- Client-side event search by title/description works
+- Client-side event filtering by status works
+- Client-side event filtering by event type works
+- Event filter clear button, filtered count, and filtered empty state work
+- eventStatusOptions and eventTypeOptions are shared application constants
 
 Not yet implemented:
-- Event search/filtering
 - Event tags
 - Event entity linking
 - Timeline visualization
@@ -182,9 +188,9 @@ Not yet implemented:
 
 ## Next Milestone
 
-The next priority is a decision point between Dashboard v1 and Event Refinement v1.
+The next priority is a decision point between Dashboard v1 and Events v1.1.
 
-Neither Dashboard v1 nor Event Refinement v1 has started. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly changes priority.
+Neither Dashboard v1 nor Events v1.1 has started. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly changes priority.
 
 ---
 
@@ -269,7 +275,7 @@ When starting a new ChatGPT or Codex session:
 2. Read FOUNDATION_STATUS.md and FOUNDATION_BACKLOG.md.
 3. Inspect the relevant source files before making changes.
 4. Do not infer that planned features are implemented.
-5. Treat Dashboard v1 / Event Refinement as the next milestone decision point unless the user explicitly chooses a different direction.
+5. Treat Dashboard v1 / Events v1.1 as the next milestone decision point unless the user explicitly chooses a different direction.
 
 ---
 
