@@ -4,7 +4,7 @@
 
 FOUNDATION is currently in early Phase 1 development.
 
-The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, Article Management v1, Event v1 with Article <-> Event relationships, and Event Refinement v1.
+The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, Article Management v1, Event v1 with Article <-> Event relationships, Event Refinement v1, and Events v1.1 Intelligence Summary.
 
 The current focus is:
 - establishing core intelligence data structures,
@@ -158,6 +158,7 @@ Sources
        -> Article Management v1
     <-> Events v1
        -> Event Refinement v1
+       -> Events v1.1 Intelligence Summary
 ```
 
 ---
@@ -213,9 +214,9 @@ Article tags can be added, removed, and replaced on existing articles through Ar
 - Event status/type options shared as application constants
 
 ## Not Yet Implemented
-- Event tags
+- Event-owned tags
 - Event entities
-- Timeline visualization
+- Global timeline module
 - Event AI suggestions
 - Event severity/confidence scoring
 - Event date ranges
@@ -241,9 +242,9 @@ Complete for v1. Events are analyst-created intelligence objects supported by li
 - EventForm uses shared event status/type constants
 
 ## Not Yet Implemented
-- Event tags
+- Event-owned tags
 - Event entity linking
-- Timeline visualization
+- Global timeline module
 - Event AI suggestions
 - Event severity/confidence scoring
 - Event date ranges
@@ -254,6 +255,38 @@ Complete for v1. Events are analyst-created intelligence objects supported by li
 ## Current Status
 
 Complete for v1.
+
+---
+
+# Events v1.1 Intelligence Summary
+
+## Implemented
+- `FoundationEventWithArticleTags` derived application type
+- `getEventWithArticleTagsById(id)` service function
+- Enriched event detail pages with linked articles that include tags
+- EventIntelligenceSummary component
+- EventArticleTimeline component
+- Supporting article count
+- Newest supporting article
+- Oldest supporting article
+- Event age
+- Last activity date
+- Related tag aggregation from supporting article tags
+- Chronological supporting article timeline
+- Replaced old linked articles card with supporting article timeline
+
+## Not Yet Implemented
+- Event-owned tags
+- Event entity linking
+- Global timeline module
+- Event AI suggestions
+- Event severity/confidence scoring
+- Event date ranges
+- Dashboard improvements
+
+## Current Status
+
+Complete for v1.1. Event detail pages now function as early analytical workspaces using existing linked article data.
 
 ---
 
@@ -388,11 +421,12 @@ Sources
        -> Article Management v1
     <-> Events v1
        -> Event Refinement v1
+       -> Events v1.1 Intelligence Summary
 ```
 
 ## Next Milestone
 
-The next milestone is a decision point between Dashboard v1 and Events v1.1. Neither has started.
+The next milestone is a decision point between Dashboard v1 and Events v1.2. Neither has started.
 
 ## Expanded Long-Term Direction
 
@@ -411,7 +445,7 @@ Sources
 # Immediate Priorities
 
 Next priority:
-1. Dashboard v1 / Events v1.1 decision point
+1. Dashboard v1 / Events v1.2 decision point
 2. Dashboard Improvements v1
 3. Article detail page / advanced article workflows
 
@@ -427,7 +461,7 @@ Open Filtering/Search follow-ups:
 # Mid-Term Priorities
 
 - Entity modeling
-- Timeline visualization
+- Global timeline module
 - Watchlists
 - Correlation workflows
 - Financial Signals exploration
@@ -453,7 +487,7 @@ Open Filtering/Search follow-ups:
 - Data normalization
 - UI consistency
 - Empty shared UI primitives for Button, Input, Textarea, and EmptyState
-- Events v1.1 refinement scope
+- Events v1.2 refinement scope
 - Timeline schema design
 - Form validation consistency
 - Better typing standardization across components

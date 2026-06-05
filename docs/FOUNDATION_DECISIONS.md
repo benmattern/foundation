@@ -610,6 +610,93 @@ This preserves the service-layer boundary and avoids adding server-side filterin
 
 ---
 
+# Event Intelligence Summary Before Dashboard v1
+
+## Decision
+Implement Events v1.1 Intelligence Summary before Dashboard v1.
+
+## Reasoning
+Event detail pages are the first place where event records become analytical workspaces rather than simple CRUD records.
+
+Adding event-level intelligence summaries before dashboard work:
+- makes event detail pages more operationally useful,
+- validates which event metrics are valuable,
+- keeps Dashboard v1 from inventing metrics before event workflows mature,
+- and uses existing article/tag/event data without schema changes.
+
+---
+
+# Related Event Tags Derived From Supporting Articles
+
+## Decision
+Derive related event tags from tags on supporting articles rather than storing event-owned tags.
+
+## Reasoning
+FOUNDATION already has article tags and article-event links.
+
+Deriving related tags from supporting articles:
+- avoids adding an `event_tags` table too early,
+- keeps event classification grounded in linked evidence,
+- prevents confusion between article taxonomy and event-owned taxonomy,
+- and preserves the option to add event-owned tags later if analyst workflows require them.
+
+Related tags in Events v1.1 are inferred context, not event-owned metadata.
+
+---
+
+# Event Article Timeline Is Local To Event Detail
+
+## Decision
+Implement the supporting article timeline as a local event detail view, not as a global Timeline module.
+
+## Reasoning
+The current feature only needs to order linked supporting articles by article date.
+
+Keeping the timeline local:
+- avoids premature timeline schema,
+- avoids route/module complexity,
+- gives immediate analytical value on event detail pages,
+- and keeps the future global Timeline module open for broader entity, event, regional, and thematic timelines.
+
+---
+
+# Event Detail Article/Tag Enrichment For Prototype Scale
+
+## Decision
+Add `getEventWithArticleTagsById(id)` and reuse existing article/tag enrichment for event detail pages.
+
+## Reasoning
+Events v1.1 needs linked articles with tags, but only on the event detail page.
+
+Reusing existing article enrichment:
+- keeps Supabase access in services,
+- avoids duplicating article/tag composition logic in components,
+- keeps the Events list page unchanged,
+- and is acceptable for the current prototype dataset size.
+
+A more targeted query can be revisited if article volume or performance constraints require it.
+
+---
+
+# Dashboard Deferred Until Events Provide Richer Data
+
+## Decision
+Defer Dashboard v1 until events provide richer analytical data through Event v1, Event Refinement v1, and Events v1.1.
+
+## Reasoning
+Dashboard views should summarize meaningful operational workflows.
+
+By enriching event detail pages first, Dashboard v1 can later draw from better-understood event metrics such as:
+- event counts,
+- supporting article counts,
+- recent activity,
+- related tags,
+- and recent event timelines.
+
+This reduces the risk of building dashboard widgets before the underlying event workflow has useful analytical signals.
+
+---
+
 # Intelligence Workflow Philosophy
 
 ## Decision

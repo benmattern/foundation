@@ -1,22 +1,32 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { EventArticleTimeline } from "../components/EventArticleTimeline";
 import { EventForm } from "../components/EventForm";
 import type { EventFormValues } from "../components/EventForm";
+import { EventIntelligenceSummary } from "../components/EventIntelligenceSummary";
 import { PageHeader } from "../components/PageHeader";
 import { Card } from "../components/ui/Card";
-import type { Article } from "../types/article";
+import type { Article, ArticleWithTags } from "../types/article";
 import { getArticles } from "../services/articleService";
-import type { FoundationEventWithArticles } from "../types/event";
+import type { FoundationEventWithArticleTags } from "../types/event";
 import {
   deleteEvent as deleteEventRecord,
-  getEventWithArticlesById,
+  getEventWithArticleTagsById,
   updateEvent as updateEventRecord,
 } from "../services/eventService";
+
+type RelatedTagSummary = {
+  id: string;
+  name: string;
+  count: number;
+};
 
 export default function EventDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [event, setEvent] = useState<FoundationEventWithArticles | null>(null);
+  const [event, setEvent] = useState<FoundationEventWithArticleTags | null>(
+    null
+  );
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -26,7 +36,7 @@ export default function EventDetailPage() {
 
     try {
       const [eventData, articleData] = await Promise.all([
-        getEventWithArticlesById(id),
+        getEventWithArticleTagsById(id),
         getArticles(),
       ]);
 
@@ -90,6 +100,11 @@ export default function EventDetailPage() {
       </>
     );
   }
+
+  const newestArticle = getNewestArticle(event.articles);
+  const oldestArticle = getOldestArticle(event.articles);
+  const timelineArticles = getTimelineArticles(event.articles);
+  const relatedTags = getRelatedTags(event.articles);
 
   return (
     <>
@@ -177,45 +192,155 @@ export default function EventDetailPage() {
             </div>
           </Card>
 
-          <Card>
-            <h2 className="mb-6 text-2xl font-semibold text-white">
-              Linked Articles
-            </h2>
+          <EventIntelligenceSummary
+            supportingArticleCount={event.articles.length}
+            newestArticle={newestArticle}
+            oldestArticle={oldestArticle}
+            eventAge={getRelativeDateLabel(event.occurred_at)}
+            lastActivity={getLastActivityLabel(event, newestArticle)}
+            relatedTags={relatedTags}
+            formatArticleDate={formatArticleDate}
+          />
 
-            {event.articles.length === 0 ? (
-              <p className="text-slate-400">
-                No articles linked to this event.
-              </p>
-            ) : (
-              <div className="space-y-4">
-                {event.articles.map((article) => (
-                  <div
-                    key={article.id}
-                    className="border-b border-slate-800 pb-4"
-                  >
-                    <p className="text-lg font-medium text-white">
-                      {article.title}
-                    </p>
-                    <a
-                      href={article.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="break-all text-sm text-blue-400 hover:text-blue-300"
-                    >
-                      {article.url}
-                    </a>
-                    {article.summary && (
-                      <p className="mt-2 text-sm text-slate-400">
-                        {article.summary}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </Card>
+          <EventArticleTimeline
+            articles={timelineArticles}
+            formatArticleDate={formatArticleDate}
+          />
         </div>
       )}
     </>
+  );
+}
+
+function getEffectiveArticleDate(article: ArticleWithTags): Date | null {
+  return getValidDate(article.published_at ?? article.created_at);
+}
+
+function getValidDate(value: string | null): Date | null {
+  if (!value) return null;
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return date;
+}
+
+function getNewestArticle(articles: ArticleWithTags[]): ArticleWithTags | null {
+  return getDatedArticles(articles).sort(
+    (a, b) => b.date.getTime() - a.date.getTime()
+  )[0]?.article ?? null;
+}
+
+function getOldestArticle(articles: ArticleWithTags[]): ArticleWithTags | null {
+  return getDatedArticles(articles).sort(
+    (a, b) => a.date.getTime() - b.date.getTime()
+  )[0]?.article ?? null;
+}
+
+function getDatedArticles(articles: ArticleWithTags[]) {
+  return articles
+    .map((article) => ({
+      article,
+      date: getEffectiveArticleDate(article),
+    }))
+    .filter(
+      (item): item is { article: ArticleWithTags; date: Date } =>
+        item.date !== null
+    );
+}
+
+function getTimelineArticles(articles: ArticleWithTags[]): ArticleWithTags[] {
+  return [...articles].sort((a, b) => {
+    const aDate = getEffectiveArticleDate(a);
+    const bDate = getEffectiveArticleDate(b);
+
+    if (!aDate && !bDate) return a.title.localeCompare(b.title);
+    if (!aDate) return 1;
+    if (!bDate) return -1;
+
+    return aDate.getTime() - bDate.getTime();
+  });
+}
+
+function getRelatedTags(articles: ArticleWithTags[]): RelatedTagSummary[] {
+  const tagsById = new Map<string, RelatedTagSummary>();
+
+  articles.forEach((article) => {
+    article.tags.forEach((tag) => {
+      const current = tagsById.get(tag.id);
+
+      if (current) {
+        current.count += 1;
+        return;
+      }
+
+      tagsById.set(tag.id, {
+        id: tag.id,
+        name: tag.name,
+        count: 1,
+      });
+    });
+  });
+
+  return [...tagsById.values()].sort(
+    (a, b) => b.count - a.count || a.name.localeCompare(b.name)
+  );
+}
+
+function formatArticleDate(article: ArticleWithTags | null): string {
+  if (!article) return "No supporting article";
+
+  return formatDate(getEffectiveArticleDate(article));
+}
+
+function formatDate(date: Date | null): string {
+  if (!date) return "Unknown date";
+
+  return date.toLocaleDateString();
+}
+
+function getRelativeDateLabel(dateValue: string | null): string {
+  const date = getValidDate(dateValue);
+
+  if (!date) return "Unknown";
+
+  const today = new Date();
+  const millisecondsPerDay = 1000 * 60 * 60 * 24;
+  const dayDifference = Math.round(
+    (today.getTime() - date.getTime()) / millisecondsPerDay
+  );
+
+  if (dayDifference === 0) return "Today";
+  if (dayDifference > 0) {
+    return `${dayDifference} day${dayDifference === 1 ? "" : "s"} ago`;
+  }
+
+  const futureDays = Math.abs(dayDifference);
+  return `In ${futureDays} day${futureDays === 1 ? "" : "s"}`;
+}
+
+function getLastActivityLabel(
+  event: FoundationEventWithArticleTags,
+  newestArticle: ArticleWithTags | null
+): string {
+  const eventUpdatedAt = getValidDate(event.updated_at);
+  const newestArticleDate = newestArticle
+    ? getEffectiveArticleDate(newestArticle)
+    : null;
+
+  if (!eventUpdatedAt && !newestArticleDate) {
+    return "Unknown";
+  }
+
+  if (!eventUpdatedAt) return formatDate(newestArticleDate);
+  if (!newestArticleDate) return formatDate(eventUpdatedAt);
+
+  return formatDate(
+    eventUpdatedAt.getTime() >= newestArticleDate.getTime()
+      ? eventUpdatedAt
+      : newestArticleDate
   );
 }

@@ -57,6 +57,7 @@ Current frontend architecture uses:
 - inline/page-level article management for early edit/delete workflows
 - event detail pages for analyst-created intelligence objects
 - client-side event filtering/search over loaded event records
+- event detail intelligence summaries derived from supporting articles
 
 ### Current Folder Structure
 
@@ -180,11 +181,15 @@ Current functionality:
 - Clear event filters
 - Display filtered event result count
 - Display filtered event empty state
+- Display event intelligence summaries on event detail pages
+- Display supporting article count, newest/oldest article, event age, and last activity
+- Aggregate related tags from supporting article tags
+- Display a chronological supporting article timeline
 
 Not implemented:
-- Event tags
+- Event-owned tags
 - Event entity linking
-- Timeline visualization
+- Global timeline module
 - Event AI suggestions
 - Event severity/confidence scoring
 - Event date ranges
@@ -203,6 +208,7 @@ Sources
        -> Article Management v1
     <-> Events v1
        -> Event Refinement v1
+       -> Events v1.1 Intelligence Summary
 ```
 
 Long-term relational direction:
@@ -230,11 +236,12 @@ Completed:
 6. Article Management v1
 7. Event v1
 8. Event Refinement v1
+9. Events v1.1 Intelligence Summary
 
 Next milestone:
-- Dashboard v1 / Events v1.1 decision point
+- Dashboard v1 / Events v1.2 decision point
 
-Neither Dashboard v1 nor Events v1.1 has started.
+Neither Dashboard v1 nor Events v1.2 has started.
 
 ---
 
@@ -259,6 +266,8 @@ Article service currently composes `ArticleWithTags` from articles, article_tags
 Event service currently composes events with linked articles from events, article_events, and articles. Events are analyst-created intelligence objects supported by article evidence.
 
 Event Refinement v1 keeps event filtering/search client-side in EventsPage and does not require eventService changes.
+
+Events v1.1 enriches event detail pages with linked articles that include tags. Related tags and supporting article timelines are derived from supporting articles, not stored as event-owned tags or global timeline records.
 
 ---
 
@@ -345,7 +354,7 @@ Examples:
 - More consistent type organization
 - Better form validation
 - Improved UI consistency
-- Events v1.1 refinement scope
+- Events v1.2 refinement scope
 - Timeline schema design
 - Article creation and tag assignment are frontend-driven separate operations
 - Article update and tag replacement are frontend-driven separate operations

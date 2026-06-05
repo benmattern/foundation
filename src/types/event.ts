@@ -1,4 +1,4 @@
-import type { Article } from "./article";
+import type { Article, ArticleWithTags } from "./article";
 
 export type EventStatus = "draft" | "active" | "resolved" | "archived";
 
@@ -42,4 +42,8 @@ export type ArticleEvent = {
 
 export type FoundationEventWithArticles = FoundationEvent & {
   articles: Article[];
+};
+
+export type FoundationEventWithArticleTags = FoundationEvent & {
+  articles: ArticleWithTags[];
 };

@@ -28,6 +28,7 @@ Sources
        -> Article Management v1
     <-> Events v1
        -> Event Refinement v1
+       -> Events v1.1 Intelligence Summary
 ```
 
 The schema is intentionally evolving in layers:
@@ -298,6 +299,27 @@ Current use:
 
 ---
 
+# FoundationEventWithArticleTags
+
+`FoundationEventWithArticleTags` is a derived frontend/application type, not a database table.
+
+It represents an event row composed with linked article records that include their related tags:
+
+```txt
+FoundationEventWithArticleTags = FoundationEvent & { articles: ArticleWithTags[] }
+```
+
+Current use:
+- EventDetailPage loads enriched event detail data through `getEventWithArticleTagsById(id)`.
+- EventIntelligenceSummary derives supporting article count, newest/oldest article, event age, last activity, and related tag aggregation.
+- EventArticleTimeline renders linked articles chronologically from article dates.
+
+Related event tags are inferred from supporting article tags. They are not stored as event-owned tags and no `event_tags` table exists.
+
+The event article timeline is local to the event detail page and is derived from linked article dates. It is not a global Timeline module.
+
+---
+
 # Filtering & Search v1
 
 Filtering & Search v1 required no schema changes.
@@ -368,6 +390,33 @@ Not implemented:
 - server-side event search/filtering
 - URL query params
 - saved event filters
+
+---
+
+# Events v1.1 Intelligence Summary
+
+Events v1.1 Intelligence Summary required no schema changes.
+
+Current implementation:
+- enriches event detail pages with linked articles that include tags
+- derives supporting article count from linked articles
+- derives newest and oldest supporting articles from linked article dates
+- derives event age from `events.occurred_at`
+- derives last activity from the later of `events.updated_at` and newest linked article date
+- aggregates related tags from supporting article tags
+- renders a chronological supporting article timeline from linked article dates
+
+Related tags are inferred from `articles -> article_tags -> tags`.
+
+The supporting article timeline is an event-detail view over existing linked articles, not a global timeline schema or module.
+
+Not implemented:
+- event-owned tags
+- event entity linking
+- global timeline module
+- event AI suggestions
+- event severity/confidence scoring
+- event date ranges
 
 ---
 
@@ -614,10 +663,11 @@ Sources
        -> Article Management v1
     <-> Events v1
        -> Event Refinement v1
+       -> Events v1.1 Intelligence Summary
 ```
 
 Next milestone:
-- Dashboard v1 / Events v1.1 decision point
+- Dashboard v1 / Events v1.2 decision point
 
 Entities, timelines, and advanced event refinements intentionally come later unless explicitly reprioritized.
 
@@ -735,8 +785,8 @@ until:
 The next schema-impacting direction has not started.
 
 Current candidate directions:
-1. Dashboard v1 / Events v1.1 decision point
+1. Dashboard v1 / Events v1.2 decision point
 2. Dashboard Improvements v1
 3. Article detail page / advanced article workflows
 
-Filtering & Search v1, Article Management v1, and Event Refinement v1 are complete and required no schema changes. Event v1 is implemented with `events` and `article_events`.
+Filtering & Search v1, Article Management v1, Event Refinement v1, and Events v1.1 Intelligence Summary are complete and required no schema changes. Event v1 is implemented with `events` and `article_events`.

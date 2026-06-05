@@ -1,9 +1,11 @@
 import { supabase } from "../lib/supabaseClient";
-import type { Article } from "../types/article";
+import { getArticlesWithTags } from "./articleService";
+import type { Article, ArticleWithTags } from "../types/article";
 import type {
   ArticleEvent,
   EventStatus,
   FoundationEvent,
+  FoundationEventWithArticleTags,
   FoundationEventWithArticles,
 } from "../types/event";
 
@@ -53,6 +55,18 @@ export async function getEventWithArticlesById(
   ]);
 
   return composeEventsWithArticles([event], articleEvents, articles)[0];
+}
+
+export async function getEventWithArticleTagsById(
+  id: string
+): Promise<FoundationEventWithArticleTags> {
+  const [event, articleEvents, articles] = await Promise.all([
+    getEventById(id),
+    getArticleEventsByEventId(id),
+    getArticlesWithTags(),
+  ]);
+
+  return composeEventsWithArticleTags([event], articleEvents, articles)[0];
 }
 
 export async function createEvent(
@@ -232,5 +246,30 @@ function composeEventsWithArticles(
     articles: (articleIdsByEventId.get(event.id) ?? [])
       .map((articleId) => articlesById.get(articleId))
       .filter((article): article is Article => Boolean(article)),
+  }));
+}
+
+function composeEventsWithArticleTags(
+  events: FoundationEvent[],
+  articleEvents: ArticleEvent[],
+  articles: ArticleWithTags[]
+): FoundationEventWithArticleTags[] {
+  const articlesById = new Map(articles.map((article) => [article.id, article]));
+  const articleIdsByEventId = articleEvents.reduce<Map<string, string[]>>(
+    (map, articleEvent) => {
+      const current = map.get(articleEvent.event_id) ?? [];
+      current.push(articleEvent.article_id);
+      map.set(articleEvent.event_id, current);
+
+      return map;
+    },
+    new Map()
+  );
+
+  return events.map((event) => ({
+    ...event,
+    articles: (articleIdsByEventId.get(event.id) ?? [])
+      .map((articleId) => articlesById.get(articleId))
+      .filter((article): article is ArticleWithTags => Boolean(article)),
   }));
 }

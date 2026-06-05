@@ -343,6 +343,7 @@ Sources
        -> Article Management v1
     <-> Events v1
        -> Event Refinement v1
+       -> Events v1.1 Intelligence Summary
 ```
 
 Long-term direction:
@@ -487,15 +488,15 @@ Use this procedure when starting or resuming work with ChatGPT, Codex, or anothe
 
 ## Current Priority Alignment
 
-Standalone Tags CRUD, Article <-> Tag relationships, Filtering & Search v1, Article Management v1, Event v1, and Event Refinement v1 are complete for the current stage.
+Standalone Tags CRUD, Article <-> Tag relationships, Filtering & Search v1, Article Management v1, Event v1, Event Refinement v1, and Events v1.1 Intelligence Summary are complete for the current stage.
 
 The next milestone is:
 
 ```txt
-Dashboard v1 / Events v1.1 decision point
+Dashboard v1 / Events v1.2 decision point
 ```
 
-Neither Dashboard v1 nor Events v1.1 has started. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly reprioritizes.
+Neither Dashboard v1 nor Events v1.2 has started. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly reprioritizes.
 
 ---
 

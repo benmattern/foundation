@@ -168,9 +168,9 @@ Build a stable platform capable of:
 - [x] View event detail pages
 
 ## Still Open
-- [ ] Event tags
+- [ ] Event-owned tags
 - [ ] Event entity linking
-- [ ] Timeline visualization
+- [ ] Global timeline module
 - [ ] Event AI suggestions
 - [ ] Event severity/confidence scoring
 - [ ] Event date ranges
@@ -193,9 +193,9 @@ Build a stable platform capable of:
 - [x] Update EventForm to use shared event status/type constants
 
 ## Still Open
-- [ ] Event tags
+- [ ] Event-owned tags
 - [ ] Event entity linking
-- [ ] Timeline visualization
+- [ ] Global timeline module
 - [ ] Event AI suggestions
 - [ ] Event severity/confidence scoring
 - [ ] Event date ranges
@@ -205,17 +205,45 @@ Build a stable platform capable of:
 
 ---
 
+# Events v1.1 Intelligence Summary
+
+## Completed Tasks
+- [x] Add FoundationEventWithArticleTags derived type
+- [x] Add getEventWithArticleTagsById(id)
+- [x] Enrich event detail pages with linked articles that include tags
+- [x] Create EventIntelligenceSummary component
+- [x] Create EventArticleTimeline component
+- [x] Display supporting article count
+- [x] Display newest supporting article
+- [x] Display oldest supporting article
+- [x] Display event age
+- [x] Display last activity date
+- [x] Aggregate related tags from supporting articles
+- [x] Add chronological supporting article timeline
+- [x] Replace old linked articles card with supporting article timeline
+
+## Still Open
+- [ ] Event-owned tags
+- [ ] Event entity linking
+- [ ] Global timeline module
+- [ ] Event AI suggestions
+- [ ] Event severity/confidence scoring
+- [ ] Event date ranges
+- [ ] Dashboard improvements
+
+---
+
 # Immediate Backlog
 
 # Next Milestone
 
-## Dashboard v1 / Events v1.1 Decision Point
+## Dashboard v1 / Events v1.2 Decision Point
 - [ ] Decide whether the next milestone is Dashboard v1
-- [ ] Decide whether the next milestone is Events v1.1
+- [ ] Decide whether the next milestone is Events v1.2
 - [ ] Define Dashboard v1 metrics and recent intelligence views if chosen
-- [ ] Define Events v1.1 scope if chosen
+- [ ] Define Events v1.2 scope if chosen
 
-Neither Dashboard v1 nor Events v1.1 has started.
+Neither Dashboard v1 nor Events v1.2 has started.
 
 ---
 
@@ -255,11 +283,11 @@ Examples:
 
 ---
 
-# Future Events v1.1
+# Future Events v1.2
 
 ## Goal
 
-Refine discrete geopolitical, technological, and operational developments after Event Refinement v1.
+Refine discrete geopolitical, technological, and operational developments after Events v1.1 Intelligence Summary.
 
 ## Planned Event Types
 - military exercises
@@ -272,8 +300,8 @@ Refine discrete geopolitical, technological, and operational developments after 
 - cyber incidents
 
 ## Planned Refinements
-- [ ] Event timelines
-- [ ] Event tags
+- [ ] Global timeline module
+- [ ] Event-owned tags
 - [ ] Event entity linking
 - [ ] Event AI suggestions
 - [ ] Event severity/confidence scoring

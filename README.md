@@ -27,6 +27,12 @@ Implemented:
 - Event filter clear button, filtered result count, and filtered empty state.
 - `EventFilters` component.
 - Shared event status/type option constants.
+- Events v1.1 Intelligence Summary on event detail pages.
+- `FoundationEventWithArticleTags` derived application type.
+- Enriched event detail loading with linked articles and tags.
+- Supporting article count, newest/oldest article, event age, and last activity.
+- Related tag aggregation inferred from supporting article tags.
+- Chronological supporting article timeline.
 - Client-side article search by title and summary.
 - Client-side article filtering by one tag.
 - Client-side article filtering by one source.
@@ -36,9 +42,9 @@ Implemented:
 - Shared Card component and low-risk UI cleanup pass.
 
 Not implemented yet:
-- Event tags.
+- Event-owned tags.
 - Event entity linking.
-- Timeline visualization.
+- Global timeline module.
 - Event AI suggestions.
 - Event severity/confidence scoring.
 - Event date ranges.
@@ -53,7 +59,7 @@ Not implemented yet:
 - Authentication, app auth flows, and RLS-managed access.
 - AI-assisted ingestion, summarization, tagging, or entity extraction.
 
-The next milestone is a decision point between Dashboard v1 and Events v1.1. Neither has started.
+The next milestone is a decision point between Dashboard v1 and Events v1.2. Neither has started.
 
 ## Tech Stack
 
@@ -129,7 +135,7 @@ Key files:
 
 Near term:
 - Dashboard v1: real article/tag/event counts and recent intelligence views.
-- Events v1.1: additional event workflow polish after search/filtering.
+- Events v1.2: additional event workflow polish after Intelligence Summary.
 - Article detail page and advanced article workflows.
 
 Still open in Filtering/Search:
