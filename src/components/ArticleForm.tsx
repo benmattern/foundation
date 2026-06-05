@@ -1,24 +1,36 @@
 import { useState } from "react";
 import { Card } from "./ui/Card";
 import type { Source } from "../types/source";
+import type { Tag } from "../types/tag";
 
 type Props = {
   sources: Source[];
+  tags: Tag[];
   onCreateArticle: (article: {
     source_id: string | null;
     title: string;
     url: string;
     summary: string;
     published_at: string;
+    tag_ids: string[];
   }) => Promise<void>;
 };
 
-export function ArticleForm({ sources, onCreateArticle }: Props) {
+export function ArticleForm({ sources, tags, onCreateArticle }: Props) {
   const [sourceId, setSourceId] = useState("");
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
   const [summary, setSummary] = useState("");
   const [publishedAt, setPublishedAt] = useState("");
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+
+  function toggleTag(tagId: string) {
+    setSelectedTagIds((prev) =>
+      prev.includes(tagId)
+        ? prev.filter((id) => id !== tagId)
+        : [...prev, tagId]
+    );
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -29,6 +41,7 @@ export function ArticleForm({ sources, onCreateArticle }: Props) {
       url,
       summary,
       published_at: publishedAt,
+      tag_ids: selectedTagIds,
     });
 
     setTitle("");
@@ -36,6 +49,7 @@ export function ArticleForm({ sources, onCreateArticle }: Props) {
     setSummary("");
     setPublishedAt("");
     setSourceId("");
+    setSelectedTagIds([]);
   }
 
   return (
@@ -98,6 +112,39 @@ export function ArticleForm({ sources, onCreateArticle }: Props) {
             value={summary}
             onChange={(e) => setSummary(e.target.value)}
           />
+
+          {tags.length > 0 && (
+            <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
+              <p className="mb-3 text-sm font-medium text-slate-300">
+                Tags
+              </p>
+
+              <div className="flex flex-wrap gap-2">
+                {tags.map((tag) => {
+                  const selected = selectedTagIds.includes(tag.id);
+
+                  return (
+                    <label
+                      key={tag.id}
+                      className={`cursor-pointer rounded-full border px-3 py-1 text-sm transition ${
+                        selected
+                          ? "border-blue-500 bg-blue-500/20 text-blue-200"
+                          : "border-slate-700 bg-slate-900 text-slate-300 hover:border-slate-500"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selected}
+                        onChange={() => toggleTag(tag.id)}
+                        className="sr-only"
+                      />
+                      {tag.name}
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         <button

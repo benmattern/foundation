@@ -1,3 +1,5 @@
+import type { Tag } from "./tag";
+
 export type Article = {
   id: string;
   source_id: string | null;
@@ -6,4 +8,8 @@ export type Article = {
   summary: string | null;
   published_at: string | null;
   created_at: string;
+};
+
+export type ArticleWithTags = Article & {
+  tags: Tag[];
 };

@@ -2,28 +2,33 @@ import { useEffect, useState } from "react";
 import { PageHeader } from "../components/PageHeader";
 import { ArticleForm } from "../components/ArticleForm";
 import { ArticleList } from "../components/ArticleList";
-import type { Article } from "../types/article";
+import type { ArticleWithTags } from "../types/article";
 import {
-  getArticles,
+  getArticlesWithTags,
   createArticle as createArticleRecord,
 } from "../services/articleService";
 import type { Source } from "../types/source";
 import { getSources } from "../services/sourceService";
+import type { Tag } from "../types/tag";
+import { getTags } from "../services/tagService";
 
 export default function ArticlesPage() {
-  const [articles, setArticles] = useState<Article[]>([]);
+  const [articles, setArticles] = useState<ArticleWithTags[]>([]);
   const [sources, setSources] = useState<Source[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
 
   async function loadArticles() {
     try {
-      const [articleData, sourceData] = await Promise.all([
-        getArticles(),
+      const [articleData, sourceData, tagData] = await Promise.all([
+        getArticlesWithTags(),
         getSources(),
+        getTags(),
       ]);
 
       setArticles(articleData);
       setSources(sourceData);
+      setTags(tagData);
     } catch (error) {
       console.error("Error loading articles page data:", error);
     } finally {
@@ -41,11 +46,11 @@ export default function ArticlesPage() {
     url: string;
     summary: string;
     published_at: string;
+    tag_ids: string[];
   }) {
     try {
-      const data = await createArticleRecord(article);
-
-      setArticles((prev) => [data, ...prev]);
+      await createArticleRecord(article);
+      await loadArticles();
     } catch (error) {
       console.error("Error adding article:", error);
     }
@@ -64,6 +69,7 @@ export default function ArticlesPage() {
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           <ArticleForm
             sources={sources}
+            tags={tags}
             onCreateArticle={createArticle}
           />
           <ArticleList articles={articles} />

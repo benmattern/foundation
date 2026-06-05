@@ -1,8 +1,8 @@
-import type { Article } from "../types/article";
+import type { ArticleWithTags } from "../types/article";
 import { Card } from "./ui/Card";
 
 type Props = {
-  articles: Article[];
+  articles: ArticleWithTags[];
 };
 
 export function ArticleList({ articles }: Props) {
@@ -38,6 +38,19 @@ export function ArticleList({ articles }: Props) {
                 <p className="text-sm text-slate-400 mt-2">
                   {article.summary}
                 </p>
+              )}
+
+              {article.tags.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {article.tags.map((tag) => (
+                    <span
+                      key={tag.id}
+                      className="rounded-full border border-slate-700 bg-slate-800 px-2.5 py-1 text-xs text-slate-300"
+                    >
+                      {tag.name}
+                    </span>
+                  ))}
+                </div>
               )}
 
               {article.published_at && (
