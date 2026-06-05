@@ -3,17 +3,13 @@
 # Current Development Philosophy
 
 The current development strategy for FOUNDATION is:
-
 - incremental
 - modular
 - architecture-first
 - schema-conscious
 - operationally useful
 
-Current priority is:
-- building stable intelligence infrastructure
-before
-- advanced automation or AI systems.
+Current priority is building stable intelligence infrastructure before advanced automation or AI systems.
 
 The project should avoid premature complexity and focus on:
 - reliable workflows,
@@ -25,26 +21,29 @@ The project should avoid premature complexity and focus on:
 # Current Development Phase
 
 ## Current Phase
-Phase 1 — Core Intelligence Platform Foundation
+
+Phase 1 - Core Intelligence Platform Foundation
 
 ## Current Goal
+
 Build a stable platform capable of:
-- ingesting,
-- organizing,
-- tagging,
-- filtering,
-- and displaying intelligence data.
+- storing intelligence records,
+- organizing sources and articles,
+- tagging records,
+- filtering and searching,
+- and supporting repeatable analyst workflows.
 
 ---
 
 # Immediate Backlog
 
-# Priority 1 — Tags System
+# Priority 1 - Tags System
 
 ## Goal
-Transform articles into structured intelligence objects.
 
-## Tasks
+Transform articles into structured intelligence objects through lightweight classification.
+
+## Completed Tasks
 
 ### Database
 - [x] Create tags table
@@ -63,6 +62,15 @@ Transform articles into structured intelligence objects.
 
 ### Pages
 - [x] Create TagsPage.tsx
+- [x] Add Tags route
+- [x] Add Tags sidebar navigation
+
+### Standalone Tags CRUD
+- [x] Create tags
+- [x] List tags
+- [x] Delete tags
+
+## Remaining Tag Work
 
 ### Relationships
 - [ ] Add article-tag relationship management
@@ -70,14 +78,70 @@ Transform articles into structured intelligence objects.
 
 ### UI
 - [ ] Add tag filtering to articles
-- [ ] Add tag badges/chips to article cards
+- [ ] Add tag badges/chips to article records
 - [ ] Add tag search/filter UI
 
 ---
 
-# Priority 2 — Event System
+# Priority 2 - Article <-> Tag Relationships
 
 ## Goal
+
+Connect article records to tags using the existing article_tags join-table direction.
+
+## Planned Tasks
+- [ ] Add service functions for article-tag assignment
+- [ ] Add service functions for removing article tags
+- [ ] Fetch articles with related tags or compose article/tag data in the service layer
+- [ ] Allow multiple tag selection during article creation
+- [ ] Display tag badges on article records
+- [ ] Filter articles by selected tag
+- [ ] Keep Supabase access centralized in services
+
+---
+
+# Priority 3 - Dashboard Improvements
+
+## Goal
+
+Make the dashboard reflect real current data instead of placeholder metrics.
+
+## Planned Features
+- [ ] Real article count
+- [ ] Real tag count
+- [ ] Recent articles
+- [ ] Recent sources
+- [ ] Basic activity overview
+
+---
+
+# Priority 4 - Search & Filtering
+
+## Goal
+
+Enable operational intelligence workflows.
+
+## Planned Features
+- [ ] Article search
+- [ ] Tag filtering
+- [ ] Multi-tag filtering
+- [ ] Source filtering
+- [ ] Date range filtering
+- [ ] Combined intelligence queries
+
+## Long-Term Search Goals
+
+Examples:
+- "Taiwan + PLA Navy"
+- "Semiconductors + Export Controls"
+- "TSMC within last 30 days"
+
+---
+
+# Priority 5 - Event System
+
+## Goal
+
 Track discrete geopolitical, technological, and operational developments.
 
 ## Planned Event Types
@@ -113,32 +177,11 @@ Track discrete geopolitical, technological, and operational developments.
 
 ---
 
-# Priority 3 — Search & Filtering
+# Priority 6 - RSS Ingestion
 
 ## Goal
-Enable operational intelligence workflows.
 
-## Planned Features
-- [ ] Article search
-- [ ] Tag filtering
-- [ ] Multi-tag filtering
-- [ ] Source filtering
-- [ ] Date range filtering
-- [ ] Event filtering
-- [ ] Combined intelligence queries
-
-## Long-Term Search Goals
-Examples:
-- “Taiwan + PLA Navy”
-- “Semiconductors + Export Controls”
-- “TSMC within last 30 days”
-
----
-
-# Priority 4 — RSS Ingestion
-
-## Goal
-Automate intelligence collection.
+Automate intelligence collection after manual collection workflows are stable.
 
 ## Planned Features
 - [ ] RSS source ingestion
@@ -157,24 +200,12 @@ Automate intelligence collection.
 
 ---
 
-# Priority 5 — Dashboard Improvements
-
-## Planned Features
-- [ ] Recent intelligence feed
-- [ ] Trending tags
-- [ ] Recent events
-- [ ] Regional summaries
-- [ ] Activity metrics
-- [ ] Watchlists
-- [ ] Timeline previews
-
----
-
 # Mid-Term Backlog
 
 # Entity System
 
 ## Goal
+
 Move beyond tags into structured real-world entities.
 
 ## Planned Entity Types
@@ -227,10 +258,8 @@ Move beyond tags into structured real-world entities.
 - [ ] Topic clustering
 
 ## Current Philosophy
-AI should:
-- assist analysts,
-not
-- replace analysts.
+
+AI should assist analysts, not replace analysts.
 
 ---
 
@@ -239,6 +268,7 @@ not
 # Intelligence Graph
 
 ## Goal
+
 Build relationship-based intelligence analysis.
 
 ## Planned Features
@@ -285,6 +315,7 @@ Build relationship-based intelligence analysis.
 # Multi-Tenant Architecture
 
 ## Goal
+
 Allow multiple organizations or analysts to operate independent FOUNDATION environments.
 
 ## Planned Features
@@ -305,6 +336,7 @@ Allow multiple organizations or analysts to operate independent FOUNDATION envir
 - [ ] Improve logging
 - [ ] Add monitoring
 - [ ] Add backups
+- [ ] Track database migrations and RLS policies in-repo
 
 ---
 
@@ -316,6 +348,7 @@ Allow multiple organizations or analysts to operate independent FOUNDATION envir
 - [ ] Better typography
 - [ ] Better loading states
 - [ ] Better empty states
+- [ ] Shared Input, Textarea, and EmptyState components
 - [ ] Better dashboard polish
 
 ---
@@ -333,14 +366,13 @@ Avoid introducing:
 until:
 - core workflows stabilize,
 - schema matures,
-- and operational patterns are proven.
+- and operational patterns become clearer.
 
 ---
 
 # Current Success Criteria
 
 Phase 1 will be considered successful when FOUNDATION can reliably:
-
 - store intelligence data,
 - organize information,
 - classify articles,
@@ -348,7 +380,4 @@ Phase 1 will be considered successful when FOUNDATION can reliably:
 - filter/search effectively,
 - and support repeatable analyst workflows.
 
-At that point, FOUNDATION transitions from:
-- prototype
-to:
-- operational platform foundation.
+At that point, FOUNDATION transitions from prototype to operational platform foundation.

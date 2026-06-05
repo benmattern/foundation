@@ -10,19 +10,13 @@ The purpose is to:
 - clarify schema intent,
 - and maintain consistency as the platform evolves.
 
-This document should evolve alongside:
-- migrations,
-- new entities,
-- and architectural changes.
+This document should evolve alongside migrations, new entities, and architectural changes.
 
 ---
 
 # Current Schema Philosophy
 
-FOUNDATION is being designed as:
-- a relational intelligence platform,
-not:
-- a flat content repository.
+FOUNDATION is being designed as a relational intelligence platform, not a flat content repository.
 
 The schema is intentionally evolving in layers:
 
@@ -36,10 +30,7 @@ Sources
           -> Relationships
 ```
 
-This allows:
-- gradual complexity,
-- stable iteration,
-- and future analytical expansion.
+This allows gradual complexity, stable iteration, and future analytical expansion.
 
 ---
 
@@ -48,6 +39,7 @@ This allows:
 # sources
 
 ## Purpose
+
 Represents external intelligence sources.
 
 Examples:
@@ -86,6 +78,7 @@ One source can have many articles.
 # articles
 
 ## Purpose
+
 Represents individual intelligence items.
 
 Examples:
@@ -94,6 +87,20 @@ Examples:
 - press releases
 - analysis pieces
 - official statements
+
+---
+
+## Current Fields Reflected In App Types
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| source_id | uuid | Nullable FK to sources.id |
+| title | text | Article title |
+| url | text | Article URL |
+| summary | text | Optional summary |
+| published_at | timestamptz | Optional published timestamp |
+| created_at | timestamptz | Creation timestamp |
 
 ---
 
@@ -112,25 +119,32 @@ They are expected to eventually connect to:
 
 ## Current Relationships
 
+Implemented in the app:
+
 ```txt
 sources
   -> articles
 ```
 
+Schema direction documented for next implementation:
+
 ```txt
 articles
   -> article_tags
+  -> tags
 ```
 
 Future:
 
 ```txt
 articles
+  -> article_entities
   -> entities
 ```
 
 ```txt
 articles
+  -> article_events
   -> events
 ```
 
@@ -140,9 +154,15 @@ articles
 
 ## Current Implementation Status
 
-The tags and article_tags tables have been created. Standalone tag management is operational. Article-to-tag assignment is not yet implemented.
+The tags and article_tags tables have been created. Standalone Tags CRUD is operational in the app:
+- create tags
+- list tags
+- delete tags
+
+Article-to-tag assignment is not yet implemented.
 
 ## Purpose
+
 Represents operational intelligence classifications/topics.
 
 Tags are intentionally lightweight and flexible.
@@ -167,7 +187,7 @@ Examples:
 
 ---
 
-## Current Relationships
+## Current Relationship Direction
 
 ```txt
 articles
@@ -177,21 +197,19 @@ articles
 
 Many-to-many relationship.
 
-One article can have:
-- many tags.
+One article can have many tags.
 
-One tag can belong to:
-- many articles.
+One tag can belong to many articles.
+
+This relationship is documented and table-backed, but the app does not yet provide assignment, display, or filtering workflows.
 
 ---
 
 # article_tags
 
 ## Purpose
-Join table connecting:
-- articles
-and
-- tags.
+
+Join table connecting articles and tags.
 
 ---
 
@@ -215,11 +233,18 @@ articles <-> tags
 
 ---
 
+## Current App Status
+
+The `ArticleTag` TypeScript type exists. Article-tag service functions and UI workflows are not implemented yet.
+
+---
+
 # Planned Tables
 
 # entities
 
 ## Purpose
+
 Represents structured real-world objects.
 
 Examples:
@@ -256,6 +281,7 @@ articles
 # events
 
 ## Purpose
+
 Represents discrete geopolitical, technological, or operational developments.
 
 Examples:
@@ -293,6 +319,7 @@ articles
 # timelines
 
 ## Purpose
+
 Represents chronological analytical views of:
 - entities
 - events
@@ -316,6 +343,7 @@ Current implementation approach is undecided.
 # relationships
 
 ## Purpose
+
 Represents explicit structured connections between entities.
 
 Examples:
@@ -445,6 +473,14 @@ Not currently implemented.
 
 ---
 
+# Security And Migration Tracking
+
+No database migrations, RLS policies, or auth configuration are currently tracked in this repo.
+
+Until migrations are added, verify schema, constraints, and RLS directly in Supabase before assuming production security behavior.
+
+---
+
 # Current Schema Constraints
 
 Avoid introducing:
@@ -462,12 +498,12 @@ until:
 
 # Current Schema Priority
 
-Current highest-priority schema work:
+Current highest-priority schema/application work:
 
-1. tags
-2. article_tags
-3. events
+1. Article <-> Tag relationship management
+2. Article tag display and filtering
+3. Events
 4. article_events
-5. search/filtering support
+5. Search/filtering support
 
 These systems will establish the operational intelligence foundation for FOUNDATION.

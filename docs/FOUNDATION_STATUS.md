@@ -4,15 +4,12 @@
 
 FOUNDATION is currently in early Phase 1 development.
 
-The application has successfully transitioned from:
-- initial prototype setup
-to:
-- a functioning modular web application with working CRUD flows, deployment infrastructure, and a scalable frontend architecture.
+The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD flows, Supabase persistence, route-based pages, and a service-layer architecture.
 
 The current focus is:
 - establishing core intelligence data structures,
 - stabilizing architecture,
-- and building foundational workflows before introducing advanced automation or AI-assisted analysis.
+- and building foundational workflows before advanced automation or AI-assisted analysis.
 
 ---
 
@@ -38,9 +35,8 @@ The current focus is:
 # Current Deployment Status
 
 ## Deployment
-Deployment pipeline is operational.
 
-Current deployment flow:
+The intended deployment flow is:
 
 ```txt
 VS Code
@@ -50,7 +46,8 @@ VS Code
 ```
 
 ## Environment Variables
-Currently configured:
+
+Required:
 - VITE_SUPABASE_URL
 - VITE_SUPABASE_PUBLISHABLE_KEY
 
@@ -64,11 +61,13 @@ Currently configured:
 - Shared DashboardLayout
 - Sidebar navigation
 - Route-based page structure
-- Reusable Card components
-- Reusable PageHeader structure
+- Reusable Card component
+- Reusable PageHeader component
+- Basic source count metric
 
 ## Current Status
-Stable and operational.
+
+Operational but minimal. Article and entity metrics are not yet connected to real data.
 
 ---
 
@@ -77,11 +76,15 @@ Stable and operational.
 ## Implemented
 - Create source
 - Edit source
-- Delete source
 - Source detail pages
 - Source listing
 - Supabase persistence
 - Service layer integration
+
+## Not Yet Implemented
+- Delete source
+- Source search/filtering
+- Source health/feed status
 
 ## Current Database Fields
 - id
@@ -92,7 +95,8 @@ Stable and operational.
 - created_at
 
 ## Current Status
-Operational.
+
+Operational for create, list, detail, and edit workflows.
 
 ---
 
@@ -100,20 +104,74 @@ Operational.
 
 ## Implemented
 - Create article
-- Associate article with source
+- Associate article with a source
 - Article listing
 - Published date handling
 - Supabase persistence
 - Service layer integration
 
+## Not Yet Implemented
+- Edit article
+- Delete article
+- Article detail page
+- Article tag assignment
+- Tag badges on article records
+- Article filtering/search
+
 ## Current Status
-Operational.
+
+Operational for create and list workflows.
 
 ## Current Relationship Direction
 
 ```txt
 Sources -> Articles
 ```
+
+Next:
+
+```txt
+Articles <-> Tags
+```
+
+---
+
+# Tags
+
+## Implemented
+- tags table created
+- article_tags join table created
+- seed tags added
+- tag.ts created
+- tagService.ts created
+- TagForm component created
+- TagList component created
+- TagsPage created
+- Tags route added
+- Sidebar navigation added
+- Create/list/delete tags working
+
+## Current Status
+
+Standalone Tags CRUD is complete for the current stage.
+
+## Next Feature
+- Add article-tag relationship management
+- Allow multiple tags per article
+- Display tags on articles
+- Filter articles by tags
+
+---
+
+# Placeholder Or Planned Areas
+
+## Entities
+
+EntitiesPage exists as a placeholder only. No entity schema, service, or CRUD workflow is implemented yet.
+
+## Timelines, Notes, Settings
+
+Sidebar entries exist for Timeline, Notes, and Settings, but route pages and workflows are not implemented yet.
 
 ---
 
@@ -123,12 +181,12 @@ Sources -> Articles
 
 ```txt
 src/
-├── components/
-├── layouts/
-├── pages/
-├── services/
-├── types/
-├── lib/
+  components/
+  layouts/
+  pages/
+  services/
+  types/
+  lib/
 ```
 
 ---
@@ -145,6 +203,7 @@ src/
 ## Current Services
 - sourceService.ts
 - articleService.ts
+- tagService.ts
 
 ---
 
@@ -162,51 +221,19 @@ Examples:
 
 ---
 
-# Pages
-
-## Pattern
-- one page per major entity/domain
-
-Examples:
-- SourcesPage.tsx
-- ArticlesPage.tsx
-
----
-
-# Components
-
-## Pattern
-Reusable:
-- forms
-- lists
-- cards
-- layout components
-
----
-
-# Current UI Direction
-
-## Design Philosophy
-- dark themed
-- intelligence-focused
-- operational dashboard style
-- clean and modern
-- modular and scalable
-
-## Design Inspirations
-- observatories
-- strategic operations centers
-- intelligence workstations
-- monitoring dashboards
-
----
-
 # Current Database Direction
 
-## Current Core Direction
+## Current Implemented Direction
 
 ```txt
-Sources -> Articles -> Entities -> Timeline Events
+Sources -> Articles
+Tags
+```
+
+## Next Relationship
+
+```txt
+Articles <-> Tags
 ```
 
 ## Expanded Long-Term Direction
@@ -223,47 +250,20 @@ Sources
 
 ---
 
-# Current Work In Progress
-
-## Tags
-
-### Implemented
-- tags table created
-- article_tags join table created
-- seed tags added
-- tag.ts created
-- tagService.ts created
-- TagForm component created
-- TagList component created
-- TagsPage created
-- Tags route added
-- Sidebar navigation added
-- Create/list/delete tags working
-
-### Current Status
-Standalone tag management is operational.
-
-### Next Steps
-- Add article-tag relationship management
-- Display tags on articles
-- Filter articles by tags
-
----
-
 # Immediate Priorities
 
-1. Tags system
-2. Article-tag relationships
-3. Event system
+1. Article-tag relationships
+2. Article tag display and filtering
+3. Dashboard metrics connected to real data
 4. Search and filtering
-5. RSS ingestion
-6. Dashboard enhancements
+5. Event system
+6. RSS ingestion
 
 ---
 
 # Mid-Term Priorities
 
-- Entity extraction
+- Entity modeling
 - Timeline visualization
 - Watchlists
 - Correlation workflows
@@ -285,12 +285,24 @@ Standalone tag management is operational.
 # Known Technical Debt
 
 ## Current Areas To Improve
+- Article-tag relationship implementation
 - Search/filtering architecture
 - Data normalization
 - UI consistency
+- Empty shared UI primitives for Input, Textarea, and EmptyState
 - Event/timeline schema design
 - Form validation consistency
 - Better typing standardization across components
+- Documentation drift between implemented and planned features
+
+---
+
+# Current Security/Auth Status
+
+- No application auth flow is implemented yet.
+- No local migrations or RLS policies are present in the repo.
+- Supabase security must be managed in the Supabase project until database migrations and policies are tracked in-repo.
+- Treat the app as private/internal at this stage unless RLS and auth are explicitly configured.
 
 ---
 
@@ -311,34 +323,4 @@ Avoid:
 - unnecessary infrastructure
 - premature AI integration
 
-Current focus is:
-- building a stable intelligence platform foundation
-before
-- advanced intelligence workflows
-
----
-
-# Current Recovery Context
-
-When starting a new chat, important current context includes:
-
-## Current Architecture
-- React + TypeScript + Vite + Tailwind
-- Supabase backend
-- Render deployment
-- route-based architecture
-- service-layer architecture
-- reusable components
-- modular page structure
-
-## Current Focus
-- Tags system
-- structured intelligence data
-- relationship architecture
-- search/filtering preparation
-
-## Current Direction
-FOUNDATION is evolving from:
-- a CRUD intelligence repository
-to:
-- a modular intelligence operating platform.
+Current focus is building a stable intelligence platform foundation before advanced intelligence workflows.

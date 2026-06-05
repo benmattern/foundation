@@ -2,7 +2,7 @@
 
 # Purpose Of This Document
 
-This document defines coding, architecture, naming, and organizational conventions for FOUNDATION.
+This document defines coding, architecture, naming, documentation, and assistant-workflow conventions for FOUNDATION.
 
 The goal is to:
 - maintain consistency,
@@ -23,10 +23,7 @@ FOUNDATION prioritizes:
 - consistency,
 - and operational usefulness.
 
-The project should favor:
-- predictable structure
-over:
-- cleverness or unnecessary abstraction.
+The project should favor predictable structure over cleverness or unnecessary abstraction.
 
 ---
 
@@ -38,12 +35,12 @@ Current frontend structure:
 
 ```txt
 src/
-├── components/
-├── layouts/
-├── pages/
-├── services/
-├── types/
-├── lib/
+  components/
+  layouts/
+  pages/
+  services/
+  types/
+  lib/
 ```
 
 ---
@@ -51,6 +48,7 @@ src/
 # Folder Responsibilities
 
 ## components/
+
 Reusable UI components.
 
 Examples:
@@ -61,27 +59,23 @@ Examples:
 - buttons
 - reusable UI blocks
 
-Components should:
-- be reusable,
-- focused,
-- and presentation-oriented.
+Components should be reusable, focused, and presentation-oriented.
 
 ---
 
 ## layouts/
+
 Shared application layouts.
 
 Examples:
 - DashboardLayout
 
-Layouts should:
-- manage page structure,
-- navigation,
-- and persistent UI sections.
+Layouts should manage page structure, navigation, and persistent UI sections.
 
 ---
 
 ## pages/
+
 Route-level pages.
 
 Examples:
@@ -94,12 +88,12 @@ Pages should:
 - manage page state,
 - and compose components.
 
-Pages should avoid:
-- direct Supabase logic.
+Pages should avoid direct Supabase logic.
 
 ---
 
 ## services/
+
 Backend/data-access layer.
 
 Examples:
@@ -118,6 +112,7 @@ All Supabase access should remain isolated to services.
 ---
 
 ## types/
+
 Shared TypeScript types.
 
 Conventions:
@@ -133,6 +128,7 @@ Examples:
 ---
 
 ## lib/
+
 Low-level utilities and configuration.
 
 Examples:
@@ -145,9 +141,8 @@ Examples:
 # File Naming
 
 ## Types
-Use:
-- lowercase
-- singular
+
+Use lowercase, singular filenames.
 
 Examples:
 - source.ts
@@ -157,9 +152,8 @@ Examples:
 ---
 
 ## Components
-Use:
-- PascalCase
-- descriptive names
+
+Use PascalCase and descriptive names.
 
 Examples:
 - SourceForm.tsx
@@ -169,9 +163,8 @@ Examples:
 ---
 
 ## Pages
-Use:
-- PascalCase
-- Page suffix
+
+Use PascalCase with the Page suffix.
 
 Examples:
 - SourcesPage.tsx
@@ -181,9 +174,8 @@ Examples:
 ---
 
 ## Services
-Use:
-- camelCase
-- Service suffix
+
+Use camelCase with the Service suffix.
 
 Examples:
 - sourceService.ts
@@ -196,19 +188,16 @@ Examples:
 
 # Preferred Component Types
 
-Prefer:
-- focused,
-- reusable,
-- composable components.
+Prefer focused, reusable, composable components.
 
-Avoid:
-- oversized “god components”.
+Avoid oversized "god components".
 
 ---
 
 # Component Categories
 
 ## Forms
+
 Examples:
 - SourceForm
 - ArticleForm
@@ -222,6 +211,7 @@ Responsible for:
 ---
 
 ## Lists
+
 Examples:
 - SourceList
 - ArticleList
@@ -235,18 +225,19 @@ Responsible for:
 ---
 
 ## Cards
+
 Examples:
 - SourceCard
 - ArticleCard
 
-Responsible for:
-- visual presentation of individual records
+Responsible for visual presentation of individual records.
 
 ---
 
 # State Management Conventions
 
 ## Current Strategy
+
 Use:
 - local component state
 - lifted state where necessary
@@ -256,8 +247,7 @@ Avoid introducing:
 - Zustand
 - global state systems
 
-until:
-- complexity clearly requires them.
+until complexity clearly requires them.
 
 ---
 
@@ -265,13 +255,9 @@ until:
 
 # Database Access
 
-All Supabase access should occur inside:
-- service files.
+All Supabase access should occur inside service files.
 
-Pages/components should:
-- call services,
-not:
-- directly query Supabase.
+Pages/components should call services, not directly query Supabase.
 
 ---
 
@@ -286,6 +272,7 @@ Pattern:
 Examples:
 - sourceService.ts
 - articleService.ts
+- tagService.ts
 
 ---
 
@@ -306,9 +293,7 @@ Services should avoid:
 
 # Table Naming
 
-Use:
-- lowercase
-- plural table names
+Use lowercase plural table names.
 
 Examples:
 - sources
@@ -335,8 +320,7 @@ Examples:
 
 # IDs
 
-Use:
-- UUID primary keys
+Use UUID primary keys.
 
 ---
 
@@ -344,7 +328,25 @@ Use:
 
 FOUNDATION is intentionally relational.
 
-Current direction:
+Current implemented relationship:
+
+```txt
+Sources -> Articles
+```
+
+Current standalone vocabulary:
+
+```txt
+Tags
+```
+
+Next relationship to implement:
+
+```txt
+Articles <-> Tags
+```
+
+Long-term direction:
 
 ```txt
 Sources
@@ -355,10 +357,7 @@ Sources
         -> Timelines
 ```
 
-Relationships should remain:
-- explicit,
-- understandable,
-- and maintainable.
+Relationships should remain explicit, understandable, and maintainable.
 
 Avoid premature graph complexity.
 
@@ -402,10 +401,7 @@ Avoid:
 
 # Incremental Architecture
 
-Prefer:
-- small iterative improvements
-over:
-- massive rewrites.
+Prefer small iterative improvements over massive rewrites.
 
 ---
 
@@ -418,17 +414,13 @@ Avoid introducing:
 - graph databases
 - complex orchestration
 
-until:
-- real operational needs emerge.
+until real operational needs emerge.
 
 ---
 
 # AI Philosophy
 
-FOUNDATION should prioritize:
-- analyst augmentation
-over:
-- analyst replacement.
+FOUNDATION should prioritize analyst augmentation over analyst replacement.
 
 AI features should:
 - assist,
@@ -438,6 +430,8 @@ AI features should:
 
 Human analysis remains central.
 
+Do not add AI-assisted workflows before core source, article, tag, event, search, and analyst workflows are stable unless the user explicitly changes priority.
+
 ---
 
 # Documentation Conventions
@@ -445,7 +439,7 @@ Human analysis remains central.
 Core project docs live in:
 
 ```txt
-/docs
+docs/
 ```
 
 Current core docs:
@@ -457,10 +451,52 @@ Current core docs:
 - FOUNDATION_RECOVERY_PROMPT.md
 - FOUNDATION_CONVENTIONS.md
 
-These documents should remain:
-- lightweight,
-- useful,
-- and regularly updated.
+These documents should remain lightweight, useful, and regularly updated.
+
+When docs and code disagree, inspect the current source code before updating implementation plans.
+
+---
+
+# ChatGPT/Codex Alignment Procedure
+
+Use this procedure when starting or resuming work with ChatGPT, Codex, or another AI coding assistant.
+
+## Before Implementation
+
+1. Read `docs/FOUNDATION_RECOVERY_PROMPT.md`.
+2. Read `docs/FOUNDATION_STATUS.md`.
+3. Read `docs/FOUNDATION_BACKLOG.md`.
+4. Inspect the source files related to the requested change.
+5. Confirm whether the request is review-only or implementation work.
+6. Treat source code as the final authority for implemented behavior.
+
+## During Implementation
+
+1. Keep Supabase access inside `src/services/`.
+2. Keep page components responsible for data orchestration and component composition.
+3. Keep reusable presentation logic inside `src/components/`.
+4. Do not introduce planned features as if they already exist.
+5. Prefer small, focused changes that match existing project patterns.
+6. Avoid schema changes unless the user explicitly requests them.
+
+## After Implementation
+
+1. Run `npm.cmd run build` when practical.
+2. Update relevant docs if the implementation changes current status, schema, or backlog.
+3. Clearly report what changed, what was verified, and what remains incomplete.
+4. Note any documentation drift discovered during the work.
+
+## Current Priority Alignment
+
+Standalone Tags CRUD is complete for the current stage.
+
+The next intended feature is:
+
+```txt
+Article <-> Tag relationship management
+```
+
+Do not skip ahead to entities, timelines, RSS ingestion, or AI workflows unless the user explicitly reprioritizes.
 
 ---
 

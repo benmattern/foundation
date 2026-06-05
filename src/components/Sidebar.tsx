@@ -6,9 +6,6 @@ const navItems = [
   { label: "Articles", to: "/articles" },
   { label: "Tags", to: "/tags" },
   { label: "Entities", to: "/entities" },
-  { label: "Timeline", to: "/timeline" },
-  { label: "Notes", to: "/notes" },
-  { label: "Settings", to: "/settings" },
 ];
 
 export function Sidebar() {
