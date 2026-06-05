@@ -9,10 +9,14 @@ FOUNDATION is designed as:
 - technology monitoring,
 - and operational awareness.
 
-The current implemented relationship model is:
+The current implemented model is:
 
 ```txt
-Sources -> Articles <-> Tags
+Sources
+  -> Articles
+    <-> Tags
+       -> Filtering/Search v1
+       -> Article Management v1
 ```
 
 The long-term direction is:
@@ -98,15 +102,33 @@ Not yet implemented:
 - Display tag badges on article records
 - Reload articles after successful creation
 - Published date handling
+- Client-side search by title
+- Client-side search by summary
+- Client-side filter by one tag
+- Client-side filter by one source
+- Clear filters button
+- Filtered result count
+- Filtered empty state
+- Edit article title
+- Edit article URL
+- Edit article summary
+- Edit article source
+- Edit article published date
+- Edit article tags
+- Add/remove tags from existing articles
+- Retag existing articles
+- Delete articles
+- Reused ArticleForm for create/edit modes
+- Edit/cancel support
 - Supabase persistence
 
 Not yet implemented:
-- Edit article
-- Delete article
 - Article detail page
-- Tag filtering
-- Search
 - Date filtering
+- Multi-tag filtering
+- Server-side filtering/search
+- URL query params
+- Saved filters
 
 ## Tags
 - tags table exists
@@ -122,25 +144,19 @@ Not yet implemented:
 - Standalone create/list/delete tags works
 - Tags can be assigned to new articles
 - Tags display on article records
+- Tags can filter articles in Filtering & Search v1
 
-Standalone Tags CRUD and Article <-> Tag relationships are complete for the current stage.
+Standalone Tags CRUD, Article <-> Tag relationships, Filtering & Search v1, and Article Management v1 are complete for the current stage.
 
 ---
 
 # Current Work In Progress
 
-## Next Feature: Filtering & Search
+## Next Milestone
 
-The next implementation step should be filtering and search.
+The next priority is Events Planning.
 
-Expected first direction:
-1. Add tag filtering on ArticlesPage.
-2. Add article text search.
-3. Add source filtering.
-4. Add date filtering.
-5. Keep Supabase access centralized in services.
-
-Do not skip ahead to events, entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly changes priority.
+Events implementation has not started. Do not create event schema, services, or UI until planning is explicitly requested and approved. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly changes priority.
 
 ---
 
@@ -225,7 +241,7 @@ When starting a new ChatGPT or Codex session:
 2. Read FOUNDATION_STATUS.md and FOUNDATION_BACKLOG.md.
 3. Inspect the relevant source files before making changes.
 4. Do not infer that planned features are implemented.
-5. Treat Filtering & Search as the next milestone unless the user explicitly changes priority.
+5. Treat Events Planning as the next milestone unless the user explicitly chooses a different direction.
 
 ---
 

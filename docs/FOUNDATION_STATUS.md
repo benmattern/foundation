@@ -4,7 +4,7 @@
 
 FOUNDATION is currently in early Phase 1 development.
 
-The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, and operational Article <-> Tag relationships.
+The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, and Article Management v1 for articles.
 
 The current focus is:
 - establishing core intelligence data structures,
@@ -113,23 +113,48 @@ Operational for create, list, detail, and edit workflows.
 - Supabase persistence
 - Service layer integration
 - Articles reload after successful creation
+- Edit article title
+- Edit article URL
+- Edit article summary
+- Edit article source
+- Edit article published date
+- Edit article tags
+- Add/remove tags from existing articles
+- Retag existing articles
+- Delete articles
+- Reused ArticleForm for create/edit modes
+- Edit/cancel support
+- Edit/Delete actions in ArticleList
+- Delete confirmation with `window.confirm`
+- Articles reload after successful edit/delete
+- Client-side search by article title
+- Client-side search by article summary
+- Client-side filter by one tag
+- Client-side filter by one source
+- Clear filters button
+- Filtered result count
+- Filtered empty state
 
 ## Not Yet Implemented
-- Edit article
-- Delete article
 - Article detail page
-- Tag filtering
-- Search
 - Date filtering
+- Multi-tag filtering
+- Server-side filtering/search
+- URL query params
+- Saved filters
 
 ## Current Status
 
-Operational for create, list, source association, multi-tag assignment, and tag display workflows.
+Operational for create, list, edit, delete, source association, published date handling, multi-tag assignment, retagging, tag display, and client-side Filtering & Search v1 workflows.
 
-## Current Relationship Direction
+## Current Flow
 
 ```txt
-Sources -> Articles <-> Tags
+Sources
+  -> Articles
+    <-> Tags
+       -> Filtering/Search v1
+       -> Article Management v1
 ```
 
 ---
@@ -151,10 +176,69 @@ Sources -> Articles <-> Tags
 - Create/list/delete tags working
 - Tags can be assigned to new articles
 - Tags display on article records
+- Tags can filter articles in Filtering & Search v1
 
 ## Current Status
 
 Standalone Tags CRUD and Article <-> Tag relationship workflows are complete for the current stage.
+
+Article tags can be added, removed, and replaced on existing articles through Article Management v1.
+
+---
+
+# Filtering & Search v1
+
+## Implemented
+- ArticleFilters component
+- Search article title
+- Search article summary
+- Filter articles by one tag
+- Filter articles by one source
+- Clear filters
+- Filtered result count
+- Filtered empty state
+- Client-side filtering over loaded `ArticleWithTags[]`
+
+## Not Yet Implemented
+- Date filtering
+- Multi-tag filtering
+- Server-side filtering/search
+- URL state
+- Saved filters
+
+## Current Status
+
+Complete for v1.
+
+---
+
+# Article Management v1
+
+## Implemented
+- Edit article title
+- Edit article URL
+- Edit article summary
+- Edit article source
+- Edit article published date
+- Edit article tags
+- Add/remove tags from existing articles
+- Retag existing articles
+- Delete articles
+- Reused ArticleForm for create/edit modes
+- Inline/page-level edit panel
+- Edit/cancel support
+- Edit/Delete actions in ArticleList
+- Native `window.confirm` delete confirmation
+- Articles reload after successful edit/delete
+
+## Not Yet Implemented
+- Article detail page
+- Advanced article workflow states
+- Transactional article/tag updates
+
+## Current Status
+
+Complete for v1.
 
 ---
 
@@ -228,13 +312,13 @@ Examples:
 Sources
   -> Articles
     <-> Tags
+       -> Filtering/Search v1
+       -> Article Management v1
 ```
 
 ## Next Milestone
 
-```txt
-Filtering & Search
-```
+Events Planning is the next milestone. Events implementation has not started.
 
 ## Expanded Long-Term Direction
 
@@ -252,12 +336,17 @@ Sources
 
 # Immediate Priorities
 
-1. Filtering & Search
-2. Tag filtering on articles
-3. Source and date filtering
-4. Dashboard metrics connected to real data
-5. Event system
-6. RSS ingestion
+Next priority:
+1. Events Planning
+2. Dashboard Improvements v1
+3. Article detail page / advanced article workflows
+
+Open Filtering/Search follow-ups:
+- Date filtering
+- Multi-tag filtering
+- Server-side filtering/search
+- URL state
+- Saved filters
 
 ---
 
@@ -286,7 +375,7 @@ Sources
 # Known Technical Debt
 
 ## Current Areas To Improve
-- Search/filtering architecture
+- Search/filtering is client-side only
 - Data normalization
 - UI consistency
 - Empty shared UI primitives for Button, Input, Textarea, and EmptyState
@@ -294,6 +383,8 @@ Sources
 - Form validation consistency
 - Better typing standardization across components
 - Frontend-driven article creation and tag assignment are not transactionally coupled
+- Article update and tag replacement are not transactionally coupled
+- Article retagging uses delete-then-insert tag replacement
 - Documentation drift between implemented and planned features
 
 ---

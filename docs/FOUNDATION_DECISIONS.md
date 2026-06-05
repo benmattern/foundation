@@ -290,6 +290,168 @@ Entities will require:
 
 ---
 
+# ArticleWithTags Derived Type
+
+## Decision
+Use `ArticleWithTags` as a derived application type rather than expanding the base `Article` type.
+
+## Reasoning
+The base `Article` type represents the raw articles table shape. `ArticleWithTags` represents composed application data used by the article list and filtering UI.
+
+This keeps:
+- database-row types clear,
+- relationship-enriched view types explicit,
+- and future article relationships easier to add without blurring raw schema types.
+
+---
+
+# Service-Layer Article/Tag Composition
+
+## Decision
+Compose articles with tags in `articleService.ts` using articles, article_tags, and tags queries rather than relying on nested Supabase relationship selects.
+
+## Reasoning
+This avoids coupling early application behavior to Supabase-generated relationship naming.
+
+The current approach:
+- keeps Supabase access centralized in services,
+- makes the composition logic explicit,
+- preserves page/component simplicity,
+- and is appropriate for the current prototype dataset size.
+
+Nested Supabase relationships can be revisited later if query volume or performance requires it.
+
+---
+
+# Filtering & Search Before Events
+
+## Decision
+Complete Filtering & Search v1 before planning or implementing events.
+
+## Reasoning
+Filtering and search make the current Sources -> Articles <-> Tags model operationally useful.
+
+This sequence:
+- improves analyst workflow immediately,
+- validates the usefulness of tags,
+- keeps the app focused on core article workflows,
+- and avoids adding event complexity before the existing article corpus can be searched and narrowed.
+
+---
+
+# Client-Side Filtering & Search v1
+
+## Decision
+Use client-side filtering for Filtering & Search v1.
+
+Implemented filters:
+- search article title,
+- search article summary,
+- filter by one tag,
+- filter by one source,
+- clear filters,
+- filtered result count,
+- filtered empty state.
+
+## Reasoning
+The current dataset is expected to be small enough for client-side filtering.
+
+This approach:
+- avoids premature server-side query complexity,
+- avoids URL state and saved-filter architecture too early,
+- keeps the service layer focused on loading article/source/tag data,
+- and gives immediate workflow value with low implementation risk.
+
+Future server-side filtering/search can be added when data volume, pagination, full-text search, RLS, or performance constraints justify it.
+
+---
+
+# ArticleForm Reuse For Article Management v1
+
+## Decision
+Reuse `ArticleForm` for both article creation and article editing.
+
+## Reasoning
+Article creation and editing share the same core fields:
+- source
+- title
+- URL
+- published date
+- summary
+- tags
+
+Reusing the form keeps UI behavior consistent, avoids a duplicate edit form, and preserves the current component architecture.
+
+---
+
+# Inline Article Editing For v1
+
+## Decision
+Use an inline/page-level edit panel for Article Management v1 instead of a modal or dedicated article detail route.
+
+## Reasoning
+The application does not yet have a modal system or article detail routing pattern.
+
+Inline editing:
+- keeps ArticlesPage as the orchestration layer,
+- minimizes routing complexity,
+- avoids modal accessibility/focus concerns,
+- and fits the current card-based interface.
+
+A dedicated article detail page remains a future workflow.
+
+---
+
+# Native Delete Confirmation For v1
+
+## Decision
+Use native `window.confirm` for article deletion confirmation in Article Management v1.
+
+## Reasoning
+This keeps deletion protection simple without introducing a modal system or new design-system primitives.
+
+A custom confirmation component can be introduced later when the UI system matures.
+
+---
+
+# Full Tag Replacement For Article Retagging
+
+## Decision
+Retag existing articles by replacing the full set of `article_tags` rows for the article.
+
+Current behavior:
+- delete existing `article_tags` rows for the article,
+- deduplicate selected tag IDs,
+- insert the selected tag IDs,
+- allow empty selection to remove all tags.
+
+## Reasoning
+Full replacement is simpler and more predictable than calculating tag add/remove diffs in the UI.
+
+This keeps retagging logic centralized in `articleService.ts` and keeps ArticleForm focused on collecting selected tag IDs.
+
+---
+
+# Article Management Before Events
+
+## Decision
+Complete Article Management v1 before Events Planning and implementation.
+
+## Reasoning
+Article records are the central intelligence object in the current platform.
+
+Before adding events, articles should be manageable after creation:
+- editable metadata,
+- editable source,
+- editable published date,
+- editable tags,
+- retagging,
+- and deletion.
+
+This strengthens the existing Sources -> Articles <-> Tags workflow before introducing a new intelligence object.
+
+---
+
 # Intelligence Workflow Philosophy
 
 ## Decision

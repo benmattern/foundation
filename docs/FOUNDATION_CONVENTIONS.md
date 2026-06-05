@@ -331,7 +331,7 @@ FOUNDATION is intentionally relational.
 Current implemented relationship model:
 
 ```txt
-Sources -> Articles <-> Tags
+Sources -> Articles <-> Tags -> Filtering/Search v1 -> Article Management v1
 ```
 
 Long-term direction:
@@ -476,15 +476,15 @@ Use this procedure when starting or resuming work with ChatGPT, Codex, or anothe
 
 ## Current Priority Alignment
 
-Standalone Tags CRUD and Article <-> Tag relationships are complete for the current stage.
+Standalone Tags CRUD, Article <-> Tag relationships, Filtering & Search v1, and Article Management v1 are complete for the current stage.
 
-The next intended feature is:
+The next milestone is:
 
 ```txt
-Filtering & Search
+Events Planning
 ```
 
-Do not skip ahead to events, entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly reprioritizes.
+Events implementation has not started. Do not create event schema, services, routes, or UI until Events Planning is explicitly requested and completed. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly reprioritizes.
 
 ---
 

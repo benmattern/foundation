@@ -3,9 +3,17 @@ import { Card } from "./ui/Card";
 
 type Props = {
   articles: ArticleWithTags[];
+  emptyMessage?: string;
+  onEditArticle?: (article: ArticleWithTags) => void;
+  onDeleteArticle?: (article: ArticleWithTags) => void;
 };
 
-export function ArticleList({ articles }: Props) {
+export function ArticleList({
+  articles,
+  emptyMessage = "No articles added yet.",
+  onEditArticle,
+  onDeleteArticle,
+}: Props) {
   return (
     <Card>
       <h2 className="text-2xl font-semibold text-white mb-6">
@@ -13,7 +21,7 @@ export function ArticleList({ articles }: Props) {
       </h2>
 
       {articles.length === 0 ? (
-        <p className="text-slate-400">No articles added yet.</p>
+        <p className="text-slate-400">{emptyMessage}</p>
       ) : (
         <div className="space-y-4">
           {articles.map((article) => (
@@ -21,9 +29,35 @@ export function ArticleList({ articles }: Props) {
               key={article.id}
               className="border-b border-slate-800 pb-4"
             >
-              <p className="font-medium text-white text-lg">
-                {article.title}
-              </p>
+              <div className="flex items-start justify-between gap-4">
+                <p className="font-medium text-white text-lg">
+                  {article.title}
+                </p>
+
+                {(onEditArticle || onDeleteArticle) && (
+                  <div className="flex shrink-0 gap-2">
+                    {onEditArticle && (
+                      <button
+                        type="button"
+                        onClick={() => onEditArticle(article)}
+                        className="rounded-md border border-slate-700 px-3 py-1 text-sm text-slate-300 transition hover:bg-slate-800"
+                      >
+                        Edit
+                      </button>
+                    )}
+
+                    {onDeleteArticle && (
+                      <button
+                        type="button"
+                        onClick={() => onDeleteArticle(article)}
+                        className="rounded-md border border-red-900/50 bg-red-950/30 px-3 py-1 text-sm text-red-300 transition hover:bg-red-900/40"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
 
               <a
                 href={article.url}

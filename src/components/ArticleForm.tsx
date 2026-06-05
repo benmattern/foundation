@@ -1,28 +1,67 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "./ui/Card";
+import type { ArticleWithTags } from "../types/article";
 import type { Source } from "../types/source";
 import type { Tag } from "../types/tag";
+
+export type ArticleFormValues = {
+  source_id: string | null;
+  title: string;
+  url: string;
+  summary: string;
+  published_at: string;
+  tag_ids: string[];
+};
 
 type Props = {
   sources: Source[];
   tags: Tag[];
-  onCreateArticle: (article: {
-    source_id: string | null;
-    title: string;
-    url: string;
-    summary: string;
-    published_at: string;
-    tag_ids: string[];
-  }) => Promise<void>;
+  mode?: "create" | "edit";
+  initialArticle?: ArticleWithTags | null;
+  onSubmit: (article: ArticleFormValues) => Promise<void>;
+  onCancel?: () => void;
 };
 
-export function ArticleForm({ sources, tags, onCreateArticle }: Props) {
+function formatDateForInput(date: string | null): string {
+  if (!date) return "";
+
+  return date.slice(0, 10);
+}
+
+export function ArticleForm({
+  sources,
+  tags,
+  mode = "create",
+  initialArticle = null,
+  onSubmit,
+  onCancel,
+}: Props) {
   const [sourceId, setSourceId] = useState("");
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
   const [summary, setSummary] = useState("");
   const [publishedAt, setPublishedAt] = useState("");
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+  const isEditing = mode === "edit";
+
+  useEffect(() => {
+    if (!initialArticle) {
+      setSourceId("");
+      setTitle("");
+      setUrl("");
+      setSummary("");
+      setPublishedAt("");
+      setSelectedTagIds([]);
+      return;
+    }
+
+    setSourceId(initialArticle.source_id ?? "");
+    setTitle(initialArticle.title);
+    setUrl(initialArticle.url);
+    setSummary(initialArticle.summary ?? "");
+    setPublishedAt(formatDateForInput(initialArticle.published_at));
+    setSelectedTagIds(initialArticle.tags.map((tag) => tag.id));
+  }, [initialArticle]);
 
   function toggleTag(tagId: string) {
     setSelectedTagIds((prev) =>
@@ -35,7 +74,7 @@ export function ArticleForm({ sources, tags, onCreateArticle }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    await onCreateArticle({
+    await onSubmit({
       source_id: sourceId || null,
       title,
       url,
@@ -44,12 +83,14 @@ export function ArticleForm({ sources, tags, onCreateArticle }: Props) {
       tag_ids: selectedTagIds,
     });
 
-    setTitle("");
-    setUrl("");
-    setSummary("");
-    setPublishedAt("");
-    setSourceId("");
-    setSelectedTagIds([]);
+    if (!isEditing) {
+      setTitle("");
+      setUrl("");
+      setSummary("");
+      setPublishedAt("");
+      setSourceId("");
+      setSelectedTagIds([]);
+    }
   }
 
   return (
@@ -57,11 +98,13 @@ export function ArticleForm({ sources, tags, onCreateArticle }: Props) {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <h2 className="text-2xl font-semibold text-white">
-            Add Article
+            {isEditing ? "Edit Article" : "Add Article"}
           </h2>
 
           <p className="text-slate-400 mt-1 text-sm">
-            Add a collected article or intelligence item.
+            {isEditing
+              ? "Update article metadata and tags."
+              : "Add a collected article or intelligence item."}
           </p>
         </div>
 
@@ -147,11 +190,23 @@ export function ArticleForm({ sources, tags, onCreateArticle }: Props) {
           )}
         </div>
 
-        <button
-          className="rounded-lg bg-slate-200 px-4 py-2 font-medium text-slate-900 transition hover:bg-white"
-        >
-          Add Article
-        </button>
+        <div className="flex flex-wrap gap-3">
+          <button
+            className="rounded-lg bg-slate-200 px-4 py-2 font-medium text-slate-900 transition hover:bg-white"
+          >
+            {isEditing ? "Save Changes" : "Add Article"}
+          </button>
+
+          {isEditing && onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="rounded-lg border border-slate-700 px-4 py-2 font-medium text-slate-300 transition hover:bg-slate-800"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
     </Card>
   );

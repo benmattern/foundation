@@ -24,6 +24,8 @@ The current implemented model is:
 Sources
   -> Articles
     <-> Tags
+       -> Filtering/Search v1
+       -> Article Management v1
 ```
 
 The schema is intentionally evolving in layers:
@@ -153,8 +155,7 @@ The tags and article_tags tables are operational in the app:
 - delete tags
 - assign multiple tags to new articles
 - display tag badges on article records
-
-Filtering by tag is not yet implemented.
+- filter articles by one tag in Filtering & Search v1
 
 ## Purpose
 
@@ -247,6 +248,13 @@ Article-tag service logic is operational through article creation:
 - Selected tag IDs are inserted into `article_tags`.
 - Articles reload after successful creation.
 
+Article-tag replacement is operational through Article Management v1:
+- Editing an article can replace its assigned tags.
+- Existing `article_tags` rows for the article are deleted.
+- Selected tag IDs are reinserted.
+- Empty tag selection removes all tags from the article.
+- Tag IDs are deduplicated before insertion.
+
 ---
 
 # Derived Application Types
@@ -264,6 +272,52 @@ ArticleWithTags = Article & { tags: Tag[] }
 Current use:
 - ArticlesPage loads composed article records with tags.
 - ArticleList displays tag badges from `ArticleWithTags.tags`.
+- ArticleFilters performs client-side tag/source/search filtering over loaded `ArticleWithTags[]`.
+- Article Management v1 uses `ArticleWithTags` to populate edit state and retag existing articles.
+
+---
+
+# Filtering & Search v1
+
+Filtering & Search v1 required no schema changes.
+
+Current implementation:
+- client-side only
+- searches article title
+- searches article summary
+- filters by one tag
+- filters by one source
+- supports clear filters
+- displays filtered result count
+- displays filtered empty state
+
+Not implemented:
+- date filtering
+- multi-tag filtering
+- server-side filtering/search
+- URL query params
+- saved filters
+
+---
+
+# Article Management v1
+
+Article Management v1 required no schema changes.
+
+Current implementation uses the existing `articles` table and `article_tags` join table to:
+- edit article title
+- edit article URL
+- edit article summary
+- edit article source
+- edit article published date
+- edit article tags
+- add/remove tags from existing articles
+- retag existing articles
+- delete articles
+
+Article deletion relies on the existing `articles` table and the `article_tags.article_id -> articles.id on delete cascade` relationship.
+
+Article retagging is implemented in the service layer with delete-then-insert replacement of `article_tags` rows.
 
 ---
 
@@ -422,15 +476,14 @@ Current implemented relationship:
 Sources
   -> Articles
     <-> Tags
+       -> Filtering/Search v1
+       -> Article Management v1
 ```
 
-Next implementation direction:
+Next milestone:
+- Events Planning
 
-```txt
-Filtering & Search
-```
-
-Entities and events intentionally come later.
+Entities and events intentionally come later unless explicitly reprioritized.
 
 ---
 
@@ -543,12 +596,11 @@ until:
 
 # Current Schema Priority
 
-Current highest-priority schema/application work:
+The next schema-impacting direction has not started.
 
-1. Filtering & Search
-2. Tag filtering on articles
-3. Source and date filtering
-4. Events
-5. article_events
+Current candidate directions:
+1. Events Planning
+2. Dashboard Improvements v1
+3. Article detail page / advanced article workflows
 
-These systems will continue establishing the operational intelligence foundation for FOUNDATION.
+Filtering & Search v1 and Article Management v1 are complete and required no schema changes.

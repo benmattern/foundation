@@ -11,6 +11,8 @@ export type CreateArticleInput = {
   tag_ids?: string[];
 };
 
+export type UpdateArticleInput = CreateArticleInput;
+
 export async function getArticles(): Promise<Article[]> {
   const { data, error } = await supabase
     .from("articles")
@@ -94,6 +96,45 @@ export async function createArticle(
   return data;
 }
 
+export async function updateArticle(
+  id: string,
+  article: UpdateArticleInput
+): Promise<Article> {
+  const { data, error } = await supabase
+    .from("articles")
+    .update({
+      source_id: article.source_id,
+      title: article.title,
+      url: article.url,
+      summary: article.summary || null,
+      published_at: article.published_at
+        ? new Date(article.published_at).toISOString()
+        : null,
+    })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  await replaceArticleTags(id, article.tag_ids ?? []);
+
+  return data;
+}
+
+export async function deleteArticle(id: string): Promise<void> {
+  const { error } = await supabase
+    .from("articles")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    throw error;
+  }
+}
+
 async function setArticleTags(
   articleId: string,
   tagIds: string[]
@@ -116,6 +157,22 @@ async function setArticleTags(
   if (error) {
     throw error;
   }
+}
+
+async function replaceArticleTags(
+  articleId: string,
+  tagIds: string[]
+): Promise<void> {
+  const { error: deleteError } = await supabase
+    .from("article_tags")
+    .delete()
+    .eq("article_id", articleId);
+
+  if (deleteError) {
+    throw deleteError;
+  }
+
+  await setArticleTags(articleId, tagIds);
 }
 
 async function getArticleTags(): Promise<ArticleTag[]> {

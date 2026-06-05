@@ -82,20 +82,93 @@ Build a stable platform capable of:
 
 ---
 
+# Filtering & Search v1
+
+## Completed Tasks
+- [x] Create ArticleFilters component
+- [x] Search article title
+- [x] Search article summary
+- [x] Filter articles by one tag
+- [x] Filter articles by one source
+- [x] Clear filters
+- [x] Display filtered result count
+- [x] Display filtered empty state
+- [x] Keep filtering client-side for v1
+
+## Still Open
+- [ ] Date filtering
+- [ ] Multi-tag filtering
+- [ ] Server-side filtering/search
+- [ ] URL state
+- [ ] Saved filters
+
+---
+
+# Article Management v1
+
+## Completed Tasks
+- [x] Edit article title
+- [x] Edit article URL
+- [x] Edit article summary
+- [x] Edit article source
+- [x] Edit article published date
+- [x] Edit article tags
+- [x] Add/remove tags from existing articles
+- [x] Retag existing articles
+- [x] Delete article
+- [x] Reuse ArticleForm for create/edit modes
+- [x] Add edit/cancel support
+- [x] Add Edit/Delete actions to ArticleList
+- [x] Use native `window.confirm` for delete confirmation
+- [x] Reload articles after successful edit/delete
+- [x] Keep Supabase access centralized in articleService.ts
+
+## Still Open
+- [ ] Article detail page
+- [ ] Advanced article workflow states
+- [ ] Transactional article/tag update behavior
+
+---
+
 # Immediate Backlog
 
-# Priority 1 - Filtering & Search
+# Next Milestone
 
-## Goal
+## Events Planning
+- [ ] Confirm event schema direction
+- [ ] Decide event/article relationship model
+- [ ] Draft event service and UI plan
+- [ ] Decide whether events come before entities
 
-Enable operational intelligence workflows across sources, articles, and tags.
+Events implementation has not started.
+
+---
+
+# Future Article Management Work
+
+- [ ] Article detail page
+- [ ] Improve article-level empty/loading/error states
+- [ ] Advanced article review/workflow states
+
+---
+
+# Dashboard Improvements v1
+- [ ] Real article count
+- [ ] Real tag count
+- [ ] Recent articles
+- [ ] Recent sources
+- [ ] Basic activity overview
+
+---
+
+# Future Filtering & Search Work
 
 ## Planned Features
-- [ ] Tag filtering on articles
-- [ ] Article search
-- [ ] Source filtering
 - [ ] Date range filtering
 - [ ] Multi-tag filtering
+- [ ] Server-side filtering/search
+- [ ] URL state for filters
+- [ ] Saved filters
 - [ ] Combined intelligence queries
 
 ## Long-Term Search Goals
@@ -107,22 +180,7 @@ Examples:
 
 ---
 
-# Priority 2 - Dashboard Improvements
-
-## Goal
-
-Make the dashboard reflect real current data instead of placeholder metrics.
-
-## Planned Features
-- [ ] Real article count
-- [ ] Real tag count
-- [ ] Recent articles
-- [ ] Recent sources
-- [ ] Basic activity overview
-
----
-
-# Priority 3 - Event System
+# Future Event System
 
 ## Goal
 
@@ -161,7 +219,7 @@ Track discrete geopolitical, technological, and operational developments.
 
 ---
 
-# Priority 4 - RSS Ingestion
+# Future RSS Ingestion
 
 ## Goal
 

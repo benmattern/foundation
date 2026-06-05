@@ -1,6 +1,6 @@
 # FOUNDATION
 
-FOUNDATION is an early-stage OSINT and geopolitical analysis platform inspired by Asimov's Foundation. It is designed to collect, organize, tag, and analyze open-source information, with an initial focus on the Taiwan region and related Indo-Pacific, semiconductor, maritime, supply-chain, and technology issues.
+FOUNDATION is an early-stage OSINT and geopolitical analysis platform inspired by Asimov's Foundation. It is designed to collect, organize, tag, filter, and analyze open-source information, with an initial focus on the Taiwan region and related Indo-Pacific, semiconductor, maritime, supply-chain, and technology issues.
 
 The project is currently in Phase 1: building a clear, reliable intelligence data foundation before adding advanced automation or AI-assisted workflows.
 
@@ -10,18 +10,27 @@ Implemented:
 - Dashboard shell with sidebar navigation and shared layout.
 - Sources workflow: create, list, view detail, and edit source records.
 - Articles workflow: create and list articles, with optional source association.
-- Tags workflow: create, list, and delete standalone tags.
+- Standalone Tags workflow: create, list, and delete tags.
 - Article <-> Tag relationships through `article_tags`.
+- `ArticleWithTags` derived application type.
 - Multi-tag assignment during article creation.
+- Article management: edit article metadata, source, published date, and tags.
+- Add/remove tags from existing articles.
+- Delete articles.
 - Tag badges displayed on article records.
+- Client-side article search by title and summary.
+- Client-side article filtering by one tag.
+- Client-side article filtering by one source.
+- Clear filters button, filtered result count, and filtered empty state.
+- `ArticleFilters` component.
 - Supabase service layer for sources, articles, and tags.
-- Shared Card component and a recent low-risk UI cleanup pass.
+- Shared Card component and low-risk UI cleanup pass.
 
 Not implemented yet:
-- Tag filtering.
-- Search.
 - Date filtering.
-- Article edit/delete.
+- Multi-tag filtering.
+- Server-side filtering or server-side search.
+- URL query params or saved filters.
 - Article detail page.
 - Entity, event, timeline, notes, and settings workflows.
 - RSS ingestion.
@@ -29,7 +38,7 @@ Not implemented yet:
 - Authentication, app auth flows, and RLS-managed access.
 - AI-assisted ingestion, summarization, tagging, or entity extraction.
 
-The next intended milestone is Filtering & Search, starting with tag filtering on articles.
+The next milestone is Events Planning. Events implementation has not started.
 
 ## Tech Stack
 
@@ -104,14 +113,20 @@ Key files:
 ## Roadmap
 
 Near term:
-- Add article filtering by tag.
-- Add article search.
-- Add source and date filtering.
-- Improve dashboard metrics and recent intelligence views.
+- Events Planning: event schema and workflow design before implementation.
+- Dashboard Improvements v1: real article/tag counts and recent intelligence views.
+- Article detail page and advanced article workflows.
+
+Still open in Filtering/Search:
+- Date filtering.
+- Multi-tag filtering.
+- Server-side filtering/search.
+- URL state.
+- Saved filters.
 
 Mid term:
-- Add events and article-event relationships.
-- Add structured entities after tag, filtering, and event workflows stabilize.
+- Add events and article-event relationships after planning.
+- Add structured entities after source, article, tag, filtering, and event workflows stabilize.
 - Improve UI consistency and shared form components.
 - Add RSS ingestion after manual collection workflows mature.
 

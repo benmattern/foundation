@@ -2,7 +2,7 @@
 
 ## Vision
 
-FOUNDATION is an OSINT-focused intelligence and monitoring platform designed to collect, organize, structure, and analyze open-source information.
+FOUNDATION is an OSINT-focused intelligence and monitoring platform designed to collect, organize, structure, filter, and analyze open-source information.
 
 The long-term goal is to build a modular intelligence operating system capable of supporting:
 - geopolitical monitoring,
@@ -53,17 +53,19 @@ Current frontend architecture uses:
 - shared layouts
 - reusable UI components
 - service-layer abstraction for Supabase access
+- client-side page state for early filtering/search workflows
+- inline/page-level article management for early edit/delete workflows
 
 ### Current Folder Structure
 
 ```txt
 src/
-├── components/
-├── layouts/
-├── pages/
-├── services/
-├── types/
-├── lib/
+  components/
+  layouts/
+  pages/
+  services/
+  types/
+  lib/
 ```
 
 ---
@@ -90,17 +92,23 @@ Design themes:
 ## Dashboard
 - Shared dashboard layout
 - Sidebar navigation
-- Reusable card components
+- Reusable Card component
+- Reusable PageHeader component
 - Route-based navigation
+- Basic source count metric
 
 ## Sources
+
 Current functionality:
 - Create source
 - Edit source
-- Delete source
 - Source listing
 - Source detail pages
 - Supabase persistence
+
+Not implemented:
+- Source delete
+- Source filtering/search
 
 Current source fields:
 - id
@@ -111,25 +119,58 @@ Current source fields:
 - created_at
 
 ## Articles
+
 Current functionality:
 - Create article
 - Associate article with source
 - Store article metadata
 - Article listing
+- Assign multiple tags during article creation
+- Display tag badges on articles
+- Client-side search by title and summary
+- Client-side filter by one tag
+- Client-side filter by one source
+- Clear filters
+- Filtered result count
+- Filtered empty state
+- Edit article metadata
+- Edit article source
+- Edit article published date
+- Edit article tags
+- Add/remove tags from existing articles
+- Retag existing articles
+- Delete articles
 
-Current article direction:
-- articles belong to sources
-- future entity extraction planned
-- future tagging planned
+Not implemented:
+- Article detail page
+- Date filtering
+- Multi-tag filtering
+- Server-side filtering/search
+- URL state
+- Saved filters
+
+## Tags
+
+Current functionality:
+- Create tag
+- List tags
+- Delete tag
+- Assign tags to new articles
+- Display tags on article records
+- Filter articles by one tag
 
 ---
 
-# Current Database Direction
+# Current Data And Workflow Model
 
-Current architecture direction:
+Current implemented flow:
 
 ```txt
-Sources -> Articles -> Entities -> Timeline Events
+Sources
+  -> Articles
+    <-> Tags
+       -> Filtering/Search v1
+       -> Article Management v1
 ```
 
 Long-term relational direction:
@@ -138,53 +179,47 @@ Long-term relational direction:
 Sources
   -> Articles
     -> Tags
+    -> Events
     -> Entities
-      -> Events
-        -> Timelines
-          -> Relationships
+      -> Timelines
+        -> Relationships
 ```
 
 ---
 
-# Current Priorities
+# Current Milestone Status
 
-## Immediate Priorities
-1. Tags / Topics system
-2. Article-to-tag relationships
-3. Event system
-4. Search and filtering
-5. RSS ingestion
-6. Dashboard improvements
+Completed:
+1. Sources foundation
+2. Articles foundation
+3. Standalone Tags CRUD
+4. Article <-> Tag relationships
+5. Filtering & Search v1
+6. Article Management v1
 
-## Mid-Term Priorities
-- Entity extraction
-- Timeline visualization
-- Watchlists
-- AI-assisted summaries
-- Correlation workflows
+Next milestone:
+- Events Planning
 
-## Long-Term Priorities
-- Intelligence graph
-- Signal detection
-- Trend analysis
-- Predictive indicators
-- Multi-tenant architecture
-- Advanced OSINT tooling
+Events implementation has not started.
 
 ---
 
 # Current Services
 
 ## Existing Service Layer
+
 Current services include:
 - sourceService.ts
 - articleService.ts
+- tagService.ts
 
 Service layer is intended to:
 - isolate Supabase logic
 - simplify component structure
 - improve maintainability
 - support future backend flexibility
+
+Article service currently composes `ArticleWithTags` from articles, article_tags, and tags rather than relying on nested Supabase relationship selects.
 
 ---
 
@@ -208,6 +243,7 @@ Environment variables currently required:
 # Planned Core Data Models
 
 ## Sources
+
 Represents external information sources.
 
 Examples:
@@ -218,6 +254,7 @@ Examples:
 - RSS feeds
 
 ## Articles
+
 Represents individual intelligence items or reports.
 
 Examples:
@@ -227,6 +264,7 @@ Examples:
 - official statements
 
 ## Tags
+
 Represents topics or classifications.
 
 Examples:
@@ -236,17 +274,8 @@ Examples:
 - Export Controls
 - PLA Navy
 
-## Entities
-Represents structured real-world objects.
-
-Examples:
-- countries
-- organizations
-- companies
-- technologies
-- individuals
-
 ## Events
+
 Represents discrete incidents or developments.
 
 Examples:
@@ -256,17 +285,31 @@ Examples:
 - product launches
 - diplomatic meetings
 
+## Entities
+
+Represents structured real-world objects.
+
+Examples:
+- countries
+- organizations
+- companies
+- technologies
+- individuals
+
 ---
 
 # Known Technical Debt
 
 ## Current Areas To Improve
-- Search/filtering architecture
+- Filtering/search is client-side only
 - Data normalization
 - More consistent type organization
 - Better form validation
 - Improved UI consistency
 - Event/timeline schema design
+- Article creation and tag assignment are frontend-driven separate operations
+- Article update and tag replacement are frontend-driven separate operations
+- Article retagging uses delete-then-insert tag replacement
 
 ---
 
@@ -311,6 +354,7 @@ Potential future capabilities:
 - watchlists
 - alerting systems
 - collaborative analysis
+- Financial Signals
 - hardware/sensor integrations
 
 The project direction is heavily inspired by:
