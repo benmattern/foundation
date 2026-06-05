@@ -4,7 +4,7 @@
 
 FOUNDATION is currently in early Phase 1 development.
 
-The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, and Article Management v1 for articles.
+The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, Article Management v1, and Event v1 with Article <-> Event relationships.
 
 The current focus is:
 - establishing core intelligence data structures,
@@ -134,6 +134,7 @@ Operational for create, list, detail, and edit workflows.
 - Clear filters button
 - Filtered result count
 - Filtered empty state
+- Link articles to analyst-created events through Event v1
 
 ## Not Yet Implemented
 - Article detail page
@@ -155,6 +156,7 @@ Sources
     <-> Tags
        -> Filtering/Search v1
        -> Article Management v1
+    <-> Events v1
 ```
 
 ---
@@ -183,6 +185,43 @@ Sources
 Standalone Tags CRUD and Article <-> Tag relationship workflows are complete for the current stage.
 
 Article tags can be added, removed, and replaced on existing articles through Article Management v1.
+
+---
+
+# Events v1
+
+## Implemented
+- events table created
+- article_events join table created
+- Event TypeScript types added
+- eventService.ts added
+- EventsPage created
+- EventDetailPage created
+- EventForm component created
+- EventList component created
+- Events route added at `/events`
+- Event detail route added at `/events/:id`
+- Events sidebar navigation added
+- Create events
+- Edit events
+- Delete events
+- Link articles to events
+- Unlink articles from events
+- Replace linked articles through service-layer delete-then-insert behavior
+- Event statuses supported: draft, active, resolved, archived
+
+## Not Yet Implemented
+- Event search/filtering
+- Event tags
+- Event entities
+- Timeline visualization
+- Event AI suggestions
+- Event severity/confidence scoring
+- Event date ranges
+
+## Current Status
+
+Complete for v1. Events are analyst-created intelligence objects supported by linked articles.
 
 ---
 
@@ -250,7 +289,7 @@ EntitiesPage exists as a placeholder only. No entity schema, service, or CRUD wo
 
 ## Events, Timelines, Notes, Settings
 
-No event, timeline, notes, or settings workflows are implemented yet.
+Events v1 is implemented. Timeline, notes, and settings workflows are not implemented yet.
 
 ## RSS, AI, Financial Signals
 
@@ -287,6 +326,7 @@ src/
 - sourceService.ts
 - articleService.ts
 - tagService.ts
+- eventService.ts
 
 ---
 
@@ -314,11 +354,12 @@ Sources
     <-> Tags
        -> Filtering/Search v1
        -> Article Management v1
+    <-> Events v1
 ```
 
 ## Next Milestone
 
-Events Planning is the next milestone. Events implementation has not started.
+The next milestone is a decision point between Dashboard v1 and Event Refinement v1. Neither has started.
 
 ## Expanded Long-Term Direction
 
@@ -337,7 +378,7 @@ Sources
 # Immediate Priorities
 
 Next priority:
-1. Events Planning
+1. Dashboard v1 / Event Refinement decision point
 2. Dashboard Improvements v1
 3. Article detail page / advanced article workflows
 
@@ -379,12 +420,14 @@ Open Filtering/Search follow-ups:
 - Data normalization
 - UI consistency
 - Empty shared UI primitives for Button, Input, Textarea, and EmptyState
-- Event/timeline schema design
+- Event search/filtering and refinement scope
+- Timeline schema design
 - Form validation consistency
 - Better typing standardization across components
 - Frontend-driven article creation and tag assignment are not transactionally coupled
 - Article update and tag replacement are not transactionally coupled
 - Article retagging uses delete-then-insert tag replacement
+- Event article-link replacement uses delete-then-insert behavior
 - Documentation drift between implemented and planned features
 
 ---

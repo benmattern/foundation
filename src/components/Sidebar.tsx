@@ -5,6 +5,7 @@ const navItems = [
   { label: "Sources", to: "/sources" },
   { label: "Articles", to: "/articles" },
   { label: "Tags", to: "/tags" },
+  { label: "Events", to: "/events" },
   { label: "Entities", to: "/entities" },
 ];
 

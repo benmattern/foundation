@@ -18,27 +18,38 @@ Implemented:
 - Add/remove tags from existing articles.
 - Delete articles.
 - Tag badges displayed on article records.
+- Event v1 workflow: create, list, view detail, edit, and delete events.
+- Article <-> Event relationships through `article_events`.
+- Link and unlink articles from events.
+- Event detail pages for analyst-created intelligence objects.
 - Client-side article search by title and summary.
 - Client-side article filtering by one tag.
 - Client-side article filtering by one source.
 - Clear filters button, filtered result count, and filtered empty state.
 - `ArticleFilters` component.
-- Supabase service layer for sources, articles, and tags.
+- Supabase service layer for sources, articles, tags, and events.
 - Shared Card component and low-risk UI cleanup pass.
 
 Not implemented yet:
+- Event search/filtering.
+- Event tags.
+- Event entity linking.
+- Timeline visualization.
+- Event AI suggestions.
+- Event severity/confidence scoring.
+- Event date ranges.
 - Date filtering.
 - Multi-tag filtering.
 - Server-side filtering or server-side search.
 - URL query params or saved filters.
 - Article detail page.
-- Entity, event, timeline, notes, and settings workflows.
+- Entity, timeline, notes, and settings workflows.
 - RSS ingestion.
 - Financial Signals.
 - Authentication, app auth flows, and RLS-managed access.
 - AI-assisted ingestion, summarization, tagging, or entity extraction.
 
-The next milestone is Events Planning. Events implementation has not started.
+The next milestone is a decision point between Dashboard v1 and Event Refinement v1. Neither has started.
 
 ## Tech Stack
 
@@ -113,8 +124,8 @@ Key files:
 ## Roadmap
 
 Near term:
-- Events Planning: event schema and workflow design before implementation.
-- Dashboard Improvements v1: real article/tag counts and recent intelligence views.
+- Dashboard v1: real article/tag/event counts and recent intelligence views.
+- Event Refinement v1: event search/filtering and workflow polish.
 - Article detail page and advanced article workflows.
 
 Still open in Filtering/Search:
@@ -125,7 +136,6 @@ Still open in Filtering/Search:
 - Saved filters.
 
 Mid term:
-- Add events and article-event relationships after planning.
 - Add structured entities after source, article, tag, filtering, and event workflows stabilize.
 - Improve UI consistency and shared form components.
 - Add RSS ingestion after manual collection workflows mature.

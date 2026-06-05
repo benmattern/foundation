@@ -55,6 +55,7 @@ Current frontend architecture uses:
 - service-layer abstraction for Supabase access
 - client-side page state for early filtering/search workflows
 - inline/page-level article management for early edit/delete workflows
+- event detail pages for analyst-created intelligence objects
 
 ### Current Folder Structure
 
@@ -140,6 +141,7 @@ Current functionality:
 - Add/remove tags from existing articles
 - Retag existing articles
 - Delete articles
+- Link articles to events
 
 Not implemented:
 - Article detail page
@@ -159,6 +161,28 @@ Current functionality:
 - Display tags on article records
 - Filter articles by one tag
 
+## Events
+
+Current functionality:
+- Create event
+- List events
+- View event detail pages
+- Edit event
+- Delete event
+- Link articles to events
+- Unlink articles from events
+- Replace linked articles through service-layer delete-then-insert behavior
+- Track event status as draft, active, resolved, or archived
+
+Not implemented:
+- Event search/filtering
+- Event tags
+- Event entity linking
+- Timeline visualization
+- Event AI suggestions
+- Event severity/confidence scoring
+- Event date ranges
+
 ---
 
 # Current Data And Workflow Model
@@ -171,6 +195,7 @@ Sources
     <-> Tags
        -> Filtering/Search v1
        -> Article Management v1
+    <-> Events v1
 ```
 
 Long-term relational direction:
@@ -196,11 +221,12 @@ Completed:
 4. Article <-> Tag relationships
 5. Filtering & Search v1
 6. Article Management v1
+7. Event v1
 
 Next milestone:
-- Events Planning
+- Dashboard v1 / Event Refinement decision point
 
-Events implementation has not started.
+Neither Dashboard v1 nor Event Refinement v1 has started.
 
 ---
 
@@ -212,6 +238,7 @@ Current services include:
 - sourceService.ts
 - articleService.ts
 - tagService.ts
+- eventService.ts
 
 Service layer is intended to:
 - isolate Supabase logic
@@ -220,6 +247,8 @@ Service layer is intended to:
 - support future backend flexibility
 
 Article service currently composes `ArticleWithTags` from articles, article_tags, and tags rather than relying on nested Supabase relationship selects.
+
+Event service currently composes events with linked articles from events, article_events, and articles. Events are analyst-created intelligence objects supported by article evidence.
 
 ---
 
@@ -276,7 +305,7 @@ Examples:
 
 ## Events
 
-Represents discrete incidents or developments.
+Represents analyst-created intelligence objects for discrete incidents or developments.
 
 Examples:
 - military exercises
@@ -306,10 +335,12 @@ Examples:
 - More consistent type organization
 - Better form validation
 - Improved UI consistency
-- Event/timeline schema design
+- Event search/filtering and refinement scope
+- Timeline schema design
 - Article creation and tag assignment are frontend-driven separate operations
 - Article update and tag replacement are frontend-driven separate operations
 - Article retagging uses delete-then-insert tag replacement
+- Event article-link replacement uses delete-then-insert behavior
 
 ---
 

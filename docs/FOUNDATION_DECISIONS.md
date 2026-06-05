@@ -435,7 +435,7 @@ This keeps retagging logic centralized in `articleService.ts` and keeps ArticleF
 # Article Management Before Events
 
 ## Decision
-Complete Article Management v1 before Events Planning and implementation.
+Complete Article Management v1 before Event v1 implementation.
 
 ## Reasoning
 Article records are the central intelligence object in the current platform.
@@ -449,6 +449,87 @@ Before adding events, articles should be manageable after creation:
 - and deletion.
 
 This strengthens the existing Sources -> Articles <-> Tags workflow before introducing a new intelligence object.
+
+---
+
+# Events As Analyst-Created Intelligence Objects
+
+## Decision
+Implement Event v1 as analyst-created intelligence objects rather than automated or AI-generated detections.
+
+## Reasoning
+The current platform is still establishing core intelligence workflows.
+
+Analyst-created events:
+- keep humans in control of event definition,
+- avoid premature AI inference,
+- provide immediate workflow value,
+- and create a stable foundation for future assisted event detection.
+
+---
+
+# Article/Event Relationship Through article_events
+
+## Decision
+Link articles and events through the `article_events` join table.
+
+## Reasoning
+Articles and events are many-to-many:
+- one event can be supported by many articles,
+- one article can support many events,
+- and article evidence should remain explicit.
+
+The join table keeps the relationship normalized and compatible with future event search, timelines, entity links, and analyst workflows.
+
+---
+
+# Event Detail Pages In Event v1
+
+## Decision
+Add event detail pages during Event v1 instead of limiting events to a list-only workflow.
+
+## Reasoning
+Events are higher-level intelligence objects than individual article cards.
+
+Detail pages provide room for:
+- event metadata,
+- linked supporting articles,
+- edit/delete actions,
+- and future refinement such as event timelines, entity links, or analyst notes.
+
+---
+
+# Event Tags, Entities, And AI Suggestions Deferred
+
+## Decision
+Defer event tags, event entity linking, and AI event suggestions until after Event v1.
+
+## Reasoning
+Event v1 should prove the core manual workflow first:
+- create events,
+- edit events,
+- delete events,
+- and link supporting articles.
+
+Adding event tags, entities, or AI suggestions too early would increase schema and UI complexity before the analyst-driven event model is validated.
+
+---
+
+# Service-Layer Replacement For Event Article Links
+
+## Decision
+Retain event/article link management in `eventService.ts` and replace the full set of linked articles on event edit.
+
+Current behavior:
+- delete existing `article_events` rows for the event,
+- deduplicate selected article IDs,
+- insert the selected article IDs,
+- allow empty selection to remove all article links.
+
+## Reasoning
+Full replacement is simple, predictable, and consistent with Article Management v1 retagging behavior.
+
+This keeps link mutation logic centralized in the service layer and avoids UI-side diffing logic during the prototype stage.
 
 ---
 

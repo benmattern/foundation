@@ -31,6 +31,7 @@ Build a stable platform capable of:
 - organizing sources and articles,
 - tagging records,
 - filtering and searching,
+- creating analyst-defined events linked to supporting articles,
 - and supporting repeatable analyst workflows.
 
 ---
@@ -130,17 +131,64 @@ Build a stable platform capable of:
 
 ---
 
+# Event v1
+
+## Completed Tasks
+
+### Database
+- [x] Create events table
+- [x] Create article_events join table
+
+### Types
+- [x] Create event.ts
+- [x] Add Event TypeScript types
+
+### Services
+- [x] Create eventService.ts
+- [x] Keep event Supabase access centralized in services
+- [x] Replace linked articles through delete-then-insert behavior
+
+### Components
+- [x] Create EventForm.tsx
+- [x] Create EventList.tsx
+
+### Pages And Routes
+- [x] Create EventsPage.tsx
+- [x] Create EventDetailPage.tsx
+- [x] Add `/events` route
+- [x] Add `/events/:id` route
+- [x] Add Events sidebar navigation
+
+### Features
+- [x] Create events
+- [x] Edit events
+- [x] Delete events
+- [x] Link articles to events
+- [x] Unlink articles from events
+- [x] View event detail pages
+
+## Still Open
+- [ ] Event search/filtering
+- [ ] Event tags
+- [ ] Event entity linking
+- [ ] Timeline visualization
+- [ ] Event AI suggestions
+- [ ] Event severity/confidence scoring
+- [ ] Event date ranges
+
+---
+
 # Immediate Backlog
 
 # Next Milestone
 
-## Events Planning
-- [ ] Confirm event schema direction
-- [ ] Decide event/article relationship model
-- [ ] Draft event service and UI plan
-- [ ] Decide whether events come before entities
+## Dashboard v1 / Event Refinement Decision Point
+- [ ] Decide whether the next milestone is Dashboard v1
+- [ ] Decide whether the next milestone is Event Refinement v1
+- [ ] Define Dashboard v1 metrics and recent intelligence views if chosen
+- [ ] Define Event Refinement v1 search/filtering scope if chosen
 
-Events implementation has not started.
+Neither Dashboard v1 nor Event Refinement v1 has started.
 
 ---
 
@@ -180,11 +228,11 @@ Examples:
 
 ---
 
-# Future Event System
+# Future Event Refinement
 
 ## Goal
 
-Track discrete geopolitical, technological, and operational developments.
+Refine discrete geopolitical, technological, and operational developments after Event v1.
 
 ## Planned Event Types
 - military exercises
@@ -196,26 +244,14 @@ Track discrete geopolitical, technological, and operational developments.
 - legislation
 - cyber incidents
 
-## Planned Tasks
-
-### Database
-- [ ] Create events table
-- [ ] Create article_events join table
-
-### Types
-- [ ] Create event.ts
-
-### Services
-- [ ] Create eventService.ts
-
-### Components
-- [ ] EventForm.tsx
-- [ ] EventList.tsx
-
-### Features
+## Planned Refinements
 - [ ] Event timelines
 - [ ] Event filtering
-- [ ] Event/article relationships
+- [ ] Event tags
+- [ ] Event entity linking
+- [ ] Event AI suggestions
+- [ ] Event severity/confidence scoring
+- [ ] Event date ranges
 
 ---
 

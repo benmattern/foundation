@@ -26,6 +26,7 @@ Sources
     <-> Tags
        -> Filtering/Search v1
        -> Article Management v1
+    <-> Events v1
 ```
 
 The schema is intentionally evolving in layers:
@@ -129,18 +130,18 @@ articles
   -> tags
 ```
 
+```txt
+articles
+  -> article_events
+  -> events
+```
+
 Future:
 
 ```txt
 articles
   -> article_entities
   -> entities
-```
-
-```txt
-articles
-  -> article_events
-  -> events
 ```
 
 ---
@@ -277,6 +278,24 @@ Current use:
 
 ---
 
+# FoundationEventWithArticles
+
+`FoundationEventWithArticles` is a derived frontend/application type, not a database table.
+
+It represents an event row composed with its linked article records:
+
+```txt
+FoundationEventWithArticles = FoundationEvent & { articles: Article[] }
+```
+
+Current use:
+- EventsPage loads composed event records with linked articles.
+- EventList displays event summaries and linked article counts.
+- EventDetailPage displays event metadata and supporting articles.
+- EventForm uses article IDs to create or replace event/article links.
+
+---
+
 # Filtering & Search v1
 
 Filtering & Search v1 required no schema changes.
@@ -321,6 +340,128 @@ Article retagging is implemented in the service layer with delete-then-insert re
 
 ---
 
+# events
+
+## Current Implementation Status
+
+The events table is operational in the app:
+- create events
+- list events
+- view event detail pages
+- edit events
+- delete events
+- link articles to events
+- unlink articles from events
+
+## Purpose
+
+Represents analyst-created intelligence objects for discrete geopolitical, technological, or operational developments.
+
+Examples:
+- military exercises
+- sanctions
+- elections
+- diplomatic meetings
+- product launches
+- export controls
+- cyber incidents
+
+---
+
+## Current Fields
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| title | text | Event title |
+| description | text | Optional event description |
+| event_type | text | Event classification |
+| status | text | Constrained event status |
+| occurred_at | timestamptz | Optional primary event timestamp |
+| location | text | Optional location |
+| created_at | timestamptz | Creation timestamp |
+| updated_at | timestamptz | Update timestamp |
+
+---
+
+## Status Values
+
+Implemented event statuses:
+- draft
+- active
+- resolved
+- archived
+
+---
+
+## Current Relationship Direction
+
+```txt
+articles
+  -> article_events
+  -> events
+```
+
+Many-to-many relationship.
+
+One event can be supported by many articles.
+
+One article can support many events.
+
+---
+
+# article_events
+
+## Purpose
+
+Join table connecting articles and events.
+
+---
+
+## Current Fields
+
+| Column | Type | Notes |
+|---|---|---|
+| article_id | uuid | FK -> articles.id; on delete cascade |
+| event_id | uuid | FK -> events.id; on delete cascade |
+| created_at | timestamptz | Creation timestamp; default now() |
+
+---
+
+## Keys And Constraints
+
+The table uses a composite primary key:
+
+```txt
+(article_id, event_id)
+```
+
+This prevents duplicate article links for the same event.
+
+---
+
+## Relationship Type
+
+Many-to-many:
+
+```txt
+articles <-> events
+```
+
+---
+
+## Current App Status
+
+Event/article linking is operational through Event v1:
+- Event creation can insert linked `article_events` records.
+- Event editing can replace linked articles.
+- Existing `article_events` rows for the event are deleted.
+- Selected article IDs are reinserted.
+- Empty article selection removes all article links from the event.
+- Article IDs are deduplicated before insertion.
+
+---
+
 # Planned Tables
 
 # entities
@@ -356,44 +497,6 @@ articles
 | name | text | Entity name |
 | entity_type | text | Country/org/company/etc |
 | description | text | Optional notes |
-| created_at | timestamptz | Creation timestamp |
-
----
-
-# events
-
-## Purpose
-
-Represents discrete geopolitical, technological, or operational developments.
-
-Examples:
-- military exercises
-- sanctions
-- elections
-- diplomatic meetings
-- product launches
-
----
-
-## Planned Relationship Direction
-
-```txt
-articles
-  -> article_events
-  -> events
-```
-
----
-
-## Potential Fields
-
-| Column | Type | Notes |
-|---|---|---|
-| id | uuid | Primary key |
-| title | text | Event title |
-| description | text | Event description |
-| event_date | timestamptz | Primary event timestamp |
-| event_type | text | Classification |
 | created_at | timestamptz | Creation timestamp |
 
 ---
@@ -478,12 +581,13 @@ Sources
     <-> Tags
        -> Filtering/Search v1
        -> Article Management v1
+    <-> Events v1
 ```
 
 Next milestone:
-- Events Planning
+- Dashboard v1 / Event Refinement decision point
 
-Entities and events intentionally come later unless explicitly reprioritized.
+Entities, timelines, and advanced event refinements intentionally come later unless explicitly reprioritized.
 
 ---
 
@@ -599,8 +703,8 @@ until:
 The next schema-impacting direction has not started.
 
 Current candidate directions:
-1. Events Planning
+1. Dashboard v1 / Event Refinement decision point
 2. Dashboard Improvements v1
 3. Article detail page / advanced article workflows
 
-Filtering & Search v1 and Article Management v1 are complete and required no schema changes.
+Filtering & Search v1 and Article Management v1 are complete and required no schema changes. Event v1 is implemented with `events` and `article_events`.

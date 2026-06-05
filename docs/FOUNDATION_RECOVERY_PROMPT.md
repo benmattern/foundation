@@ -17,6 +17,7 @@ Sources
     <-> Tags
        -> Filtering/Search v1
        -> Article Management v1
+    <-> Events v1
 ```
 
 The long-term direction is:
@@ -148,15 +149,42 @@ Not yet implemented:
 
 Standalone Tags CRUD, Article <-> Tag relationships, Filtering & Search v1, and Article Management v1 are complete for the current stage.
 
+## Events
+- events table exists
+- article_events table exists
+- event.ts exists
+- eventService.ts exists
+- EventForm exists
+- EventList exists
+- EventsPage exists
+- EventDetailPage exists
+- Events route exists at `/events`
+- Event detail route exists at `/events/:id`
+- Events sidebar navigation exists
+- Create/edit/delete events works
+- Link/unlink articles to events works
+- Event article links are replaced through delete-then-insert service behavior
+- Event detail pages work
+- Event statuses are draft, active, resolved, and archived
+
+Not yet implemented:
+- Event search/filtering
+- Event tags
+- Event entity linking
+- Timeline visualization
+- Event AI suggestions
+- Event severity/confidence scoring
+- Event date ranges
+
 ---
 
 # Current Work In Progress
 
 ## Next Milestone
 
-The next priority is Events Planning.
+The next priority is a decision point between Dashboard v1 and Event Refinement v1.
 
-Events implementation has not started. Do not create event schema, services, or UI until planning is explicitly requested and approved. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly changes priority.
+Neither Dashboard v1 nor Event Refinement v1 has started. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly changes priority.
 
 ---
 
@@ -166,9 +194,9 @@ Events implementation has not started. Do not create event schema, services, or 
 
 EntitiesPage exists as a placeholder only. No entity schema, service, or CRUD workflow is implemented.
 
-## Events, Timeline, Notes, Settings
+## Timeline, Notes, Settings
 
-No event, timeline, notes, or settings workflows are implemented.
+Timeline, notes, and settings workflows are not implemented.
 
 ## RSS, AI, Financial Signals
 
@@ -241,7 +269,7 @@ When starting a new ChatGPT or Codex session:
 2. Read FOUNDATION_STATUS.md and FOUNDATION_BACKLOG.md.
 3. Inspect the relevant source files before making changes.
 4. Do not infer that planned features are implemented.
-5. Treat Events Planning as the next milestone unless the user explicitly chooses a different direction.
+5. Treat Dashboard v1 / Event Refinement as the next milestone decision point unless the user explicitly chooses a different direction.
 
 ---
 

@@ -82,6 +82,7 @@ Examples:
 - SourcesPage
 - ArticlesPage
 - TagsPage
+- EventsPage
 
 Pages should:
 - coordinate data,
@@ -100,6 +101,7 @@ Examples:
 - sourceService.ts
 - articleService.ts
 - tagService.ts
+- eventService.ts
 
 Services are responsible for:
 - Supabase queries,
@@ -124,6 +126,7 @@ Examples:
 - source.ts
 - article.ts
 - tag.ts
+- event.ts
 
 ---
 
@@ -300,6 +303,8 @@ Examples:
 - articles
 - tags
 - article_tags
+- events
+- article_events
 
 ---
 
@@ -331,7 +336,12 @@ FOUNDATION is intentionally relational.
 Current implemented relationship model:
 
 ```txt
-Sources -> Articles <-> Tags -> Filtering/Search v1 -> Article Management v1
+Sources
+  -> Articles
+    <-> Tags
+       -> Filtering/Search v1
+       -> Article Management v1
+    <-> Events v1
 ```
 
 Long-term direction:
@@ -476,15 +486,15 @@ Use this procedure when starting or resuming work with ChatGPT, Codex, or anothe
 
 ## Current Priority Alignment
 
-Standalone Tags CRUD, Article <-> Tag relationships, Filtering & Search v1, and Article Management v1 are complete for the current stage.
+Standalone Tags CRUD, Article <-> Tag relationships, Filtering & Search v1, Article Management v1, and Event v1 are complete for the current stage.
 
 The next milestone is:
 
 ```txt
-Events Planning
+Dashboard v1 / Event Refinement decision point
 ```
 
-Events implementation has not started. Do not create event schema, services, routes, or UI until Events Planning is explicitly requested and completed. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly reprioritizes.
+Neither Dashboard v1 nor Event Refinement v1 has started. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly reprioritizes.
 
 ---
 
