@@ -11,16 +11,25 @@ Implemented:
 - Sources workflow: create, list, view detail, and edit source records.
 - Articles workflow: create and list articles, with optional source association.
 - Tags workflow: create, list, and delete standalone tags.
+- Article <-> Tag relationships through `article_tags`.
+- Multi-tag assignment during article creation.
+- Tag badges displayed on article records.
 - Supabase service layer for sources, articles, and tags.
+- Shared Card component and a recent low-risk UI cleanup pass.
 
 Not implemented yet:
-- Article-to-tag assignment.
-- Article tag badges and tag filtering.
+- Tag filtering.
+- Search.
+- Date filtering.
+- Article edit/delete.
+- Article detail page.
 - Entity, event, timeline, notes, and settings workflows.
-- Authentication and role-based access.
+- RSS ingestion.
+- Financial Signals.
+- Authentication, app auth flows, and RLS-managed access.
 - AI-assisted ingestion, summarization, tagging, or entity extraction.
 
-The next intended feature is Article <-> Tag relationship management using the existing `article_tags` join-table direction.
+The next intended milestone is Filtering & Search, starting with tag filtering on articles.
 
 ## Tech Stack
 
@@ -95,21 +104,22 @@ Key files:
 ## Roadmap
 
 Near term:
-- Implement Article <-> Tag relationship management.
-- Display tags on article records.
-- Add article filtering by tag, source, and date.
+- Add article filtering by tag.
+- Add article search.
+- Add source and date filtering.
 - Improve dashboard metrics and recent intelligence views.
 
 Mid term:
 - Add events and article-event relationships.
-- Add search and filtering workflows.
-- Add structured entities after tag and event workflows stabilize.
+- Add structured entities after tag, filtering, and event workflows stabilize.
 - Improve UI consistency and shared form components.
+- Add RSS ingestion after manual collection workflows mature.
 
 Long term:
 - Timeline intelligence.
 - Watchlists.
 - Analyst notes and reporting workflows.
+- Financial Signals.
 - Intelligence graph and relationship mapping.
 - AI-assisted summarization, tagging, and entity extraction.
 

@@ -9,10 +9,16 @@ FOUNDATION is designed as:
 - technology monitoring,
 - and operational awareness.
 
+The current implemented relationship model is:
+
+```txt
+Sources -> Articles <-> Tags
+```
+
 The long-term direction is:
 
 ```txt
-Sources -> Articles -> Tags -> Entities -> Events -> Timelines -> Relationships
+Sources -> Articles -> Tags -> Events -> Entities -> Timelines -> Relationships
 ```
 
 The current implementation is still early Phase 1. Do not assume advanced workflows are implemented.
@@ -87,6 +93,10 @@ Not yet implemented:
 - Create article
 - List articles
 - Associate article with a source
+- Assign multiple tags during article creation
+- Insert article_tags records after article creation
+- Display tag badges on article records
+- Reload articles after successful creation
 - Published date handling
 - Supabase persistence
 
@@ -94,40 +104,43 @@ Not yet implemented:
 - Edit article
 - Delete article
 - Article detail page
-- Article-tag assignment
-- Article filtering/search
+- Tag filtering
+- Search
+- Date filtering
 
 ## Tags
 - tags table exists
 - article_tags table exists
 - seed tags exist
 - tag.ts exists
+- ArticleWithTags derived application type exists
 - tagService.ts exists
 - TagForm exists
 - TagList exists
 - TagsPage exists
 - Tags route exists
 - Standalone create/list/delete tags works
+- Tags can be assigned to new articles
+- Tags display on article records
 
-Standalone Tags CRUD is complete for the current stage.
+Standalone Tags CRUD and Article <-> Tag relationships are complete for the current stage.
 
 ---
 
 # Current Work In Progress
 
-## Next Feature: Article <-> Tag Relationships
+## Next Feature: Filtering & Search
 
-The next implementation step should be article-tag relationship management.
+The next implementation step should be filtering and search.
 
-Expected direction:
-1. Add service functions for assigning tags to articles.
-2. Add service functions for removing tags from articles.
-3. Fetch or compose article records with related tags.
-4. Allow multiple tag selection during article creation or article editing.
-5. Display tag badges on article records.
-6. Add article filtering by tag.
+Expected first direction:
+1. Add tag filtering on ArticlesPage.
+2. Add article text search.
+3. Add source filtering.
+4. Add date filtering.
+5. Keep Supabase access centralized in services.
 
-Keep Supabase access centralized in services.
+Do not skip ahead to events, entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly changes priority.
 
 ---
 
@@ -137,9 +150,13 @@ Keep Supabase access centralized in services.
 
 EntitiesPage exists as a placeholder only. No entity schema, service, or CRUD workflow is implemented.
 
-## Timeline, Notes, Settings
+## Events, Timeline, Notes, Settings
 
-Sidebar entries exist, but routes/pages/workflows are not implemented.
+No event, timeline, notes, or settings workflows are implemented.
+
+## RSS, AI, Financial Signals
+
+RSS ingestion, AI-assisted workflows, and Financial Signals are future-phase concepts only.
 
 ---
 
@@ -208,7 +225,7 @@ When starting a new ChatGPT or Codex session:
 2. Read FOUNDATION_STATUS.md and FOUNDATION_BACKLOG.md.
 3. Inspect the relevant source files before making changes.
 4. Do not infer that planned features are implemented.
-5. Keep Article <-> Tag relationships as the next feature unless the user explicitly changes priority.
+5. Treat Filtering & Search as the next milestone unless the user explicitly changes priority.
 
 ---
 
@@ -221,6 +238,7 @@ FOUNDATION is intended to evolve into:
 - relationship mapping,
 - timeline analysis,
 - signal detection,
+- financial signal awareness,
 - and AI-assisted analyst workflows.
 
 Current focus is:

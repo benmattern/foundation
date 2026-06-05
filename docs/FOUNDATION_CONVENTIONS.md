@@ -328,22 +328,10 @@ Use UUID primary keys.
 
 FOUNDATION is intentionally relational.
 
-Current implemented relationship:
+Current implemented relationship model:
 
 ```txt
-Sources -> Articles
-```
-
-Current standalone vocabulary:
-
-```txt
-Tags
-```
-
-Next relationship to implement:
-
-```txt
-Articles <-> Tags
+Sources -> Articles <-> Tags
 ```
 
 Long-term direction:
@@ -488,15 +476,15 @@ Use this procedure when starting or resuming work with ChatGPT, Codex, or anothe
 
 ## Current Priority Alignment
 
-Standalone Tags CRUD is complete for the current stage.
+Standalone Tags CRUD and Article <-> Tag relationships are complete for the current stage.
 
 The next intended feature is:
 
 ```txt
-Article <-> Tag relationship management
+Filtering & Search
 ```
 
-Do not skip ahead to entities, timelines, RSS ingestion, or AI workflows unless the user explicitly reprioritizes.
+Do not skip ahead to events, entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly reprioritizes.
 
 ---
 

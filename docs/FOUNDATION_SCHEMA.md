@@ -18,16 +18,24 @@ This document should evolve alongside migrations, new entities, and architectura
 
 FOUNDATION is being designed as a relational intelligence platform, not a flat content repository.
 
+The current implemented model is:
+
+```txt
+Sources
+  -> Articles
+    <-> Tags
+```
+
 The schema is intentionally evolving in layers:
 
 ```txt
 Sources
   -> Articles
     -> Tags
+    -> Events
     -> Entities
-      -> Events
-        -> Timelines
-          -> Relationships
+      -> Timelines
+        -> Relationships
 ```
 
 This allows gradual complexity, stable iteration, and future analytical expansion.
@@ -104,19 +112,6 @@ Examples:
 
 ---
 
-## Current Direction
-
-Articles are currently the central operational intelligence object.
-
-They are expected to eventually connect to:
-- tags
-- entities
-- events
-- timelines
-- relationships
-
----
-
 ## Current Relationships
 
 Implemented in the app:
@@ -125,8 +120,6 @@ Implemented in the app:
 sources
   -> articles
 ```
-
-Schema direction documented for next implementation:
 
 ```txt
 articles
@@ -154,12 +147,14 @@ articles
 
 ## Current Implementation Status
 
-The tags and article_tags tables have been created. Standalone Tags CRUD is operational in the app:
+The tags and article_tags tables are operational in the app:
 - create tags
 - list tags
 - delete tags
+- assign multiple tags to new articles
+- display tag badges on article records
 
-Article-to-tag assignment is not yet implemented.
+Filtering by tag is not yet implemented.
 
 ## Purpose
 
@@ -201,8 +196,6 @@ One article can have many tags.
 
 One tag can belong to many articles.
 
-This relationship is documented and table-backed, but the app does not yet provide assignment, display, or filtering workflows.
-
 ---
 
 # article_tags
@@ -217,9 +210,21 @@ Join table connecting articles and tags.
 
 | Column | Type | Notes |
 |---|---|---|
-| article_id | uuid | FK -> articles.id |
-| tag_id | uuid | FK -> tags.id |
-| created_at | timestamptz | Creation timestamp |
+| article_id | uuid | FK -> articles.id; on delete cascade |
+| tag_id | uuid | FK -> tags.id; on delete cascade |
+| created_at | timestamptz | Creation timestamp; default now() |
+
+---
+
+## Keys And Constraints
+
+The table uses a composite primary key:
+
+```txt
+(article_id, tag_id)
+```
+
+This prevents duplicate tag assignments for the same article.
 
 ---
 
@@ -235,7 +240,30 @@ articles <-> tags
 
 ## Current App Status
 
-The `ArticleTag` TypeScript type exists. Article-tag service functions and UI workflows are not implemented yet.
+The `ArticleTag` TypeScript type exists.
+
+Article-tag service logic is operational through article creation:
+- Article creation inserts the article row first.
+- Selected tag IDs are inserted into `article_tags`.
+- Articles reload after successful creation.
+
+---
+
+# Derived Application Types
+
+# ArticleWithTags
+
+`ArticleWithTags` is a derived frontend/application type, not a database table.
+
+It represents an article row composed with its related tag records:
+
+```txt
+ArticleWithTags = Article & { tags: Tag[] }
+```
+
+Current use:
+- ArticlesPage loads composed article records with tags.
+- ArticleList displays tag badges from `ArticleWithTags.tags`.
 
 ---
 
@@ -340,6 +368,19 @@ Current implementation approach is undecided.
 
 ---
 
+# financial_signals
+
+## Purpose
+
+Potential future area for market, company, sector, and economic signals relevant to geopolitical analysis.
+
+Current status:
+- conceptual only
+- no schema implemented
+- no application workflow implemented
+
+---
+
 # relationships
 
 ## Purpose
@@ -375,17 +416,21 @@ Current focus:
 - stable schema growth
 - operational usefulness
 
-Current order of implementation:
+Current implemented relationship:
 
 ```txt
 Sources
   -> Articles
-    -> Tags
-      -> Events
-        -> Entities
+    <-> Tags
 ```
 
-Entities intentionally come later.
+Next implementation direction:
+
+```txt
+Filtering & Search
+```
+
+Entities and events intentionally come later.
 
 ---
 
@@ -477,7 +522,7 @@ Not currently implemented.
 
 No database migrations, RLS policies, or auth configuration are currently tracked in this repo.
 
-Until migrations are added, verify schema, constraints, and RLS directly in Supabase before assuming production security behavior.
+RLS is currently disabled for the prototype. Supabase security must be revisited before public or multi-user deployment.
 
 ---
 
@@ -500,10 +545,10 @@ until:
 
 Current highest-priority schema/application work:
 
-1. Article <-> Tag relationship management
-2. Article tag display and filtering
-3. Events
-4. article_events
-5. Search/filtering support
+1. Filtering & Search
+2. Tag filtering on articles
+3. Source and date filtering
+4. Events
+5. article_events
 
-These systems will establish the operational intelligence foundation for FOUNDATION.
+These systems will continue establishing the operational intelligence foundation for FOUNDATION.

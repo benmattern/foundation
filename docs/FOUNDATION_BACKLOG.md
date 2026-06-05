@@ -35,13 +35,9 @@ Build a stable platform capable of:
 
 ---
 
-# Immediate Backlog
+# Completed Milestones
 
-# Priority 1 - Tags System
-
-## Goal
-
-Transform articles into structured intelligence objects through lightweight classification.
+# Tags System
 
 ## Completed Tasks
 
@@ -52,55 +48,66 @@ Transform articles into structured intelligence objects through lightweight clas
 
 ### Types
 - [x] Finalize tag.ts
+- [x] Add ArticleWithTags derived application type
 
 ### Services
 - [x] Finish tagService.ts
+- [x] Add article-tag assignment in articleService.ts
+- [x] Fetch/compose article records with related tags in the service layer
 
 ### Components
 - [x] Create TagForm.tsx
 - [x] Create TagList.tsx
+- [x] Add tag selection to ArticleForm.tsx
+- [x] Display tag badges on article records
 
 ### Pages
 - [x] Create TagsPage.tsx
 - [x] Add Tags route
 - [x] Add Tags sidebar navigation
+- [x] Load tags into ArticlesPage
 
 ### Standalone Tags CRUD
 - [x] Create tags
 - [x] List tags
 - [x] Delete tags
 
-## Remaining Tag Work
-
-### Relationships
-- [ ] Add article-tag relationship management
-- [ ] Allow multiple tags per article
-
-### UI
-- [ ] Add tag filtering to articles
-- [ ] Add tag badges/chips to article records
-- [ ] Add tag search/filter UI
+### Article <-> Tag Relationships
+- [x] Add article-tag relationship management
+- [x] Allow multiple tags per article during article creation
+- [x] Insert article_tags records after article creation
+- [x] Reload articles after successful creation
+- [x] Display tag badges/chips on article records
+- [x] Keep Supabase access centralized in services
 
 ---
 
-# Priority 2 - Article <-> Tag Relationships
+# Immediate Backlog
+
+# Priority 1 - Filtering & Search
 
 ## Goal
 
-Connect article records to tags using the existing article_tags join-table direction.
+Enable operational intelligence workflows across sources, articles, and tags.
 
-## Planned Tasks
-- [ ] Add service functions for article-tag assignment
-- [ ] Add service functions for removing article tags
-- [ ] Fetch articles with related tags or compose article/tag data in the service layer
-- [ ] Allow multiple tag selection during article creation
-- [ ] Display tag badges on article records
-- [ ] Filter articles by selected tag
-- [ ] Keep Supabase access centralized in services
+## Planned Features
+- [ ] Tag filtering on articles
+- [ ] Article search
+- [ ] Source filtering
+- [ ] Date range filtering
+- [ ] Multi-tag filtering
+- [ ] Combined intelligence queries
+
+## Long-Term Search Goals
+
+Examples:
+- "Taiwan + PLA Navy"
+- "Semiconductors + Export Controls"
+- "TSMC within last 30 days"
 
 ---
 
-# Priority 3 - Dashboard Improvements
+# Priority 2 - Dashboard Improvements
 
 ## Goal
 
@@ -115,30 +122,7 @@ Make the dashboard reflect real current data instead of placeholder metrics.
 
 ---
 
-# Priority 4 - Search & Filtering
-
-## Goal
-
-Enable operational intelligence workflows.
-
-## Planned Features
-- [ ] Article search
-- [ ] Tag filtering
-- [ ] Multi-tag filtering
-- [ ] Source filtering
-- [ ] Date range filtering
-- [ ] Combined intelligence queries
-
-## Long-Term Search Goals
-
-Examples:
-- "Taiwan + PLA Navy"
-- "Semiconductors + Export Controls"
-- "TSMC within last 30 days"
-
----
-
-# Priority 5 - Event System
+# Priority 3 - Event System
 
 ## Goal
 
@@ -177,7 +161,7 @@ Track discrete geopolitical, technological, and operational developments.
 
 ---
 
-# Priority 6 - RSS Ingestion
+# Priority 4 - RSS Ingestion
 
 ## Goal
 
@@ -236,6 +220,17 @@ Move beyond tags into structured real-world entities.
 
 ---
 
+# Notes And Analyst Workspace
+
+## Planned Features
+- [ ] Research notes
+- [ ] Hypothesis tracking
+- [ ] Intelligence reports
+- [ ] Evidence linking
+- [ ] Exportable briefings
+
+---
+
 # Watchlists
 
 ## Planned Features
@@ -245,6 +240,15 @@ Move beyond tags into structured real-world entities.
 - [ ] Follow countries
 - [ ] Alert generation
 - [ ] Recent activity summaries
+
+---
+
+# Financial Signals
+
+## Planned Features
+- [ ] Market signal watchlists
+- [ ] Company and sector tracking
+- [ ] Cross-linking financial signals to articles, tags, entities, and events
 
 ---
 
@@ -301,17 +305,6 @@ Build relationship-based intelligence analysis.
 
 ---
 
-# Analyst Workspace
-
-## Planned Features
-- [ ] Research notes
-- [ ] Hypothesis tracking
-- [ ] Intelligence reports
-- [ ] Evidence linking
-- [ ] Exportable briefings
-
----
-
 # Multi-Tenant Architecture
 
 ## Goal
@@ -342,13 +335,17 @@ Allow multiple organizations or analysts to operate independent FOUNDATION envir
 
 # UI/UX Backlog
 
+## Completed
+- [x] Low-risk cleanup pass for dead navigation and stale starter files
+- [x] Shared Card component in active use
+
 ## Planned Improvements
 - [ ] Better mobile responsiveness
 - [ ] Consistent spacing system
 - [ ] Better typography
 - [ ] Better loading states
 - [ ] Better empty states
-- [ ] Shared Input, Textarea, and EmptyState components
+- [ ] Shared Button, Input, Textarea, and EmptyState components
 - [ ] Better dashboard polish
 
 ---
@@ -376,8 +373,8 @@ Phase 1 will be considered successful when FOUNDATION can reliably:
 - store intelligence data,
 - organize information,
 - classify articles,
-- track events,
 - filter/search effectively,
+- track events,
 - and support repeatable analyst workflows.
 
 At that point, FOUNDATION transitions from prototype to operational platform foundation.
