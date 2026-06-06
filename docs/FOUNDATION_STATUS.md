@@ -4,7 +4,7 @@
 
 FOUNDATION is currently in early Phase 1 development.
 
-The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, Article Management v1, Event v1 with Article <-> Event relationships, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, Dashboard v1, URL Import v1, and URL Metadata Fetch v1.1.
+The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, Article Management v1, Event v1 with Article <-> Event relationships, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, and Review Queue v1.
 
 The current focus is:
 - establishing core intelligence data structures,
@@ -150,6 +150,9 @@ Operational for create, list, detail, and edit workflows.
 - URL Metadata Fetch v1.1 through the deployed `fetch-url-metadata` Supabase Edge Function
 - Metadata preview/apply workflow for title, summary, published date, canonical/final URL, and site/source hints
 - URL-only fallback when metadata fetch is unavailable or incomplete
+- Save URL candidates to Review Queue
+- Review Queue v1 using `ingestion_candidates`
+- Candidate-to-article conversion after analyst review
 
 ## Not Yet Implemented
 - Article detail page
@@ -173,6 +176,7 @@ Sources
        -> Article Management v1
        -> URL Import v1
        -> URL Metadata Fetch v1.1
+       -> Review Queue v1
     <-> Events v1
        -> Event Refinement v1
        -> Events v1.1 Intelligence Summary
@@ -406,19 +410,27 @@ Complete for v1.1. The Edge Function has been deployed and validated with live a
 
 ---
 
-# Ingestion Review Queue
+# Review Queue v1
 
-## Planned
-- `ingestion_candidates` as pre-article intake records
-- Candidates remain separate from approved `articles`
-- Candidate statuses: pending, accepted, rejected, duplicate, and optional stale
-- Accepted candidates convert to articles after analyst review
-- Rejected, duplicate, and stale candidates stay out of article records
-- Future URL, RSS, browser extension, and connector intake should create candidates rather than articles directly
+## Implemented
+- `ingestion_candidates` table created
+- Candidate records remain separate from approved `articles`
+- Candidate statuses: pending, accepted, rejected, duplicate
+- Import source values: manual_url, rss, browser_extension, connector
+- `/ingestion` route added
+- Ingestion sidebar navigation added
+- Save to Review Queue action from URL Import
+- Candidate list/review UI
+- Accept candidate as article
+- Reject candidate
+- Mark candidate duplicate
+- Candidate-to-article conversion records `converted_article_id`
+- Direct ArticleForm creation workflow preserved
+- Accept/Reject/Duplicate workflow tested successfully
 
 ## Current Status
 
-Planned, not implemented. This is the next likely ingestion schema milestone.
+Complete for v1. Review Queue now acts as the staging layer between URL intake and approved article records.
 
 ---
 
@@ -524,6 +536,8 @@ src/
 - articleService.ts
 - tagService.ts
 - eventService.ts
+- urlMetadataService.ts
+- ingestionCandidateService.ts
 
 ---
 
@@ -559,15 +573,17 @@ Sources
        -> Dashboard v1
        -> URL Import v1
        -> URL Metadata Fetch v1.1
+       -> Review Queue v1
 ```
 
 ## Next Milestone
 
 The next milestone is a decision point between:
-- Ingestion Review Queue / `ingestion_candidates`
+- RSS Planning
+- Browser Extension Planning
 - Article Detail Pages
 - Source Management cleanup
-- Events v1.3
+- Auth/RLS Planning
 
 ## Expanded Long-Term Direction
 
@@ -586,7 +602,7 @@ Sources
 # Immediate Priorities
 
 Next priority:
-1. Ingestion Review Queue / `ingestion_candidates` planning or implementation
+1. Decide next milestone: RSS Planning, Browser Extension Planning, Article Detail Pages, Source Management cleanup, or Auth/RLS Planning
 2. Article detail page / advanced article workflows
 3. Source search/filtering or source delete planning
 
@@ -595,7 +611,8 @@ Ingestion roadmap status:
 - Seed Data Script v1 is implemented as repeatable fictional prototype/demo data.
 - URL Import v1 is implemented.
 - URL Metadata Fetch v1.1 is implemented through a deployed Supabase Edge Function.
-- Review Queue is planned as the next likely ingestion layer.
+- Review Queue v1 is implemented as the staging layer for ingestion candidates.
+- Current ingestion flow: URL -> normalize/validate -> fetch metadata -> preview/apply metadata -> save to Review Queue -> review candidate -> accept/reject/duplicate -> accepted candidate becomes an article.
 - RSS ingestion, browser extension capture, and custom connectors remain planned and should feed Review Queue candidates rather than articles directly.
 
 Open Filtering/Search follow-ups:

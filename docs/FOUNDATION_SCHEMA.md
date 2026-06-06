@@ -34,6 +34,7 @@ Sources
        -> Dashboard v1
        -> URL Import v1
        -> URL Metadata Fetch v1.1
+       -> Review Queue v1
 ```
 
 The schema is intentionally evolving in layers:
@@ -505,7 +506,7 @@ Current implementation:
 - prefills ArticleForm with URL and matched source
 - requires analyst review before article save
 
-URL Import v1 does not store separate ingestion records and does not create articles automatically.
+URL Import v1 can either prefill the direct ArticleForm workflow or save a candidate to Review Queue. It does not create articles automatically.
 
 ---
 
@@ -523,6 +524,133 @@ Current implementation:
 - requires analyst review before article save
 
 The Edge Function is an acquisition helper, not a schema object or ingestion persistence layer.
+
+---
+
+# Review Queue v1
+
+Review Queue v1 uses the implemented `ingestion_candidates` table.
+
+Current implementation:
+- stores pre-article ingestion candidates separately from approved articles
+- supports manual URL candidates from URL Import
+- stores transient URL metadata as reviewable candidate data
+- allows analysts to accept, reject, or mark candidates duplicate
+- converts accepted candidates into records in the existing `articles` table
+- records `converted_article_id` after acceptance
+
+Review Queue uses the existing articles schema on acceptance. It does not create a separate approved intelligence record type.
+
+Current ingestion flow:
+
+```txt
+URL Import / Metadata Fetch
+  -> ingestion_candidates
+    -> analyst review
+      -> accepted candidate creates article
+      -> rejected/duplicate candidates stay out of articles
+```
+
+Candidate conversion is implemented in the service layer as sequential prototype-scale operations, not as a database transaction or stored procedure.
+
+---
+
+# ingestion_candidates
+
+## Purpose
+
+Staging table for ingestion candidates before they become approved article records.
+
+An ingestion candidate is a pre-article intake record produced by URL Import or future RSS, browser extension, or connector workflows. Candidates are not approved intelligence records until an analyst reviews and accepts them.
+
+---
+
+## Current Fields
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| url | text | Original or normalized candidate URL |
+| canonical_url | text | Optional canonical URL from metadata |
+| final_url | text | Optional final URL after redirects |
+| source_id | uuid | Nullable FK to sources.id for matched source |
+| title | text | Candidate title from metadata or analyst edit |
+| description | text | Candidate description/summary draft |
+| published_at | timestamptz | Optional candidate published timestamp |
+| import_source | text | manual_url, rss, browser_extension, connector |
+| status | text | pending, accepted, rejected, duplicate |
+| raw_metadata | jsonb | Lightweight fetched metadata, not full article body |
+| warnings | jsonb | Metadata/import warnings |
+| converted_article_id | uuid | Nullable FK to articles.id after acceptance |
+| rejection_reason | text | Optional analyst rejection note |
+| created_at | timestamptz | Creation timestamp |
+| updated_at | timestamptz | Update timestamp |
+| reviewed_at | timestamptz | Optional review timestamp |
+
+---
+
+## Status Values
+
+Implemented candidate statuses:
+- pending
+- accepted
+- rejected
+- duplicate
+
+`stale` remains a possible future status but is not part of Review Queue v1.
+
+---
+
+## Import Source Values
+
+Implemented import source values:
+- manual_url
+- rss
+- browser_extension
+- connector
+
+Only `manual_url` is currently used by the implemented UI. RSS, browser extension capture, and custom connectors are future ingestion sources.
+
+---
+
+## JSONB Fields
+
+`raw_metadata` stores lightweight metadata returned by ingestion helpers, such as requested URL, final URL, canonical URL, title, description, site name, published date, source hints, and warnings.
+
+`warnings` stores structured import/review warnings such as metadata unavailable, URL differences, weak or missing published date, duplicate hints, or fetch failure messages.
+
+Neither field stores full article body content.
+
+---
+
+## Current Relationships
+
+```txt
+ingestion_candidates
+  -> sources
+```
+
+Optional matched source through `source_id`.
+
+```txt
+ingestion_candidates
+  -> articles
+```
+
+Accepted candidates may reference the approved article they created through `converted_article_id`.
+
+---
+
+## Current App Status
+
+Review Queue v1 is operational:
+- URL Import can save candidates to Review Queue.
+- The Ingestion page lists candidates.
+- Analysts can review and edit candidate fields.
+- Analysts can accept candidates as articles.
+- Analysts can reject candidates.
+- Analysts can mark candidates duplicate.
+- Direct ArticleForm creation remains available.
 
 ---
 
@@ -650,54 +778,6 @@ Event/article linking is operational through Event v1:
 
 # Planned Tables
 
-# ingestion_candidates
-
-## Purpose
-
-Planned staging table for ingestion candidates before they become approved article records.
-
-An ingestion candidate is a pre-article intake record produced by URL Import, RSS, browser extension capture, or future connectors. Candidates are not approved intelligence records until an analyst reviews and accepts them.
-
----
-
-## Planned Fields
-
-| Column | Type | Notes |
-|---|---|---|
-| id | uuid | Primary key |
-| url | text | Original or normalized candidate URL |
-| canonical_url | text | Optional canonical URL from metadata |
-| final_url | text | Optional final URL after redirects |
-| source_id | uuid | Nullable FK to sources.id for matched source |
-| title | text | Candidate title from metadata or analyst edit |
-| description | text | Candidate description/summary draft |
-| published_at | timestamptz | Optional candidate published timestamp |
-| import_source | text | manual_url, rss, browser_extension, connector |
-| status | text | pending, accepted, rejected, duplicate; stale later/optional |
-| raw_metadata | jsonb | Lightweight fetched metadata, not full article body |
-| warnings | jsonb | Metadata/import warnings |
-| converted_article_id | uuid | Nullable FK to articles.id after acceptance |
-| rejection_reason | text | Optional analyst rejection note |
-| created_at | timestamptz | Creation timestamp |
-| updated_at | timestamptz | Update timestamp |
-| reviewed_at | timestamptz | Optional review timestamp |
-
----
-
-## Planned Workflow
-
-```txt
-URL Import / RSS / Browser Extension / Connector
-  -> ingestion_candidates
-    -> analyst review
-      -> accepted candidate creates article
-      -> rejected/duplicate/stale candidates stay out of articles
-```
-
-Future automated ingestion should create candidates, not approved articles directly.
-
----
-
 # entities
 
 ## Purpose
@@ -823,10 +903,11 @@ Sources
        -> Dashboard v1
        -> URL Import v1
        -> URL Metadata Fetch v1.1
+       -> Review Queue v1
 ```
 
 Next milestone:
-- Decision point between Ingestion Review Queue / `ingestion_candidates`, Article Detail Pages, Source Management cleanup, and Events v1.3
+- Decision point between RSS Planning, Browser Extension Planning, Article Detail Pages, Source Management cleanup, and Auth/RLS Planning
 
 Entities, timelines, and advanced event refinements intentionally come later unless explicitly reprioritized.
 
@@ -944,9 +1025,10 @@ until:
 The next likely schema-impacting direction has not started.
 
 Current candidate directions:
-1. Ingestion Review Queue / `ingestion_candidates`
-2. Article detail page / advanced article workflows
-3. Source search/filtering or source delete planning
-4. Events v1.3
+1. RSS Planning
+2. Browser Extension Planning
+3. Article detail page / advanced article workflows
+4. Source search/filtering or source delete planning
+5. Auth/RLS Planning
 
-Filtering & Search v1, Article Management v1, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, Dashboard v1, URL Import v1, and URL Metadata Fetch v1.1 are complete. Dashboard v1, URL Import v1, and URL Metadata Fetch v1.1 required no schema changes. Event v1 is implemented with `events` and `article_events`.
+Filtering & Search v1, Article Management v1, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, and Review Queue v1 are complete. Dashboard v1, URL Import v1, and URL Metadata Fetch v1.1 required no schema changes. Event v1 is implemented with `events` and `article_events`; Review Queue v1 is implemented with `ingestion_candidates`.

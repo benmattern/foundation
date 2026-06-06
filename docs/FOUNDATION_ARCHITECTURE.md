@@ -63,6 +63,7 @@ Current frontend architecture uses:
 - Dashboard v1 analyst overview derived from loaded source, article, tag, and event data
 - URL Import v1 analyst-reviewed article draft workflow
 - URL Metadata Fetch v1.1 through a deployed Supabase Edge Function
+- Review Queue v1 for analyst-reviewed ingestion candidates
 
 ### Current Folder Structure
 
@@ -160,6 +161,8 @@ Current functionality:
 - Start article drafts from imported URLs
 - Fetch lightweight URL metadata through `fetch-url-metadata`
 - Preview/apply metadata before article save
+- Save imported URL candidates to Review Queue
+- Accept reviewed candidates as articles
 
 Not implemented:
 - Article detail page
@@ -233,6 +236,7 @@ Sources
        -> Dashboard v1
        -> URL Import v1
        -> URL Metadata Fetch v1.1
+       -> Review Queue v1
 ```
 
 Long-term relational direction:
@@ -266,11 +270,12 @@ Completed:
 12. Dashboard v1
 13. URL Import v1
 14. URL Metadata Fetch v1.1
+15. Review Queue v1
 
 Next milestone:
-- Decision point between Ingestion Review Queue / `ingestion_candidates`, Article Detail Pages, Source Management cleanup, and Events v1.3
+- Decision point between RSS Planning, Browser Extension Planning, Article Detail Pages, Source Management cleanup, and Auth/RLS Planning
 
-Seed Data Script v1, Dashboard v1, URL Import v1, and URL Metadata Fetch v1.1 are complete. The next milestone has not started.
+Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, and Review Queue v1 are complete. The next milestone has not started.
 
 ---
 
@@ -283,6 +288,8 @@ Current services include:
 - articleService.ts
 - tagService.ts
 - eventService.ts
+- urlMetadataService.ts
+- ingestionCandidateService.ts
 
 Service layer is intended to:
 - isolate Supabase logic
@@ -302,6 +309,8 @@ Events v1.2 adds event list activity indicators, status overview cards, sorting,
 
 Dashboard v1 is the Presentation Layer's first analyst overview. It loads existing source, article/tag, tag, and event/article data and derives event-centered dashboard metrics client-side for prototype scale.
 
+URL metadata and ingestion candidate workflows use service wrappers to keep Edge Function calls and candidate database access out of page/component code.
+
 ---
 
 # Ingestion And Acquisition Architecture Direction
@@ -315,6 +324,10 @@ Current ingestion:
 - URL Import v1 for article draft creation
 - URL Metadata Fetch v1.1 through the deployed `fetch-url-metadata` Supabase Edge Function
 - metadata preview/apply workflow with analyst review before save
+- Review Queue v1 through `ingestion_candidates`
+- candidate list/review UI
+- accept/reject/duplicate workflow
+- candidate-to-article conversion after analyst review
 
 Current demo/acquisition support:
 - Seed Data Script v1 at `supabase/seed.sql`
@@ -323,14 +336,13 @@ Current demo/acquisition support:
 - fixed UUID seed strategy and seed-only cleanup
 
 Planned ingestion layers:
-- Review Queue using `ingestion_candidates`
 - RSS ingestion
 - browser extension capture
 - custom connectors
 
-The future ingestion layer should preserve analyst review and avoid automatically turning external content into trusted intelligence records without human oversight.
+Review Queue candidates are staging records, not approved intelligence. Accepted candidates become articles through analyst action. Rejected and duplicate candidates remain outside `articles`.
 
-Future RSS ingestion, browser extension capture, and custom connectors should feed Review Queue candidates rather than creating articles directly. Accepted candidates can later convert into approved article records; rejected, duplicate, or stale candidates should remain outside `articles`.
+Future RSS ingestion, browser extension capture, and custom connectors should feed Review Queue candidates rather than creating articles directly.
 
 ---
 

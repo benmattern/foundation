@@ -800,7 +800,7 @@ Current and planned ingestion direction:
 - Seed Data Script v1 is implemented as near-term support
 - URL Import v1 is implemented
 - URL Metadata Fetch v1.1 is implemented through a Supabase Edge Function
-- Review Queue / `ingestion_candidates` is planned
+- Review Queue v1 / `ingestion_candidates` is implemented
 - RSS ingestion should feed Review Queue candidates
 - browser extension capture should feed Review Queue candidates
 - custom connectors should feed Review Queue candidates
@@ -985,6 +985,9 @@ Current implemented ingestion behavior:
 - URL Metadata Fetch v1.1 fetches lightweight metadata through an Edge Function.
 - Metadata is previewed and explicitly applied by the analyst.
 - Article save remains a separate analyst action.
+- URL Import can save candidates to Review Queue.
+- Review Queue candidates can be accepted, rejected, or marked duplicate.
+- Accepted candidates become articles only after analyst action.
 
 ## Reasoning
 FOUNDATION operates in an OSINT/intelligence domain where source material, metadata, and summaries should not become trusted records without human review.
@@ -1026,23 +1029,38 @@ Metadata from external pages may be incomplete, inaccurate, stale, misleading, o
 
 Keeping metadata transient:
 - reinforces analyst review,
-- avoids storing raw ingestion artifacts before a Review Queue exists,
+- avoids storing raw ingestion artifacts as approved article data,
 - keeps the current schema unchanged,
 - and preserves the `articles` table as approved analyst-created records.
+
+---
+
+# Review Queue Before Automated Collection
+
+## Decision
+Implement Review Queue v1 before RSS ingestion, browser extension capture, or custom connectors.
+
+## Reasoning
+Automated and semi-automated intake will create noisy, duplicate, incomplete, or irrelevant records.
+
+Adding Review Queue first:
+- creates a staging layer before automated collection arrives,
+- validates the candidate review workflow with manual URL intake,
+- protects approved article records from unreviewed content,
+- and gives RSS/browser/connectors a clear future destination.
 
 ---
 
 # Ingestion Candidates Separate From Articles
 
 ## Decision
-Plan Review Queue around `ingestion_candidates` as pre-article records separate from approved `articles`.
+Implement Review Queue around `ingestion_candidates` as pre-article records separate from approved `articles`.
 
-Planned candidate statuses:
+Implemented candidate statuses:
 - pending
 - accepted
 - rejected
 - duplicate
-- stale as later/optional
 
 ## Reasoning
 Candidates represent possible intake items, not approved intelligence records.
@@ -1053,7 +1071,61 @@ Separating candidates from articles:
 - supports future RSS, browser extension, and connector intake,
 - and preserves a clear analyst approval boundary before article creation.
 
-Accepted candidates can convert into articles. Rejected, duplicate, and stale candidates should remain outside `articles`.
+Accepted candidates can convert into articles. Rejected and duplicate candidates remain outside `articles`. A stale status can be considered later if cleanup workflows need it.
+
+---
+
+# Accept/Reject/Duplicate Workflow For Review Queue v1
+
+## Decision
+Use a simple candidate review workflow for v1:
+- accept as article,
+- reject,
+- mark duplicate.
+
+## Reasoning
+These statuses cover the core analyst decisions without adding assignment, batching, stale cleanup, scoring, or analytics too early.
+
+The workflow keeps Review Queue operationally useful while preserving future room for:
+- stale candidates,
+- batch operations,
+- review analytics,
+- event linking during acceptance,
+- and richer ingestion sources.
+
+---
+
+# Direct Article Creation Preserved
+
+## Decision
+Keep direct ArticleForm creation available alongside Review Queue.
+
+## Reasoning
+Review Queue improves ingestion, but not every article needs to pass through queue staging.
+
+Preserving direct creation:
+- keeps the existing manual workflow intact,
+- avoids forcing extra steps for analyst-authored records,
+- lowers adoption risk,
+- and keeps Review Queue focused on intake candidates rather than all article creation.
+
+---
+
+# Sequential Candidate Conversion For Prototype Scale
+
+## Decision
+Convert accepted candidates to articles through sequential service-layer operations for Review Queue v1.
+
+Current behavior:
+- create the article using existing article creation behavior,
+- update the candidate to accepted,
+- set `converted_article_id`,
+- set `reviewed_at`.
+
+## Reasoning
+This is sufficient for prototype scale and avoids adding stored procedures or transaction orchestration before operational requirements are proven.
+
+Transactional candidate conversion should be revisited before multi-user or production use, especially once RLS/auth and higher ingestion volume are introduced.
 
 ---
 

@@ -25,6 +25,7 @@ Sources
        -> Dashboard v1
        -> URL Import v1
        -> URL Metadata Fetch v1.1
+       -> Review Queue v1
 ```
 
 The long-term direction is:
@@ -144,6 +145,16 @@ Not yet implemented:
 - Metadata preview/apply workflow exists for title, summary, published date, canonical/final URL, site name, and source hints
 - Metadata remains transient draft data and article save still requires analyst review
 - URL-only fallback still works when metadata fetch fails or returns weak metadata
+- Save to Review Queue exists from URL Import
+- Review Queue v1 exists at `/ingestion`
+- Ingestion sidebar navigation exists
+- `ingestion_candidates` table exists
+- Candidate list/review UI exists
+- Candidates can be accepted as articles
+- Candidates can be rejected
+- Candidates can be marked duplicate
+- Accepted candidates store `converted_article_id`
+- Direct ArticleForm creation remains available
 
 Not yet implemented:
 - Article detail page
@@ -218,7 +229,7 @@ Not yet implemented:
 - Event AI suggestions
 - Event severity/confidence scoring
 - Event date ranges
-- Review Queue, RSS ingestion, browser extension capture, and custom connectors
+- RSS ingestion, browser extension capture, and custom connectors
 
 ---
 
@@ -226,9 +237,9 @@ Not yet implemented:
 
 ## Next Milestone
 
-The next priority is a decision point between Ingestion Review Queue / `ingestion_candidates`, Article Detail Pages, Source Management cleanup, and Events v1.3.
+The next priority is a decision point between RSS Planning, Browser Extension Planning, Article Detail Pages, Source Management cleanup, and Auth/RLS Planning.
 
-Seed Data Script v1, Dashboard v1, URL Import v1, and URL Metadata Fetch v1.1 are complete. Ingestion is elevated as a roadmap layer. Review Queue is planned, not implemented. Future RSS ingestion, browser extension capture, and custom connectors should feed Review Queue candidates rather than creating articles directly. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly changes priority.
+Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, and Review Queue v1 are complete. Ingestion is elevated as a roadmap layer. Future RSS ingestion, browser extension capture, and custom connectors should feed Review Queue candidates rather than creating articles directly. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly changes priority.
 
 ---
 
@@ -248,9 +259,22 @@ RSS ingestion, AI-assisted workflows, and Financial Signals are future-phase con
 
 ## Ingestion
 
-Manual entry, Seed Data Script v1, URL Import v1, and URL Metadata Fetch v1.1 are implemented acquisition capabilities.
+Manual entry, Seed Data Script v1, URL Import v1, URL Metadata Fetch v1.1, and Review Queue v1 are implemented acquisition capabilities.
 
-Review Queue is planned as the next likely ingestion milestone. Planned `ingestion_candidates` should be pre-article records separate from approved `articles`, with pending, accepted, rejected, duplicate, and optional stale statuses. Accepted candidates may convert to articles after analyst review. Rejected, duplicate, and stale candidates should stay out of `articles`.
+Current ingestion flow:
+
+```txt
+URL
+  -> normalize/validate
+    -> fetch metadata
+      -> preview/apply metadata
+        -> save to Review Queue
+          -> review candidate
+            -> accept/reject/duplicate
+              -> accepted candidate becomes Article
+```
+
+Review Queue candidates are pre-article records separate from approved `articles`, with pending, accepted, rejected, and duplicate statuses. Accepted candidates convert to articles after analyst review. Rejected and duplicate candidates stay out of `articles`.
 
 ---
 
@@ -319,7 +343,7 @@ When starting a new ChatGPT or Codex session:
 2. Read FOUNDATION_STATUS.md and FOUNDATION_BACKLOG.md.
 3. Inspect the relevant source files before making changes.
 4. Do not infer that planned features are implemented.
-5. Treat the next milestone as a decision point between Ingestion Review Queue / `ingestion_candidates`, Article Detail Pages, Source Management cleanup, and Events v1.3 unless the user explicitly chooses a different direction.
+5. Treat the next milestone as a decision point between RSS Planning, Browser Extension Planning, Article Detail Pages, Source Management cleanup, and Auth/RLS Planning unless the user explicitly chooses a different direction.
 
 ---
 

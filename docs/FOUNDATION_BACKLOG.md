@@ -359,17 +359,52 @@ Complete for v1.1.
 
 ---
 
+# Review Queue v1
+
+## Completed Tasks
+- [x] Create `ingestion_candidates` table
+- [x] Add Review Queue route at `/ingestion`
+- [x] Add Ingestion sidebar navigation
+- [x] Add ingestion candidate TypeScript types
+- [x] Add ingestionCandidateService
+- [x] Add candidate list/review UI
+- [x] Add Save to Review Queue action from URL Import
+- [x] Save normalized URL, metadata, warnings, and matched source when available
+- [x] Preserve direct ArticleForm creation workflow
+- [x] Accept candidate as article
+- [x] Reject candidate
+- [x] Mark candidate duplicate
+- [x] Convert accepted candidates into approved article records
+- [x] Record converted_article_id on accepted candidates
+- [x] Accept/Reject/Duplicate workflow tested successfully
+
+## Still Open
+- [ ] RSS ingestion
+- [ ] Browser extension capture
+- [ ] Custom connectors
+- [ ] Batch import
+- [ ] Review analytics
+- [ ] Event linking during candidate acceptance
+- [ ] Transactional candidate conversion
+
+## Current Status
+
+Complete for v1. Review Queue now provides a staging layer between URL intake and approved article creation.
+
+---
+
 # Immediate Backlog
 
 # Next Milestone
 
 ## Next Milestone Decision Point
-- [ ] Decide whether the next milestone is Ingestion Review Queue / `ingestion_candidates`
+- [ ] Decide whether the next milestone is RSS Planning
+- [ ] Decide whether the next milestone is Browser Extension Planning
 - [ ] Decide whether the next milestone is Article Detail Pages
 - [ ] Decide whether the next milestone is Source Management cleanup
-- [ ] Decide whether the next milestone is Events v1.3
+- [ ] Decide whether the next milestone is Auth/RLS Planning
 
-Seed Data Script v1, Dashboard v1, URL Import v1, and URL Metadata Fetch v1.1 are complete. The next milestone has not started.
+Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, and Review Queue v1 are complete. The next milestone has not started.
 
 ---
 
@@ -442,26 +477,21 @@ Improve how intelligence enters FOUNDATION after manual workflows and schema fou
 - [x] Seed Data Script v1
 - [x] URL Import v1
 - [x] URL Metadata Fetch v1.1
+- [x] Review Queue v1
+- [x] `ingestion_candidates` schema
+- [x] Accept/reject/duplicate workflow
+- [x] Candidate-to-article conversion
 
 ## Planned Ingestion Layers
-- [ ] Review queue
-- [ ] `ingestion_candidates` schema
 - [ ] RSS ingestion into Review Queue candidates
 - [ ] Browser extension capture into Review Queue candidates
 - [ ] Custom connectors
+- [ ] Batch import
+- [ ] Review analytics
+- [ ] Event linking during candidate acceptance
+- [ ] Transactional candidate conversion
 
-Current status: URL Import v1 and URL Metadata Fetch v1.1 are implemented as analyst-reviewed draft workflows. Review Queue is planned, not implemented, and should become the staging layer for future URL, RSS, browser extension, and connector intake before approved article creation.
-
-## Planned Review Queue v1
-- [ ] Create `ingestion_candidates` table
-- [ ] Store candidates separately from approved articles
-- [ ] Track candidate status: pending, accepted, rejected, duplicate
-- [ ] Consider stale as later/optional status
-- [ ] Store original URL, canonical URL, final URL, source match, title, description, published date, import source, raw metadata, and warnings
-- [ ] Convert accepted candidates into articles through analyst action
-- [ ] Keep rejected, duplicate, and stale candidates out of `articles`
-- [ ] Detect duplicate candidates and duplicate articles
-- [ ] Preserve analyst review before article creation
+Current status: URL Import v1, URL Metadata Fetch v1.1, and Review Queue v1 are implemented as analyst-reviewed ingestion workflows. RSS ingestion, browser extension capture, and custom connectors remain planned and should feed Review Queue candidates rather than approved articles directly.
 
 ---
 
