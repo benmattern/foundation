@@ -233,17 +233,70 @@ Build a stable platform capable of:
 
 ---
 
+# Events v1.2 Activity & Analyst Workflow
+
+## Completed Tasks
+- [x] Add shared event/date/activity helpers in src/lib/eventMetrics.ts
+- [x] Add EventSortOption type
+- [x] Add EventListItem type
+- [x] Create EventStatusOverview component
+- [x] Add status overview cards for Draft, Active, Resolved, and Archived
+- [x] Add event activity indicators to event list cards
+- [x] Display supporting article count on event list cards
+- [x] Display last activity on event list cards
+- [x] Display occurred date on event list cards
+- [x] Display status, event type, and location metadata on event list cards
+- [x] Add sort control to EventFilters
+- [x] Sort events by newest activity
+- [x] Sort events by newest event
+- [x] Sort events by oldest event
+- [x] Sort events by most supporting articles
+- [x] Compute event activity/count/sort client-side in EventsPage
+- [x] Reuse shared event metric helpers in EventDetailPage
+
+## Still Open
+- [ ] Dashboard improvements
+- [ ] Seed data script
+- [ ] Event-owned tags
+- [ ] Event entity linking
+- [ ] Global timeline module
+- [ ] Event AI suggestions
+- [ ] Event severity/confidence scoring
+- [ ] Event date ranges
+- [ ] Server-side event sorting/filtering
+
+---
+
 # Immediate Backlog
 
 # Next Milestone
 
-## Dashboard v1 / Events v1.2 Decision Point
+## Seed Data Script / Dashboard v1 Decision Point
+- [ ] Decide whether the next milestone is Seed Data Script
 - [ ] Decide whether the next milestone is Dashboard v1
-- [ ] Decide whether the next milestone is Events v1.2
+- [ ] Define repeatable prototype seed data scope if Seed Data Script is chosen
 - [ ] Define Dashboard v1 metrics and recent intelligence views if chosen
-- [ ] Define Events v1.2 scope if chosen
 
-Neither Dashboard v1 nor Events v1.2 has started.
+Neither Seed Data Script nor Dashboard v1 has started.
+
+---
+
+# Seed Data Script
+
+## Goal
+
+Create repeatable prototype data for testing and demonstration.
+
+## Planned Scope
+- [ ] Seed sources
+- [ ] Seed articles
+- [ ] Seed tags
+- [ ] Seed article_tags relationships
+- [ ] Seed events
+- [ ] Seed article_events relationships
+- [ ] Keep seed data clearly marked as prototype/test-only
+
+Current status: not implemented.
 
 ---
 
@@ -283,11 +336,34 @@ Examples:
 
 ---
 
-# Future Events v1.2
+# Ingestion Roadmap
 
 ## Goal
 
-Refine discrete geopolitical, technological, and operational developments after Events v1.1 Intelligence Summary.
+Improve how intelligence enters FOUNDATION after manual workflows and schema foundations stabilize.
+
+## Current State
+- [x] Manual source/article/event entry
+
+## Near-Term Support
+- [ ] Seed Data Script
+
+## Planned Ingestion Layers
+- [ ] URL import
+- [ ] RSS ingestion
+- [ ] Browser extension capture
+- [ ] Review queue
+- [ ] Custom connectors
+
+Current status: elevated roadmap layer only. No ingestion automation is implemented yet.
+
+---
+
+# Future Events Refinement
+
+## Goal
+
+Refine discrete geopolitical, technological, and operational developments after Events v1.2 Activity & Analyst Workflow.
 
 ## Planned Event Types
 - military exercises

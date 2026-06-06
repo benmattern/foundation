@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
-import type { FoundationEventWithArticles } from "../types/event";
+import { formatDate, getEventDate } from "../lib/eventMetrics";
+import type { EventListItem } from "../types/event";
 import { Card } from "./ui/Card";
 
 type Props = {
-  events: FoundationEventWithArticles[];
+  events: EventListItem[];
   emptyMessage?: string;
 };
 
@@ -42,18 +43,14 @@ export function EventList({
                 </span>
               </div>
 
-              <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-500">
-                {event.event_type && <span>{event.event_type}</span>}
-                {event.location && <span>{event.location}</span>}
-                {event.occurred_at && (
-                  <span>
-                    {new Date(event.occurred_at).toLocaleDateString()}
-                  </span>
-                )}
+              <div className="mt-3 grid grid-cols-1 gap-2 text-xs text-slate-500 sm:grid-cols-2">
                 <span>
-                  {event.articles.length} linked article
-                  {event.articles.length === 1 ? "" : "s"}
+                  Supporting articles: {event.supportingArticleCount}
                 </span>
+                <span>Last activity: {formatDate(event.lastActivityAt)}</span>
+                <span>Occurred: {formatDate(getEventDate(event))}</span>
+                {event.event_type && <span>Type: {event.event_type}</span>}
+                {event.location && <span>Location: {event.location}</span>}
               </div>
             </Link>
           ))}

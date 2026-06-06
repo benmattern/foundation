@@ -20,6 +20,7 @@ Sources
     <-> Events v1
        -> Event Refinement v1
        -> Events v1.1 Intelligence Summary
+       -> Events v1.2 Activity & Analyst Workflow
 ```
 
 The long-term direction is:
@@ -180,14 +181,23 @@ Standalone Tags CRUD, Article <-> Tag relationships, Filtering & Search v1, and 
 - EventIntelligenceSummary exists
 - EventArticleTimeline exists
 - Event detail pages show supporting article count, newest/oldest article, event age, last activity, related tags from supporting articles, and a chronological supporting article timeline
+- eventMetrics helpers exist in src/lib/eventMetrics.ts
+- EventStatusOverview exists
+- Events list page shows status overview cards
+- Events list cards show supporting article count, last activity, occurred date, status, type, and location
+- EventFilters includes sort control
+- Events can be sorted by newest activity, newest event, oldest event, and most supporting articles
 
 Not yet implemented:
+- Seed data script
 - Event-owned tags
 - Event entity linking
 - Global timeline module
 - Event AI suggestions
 - Event severity/confidence scoring
 - Event date ranges
+- Dashboard improvements
+- URL import, RSS ingestion, browser extension capture, review queue, and custom connectors
 
 ---
 
@@ -195,9 +205,9 @@ Not yet implemented:
 
 ## Next Milestone
 
-The next priority is a decision point between Dashboard v1 and Events v1.2.
+The next priority is a decision point between Seed Data Script and Dashboard v1.
 
-Neither Dashboard v1 nor Events v1.2 has started. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly changes priority.
+Neither Seed Data Script nor Dashboard v1 has started. Ingestion is elevated as a roadmap layer, but URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are not implemented. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly changes priority.
 
 ---
 
@@ -214,6 +224,10 @@ Timeline, notes, and settings workflows are not implemented.
 ## RSS, AI, Financial Signals
 
 RSS ingestion, AI-assisted workflows, and Financial Signals are future-phase concepts only.
+
+## Ingestion
+
+Manual entry is the current ingestion workflow. Seed data is a near-term support task. URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are elevated roadmap items only.
 
 ---
 
@@ -282,7 +296,7 @@ When starting a new ChatGPT or Codex session:
 2. Read FOUNDATION_STATUS.md and FOUNDATION_BACKLOG.md.
 3. Inspect the relevant source files before making changes.
 4. Do not infer that planned features are implemented.
-5. Treat Dashboard v1 / Events v1.2 as the next milestone decision point unless the user explicitly chooses a different direction.
+5. Treat Seed Data Script / Dashboard v1 as the next milestone decision point unless the user explicitly chooses a different direction.
 
 ---
 

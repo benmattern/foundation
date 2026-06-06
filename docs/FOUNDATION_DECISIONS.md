@@ -697,6 +697,124 @@ This reduces the risk of building dashboard widgets before the underlying event 
 
 ---
 
+# Events v1.2 Before Dashboard v1
+
+## Decision
+Implement Events v1.2 Activity & Analyst Workflow before Dashboard v1.
+
+## Reasoning
+The Events list page is the analyst's current event operations surface.
+
+Improving event list scanning before Dashboard v1:
+- makes events more useful immediately,
+- validates activity metrics before promoting them into dashboard widgets,
+- keeps dashboard work grounded in existing workflows,
+- and avoids building dashboard summaries before event list behavior matures.
+
+---
+
+# Client-Side Event Activity Indicators
+
+## Decision
+Derive event activity indicators client-side from loaded event and linked article data.
+
+Current derived indicators:
+- supporting article count
+- last activity
+- occurred date
+- event type/location metadata
+- status badge
+
+## Reasoning
+The required data is already loaded as composed event records.
+
+Client-side derivation:
+- avoids schema changes,
+- avoids service-layer query changes,
+- keeps eventService focused on data loading/mutation,
+- and is appropriate for prototype scale.
+
+---
+
+# Event Status Overview From Loaded Events
+
+## Decision
+Compute Draft, Active, Resolved, and Archived status overview counts from loaded event data.
+
+## Reasoning
+Status overview cards are page-level workflow indicators, not persisted metrics.
+
+Using loaded events:
+- keeps the overview consistent with the current event list,
+- avoids database aggregation queries too early,
+- and keeps EventsPage as the orchestration layer.
+
+---
+
+# Client-Side Event Sorting For Prototype Scale
+
+## Decision
+Keep event sorting client-side for Events v1.2.
+
+Implemented sort options:
+- newest activity
+- newest event
+- oldest event
+- most supporting articles
+
+## Reasoning
+Sorting uses derived event/list metrics and the current prototype dataset is expected to stay small.
+
+Client-side sorting:
+- avoids server-side sorting complexity,
+- avoids schema/index decisions too early,
+- and preserves the existing eventService API.
+
+Server-side sorting can be revisited when event volume, pagination, or performance requires it.
+
+---
+
+# Shared Event Metric Helpers
+
+## Decision
+Introduce shared event/date/activity helpers in `src/lib/eventMetrics.ts`.
+
+## Reasoning
+Events v1.1 and Events v1.2 both need effective article dates, event dates, and last activity calculations.
+
+Shared helpers:
+- avoid divergence between EventDetailPage and EventsPage,
+- keep page components smaller,
+- preserve consistent date fallback behavior,
+- and fit the convention that reused derived metric logic belongs in `src/lib`.
+
+---
+
+# Ingestion Elevated As Strategic Roadmap Layer
+
+## Decision
+Elevate ingestion as a strategic roadmap layer, while keeping it unimplemented for now.
+
+Planned ingestion direction:
+- manual entry remains current
+- Seed Data Script as near-term support
+- URL import
+- RSS ingestion
+- browser extension capture
+- review queue
+- custom connectors
+
+## Reasoning
+FOUNDATION will eventually need reliable intake workflows, but the current priority remains stable schema, relationships, and analyst review.
+
+Elevating ingestion now:
+- clarifies product direction,
+- separates test data needs from production ingestion,
+- avoids premature automation,
+- and keeps future ingestion aligned with analyst-controlled workflows.
+
+---
+
 # Intelligence Workflow Philosophy
 
 ## Decision

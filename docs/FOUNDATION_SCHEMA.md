@@ -29,6 +29,7 @@ Sources
     <-> Events v1
        -> Event Refinement v1
        -> Events v1.1 Intelligence Summary
+       -> Events v1.2 Activity & Analyst Workflow
 ```
 
 The schema is intentionally evolving in layers:
@@ -420,6 +421,32 @@ Not implemented:
 
 ---
 
+# Events v1.2 Activity & Analyst Workflow
+
+Events v1.2 Activity & Analyst Workflow required no schema changes.
+
+Current implementation:
+- derives event activity indicators from loaded events and linked articles
+- derives supporting article count from linked articles
+- derives last activity from `events.updated_at` and linked article dates
+- derives occurred date from existing event date fields
+- computes event status overview counts from loaded event data
+- sorts events client-side by newest activity, newest event, oldest event, and most supporting articles
+
+The `eventMetrics` helpers in `src/lib/eventMetrics.ts` are application logic, not schema.
+
+Not implemented:
+- event-owned tags
+- event entity linking
+- global timeline module
+- event AI suggestions
+- event severity/confidence scoring
+- event date ranges
+- dashboard improvements
+- seed data script
+
+---
+
 # events
 
 ## Current Implementation Status
@@ -664,10 +691,11 @@ Sources
     <-> Events v1
        -> Event Refinement v1
        -> Events v1.1 Intelligence Summary
+       -> Events v1.2 Activity & Analyst Workflow
 ```
 
 Next milestone:
-- Dashboard v1 / Events v1.2 decision point
+- Seed Data Script / Dashboard v1 decision point
 
 Entities, timelines, and advanced event refinements intentionally come later unless explicitly reprioritized.
 
@@ -785,8 +813,8 @@ until:
 The next schema-impacting direction has not started.
 
 Current candidate directions:
-1. Dashboard v1 / Events v1.2 decision point
+1. Seed Data Script / Dashboard v1 decision point
 2. Dashboard Improvements v1
 3. Article detail page / advanced article workflows
 
-Filtering & Search v1, Article Management v1, Event Refinement v1, and Events v1.1 Intelligence Summary are complete and required no schema changes. Event v1 is implemented with `events` and `article_events`.
+Filtering & Search v1, Article Management v1, Event Refinement v1, Events v1.1 Intelligence Summary, and Events v1.2 Activity & Analyst Workflow are complete and required no schema changes. Event v1 is implemented with `events` and `article_events`.

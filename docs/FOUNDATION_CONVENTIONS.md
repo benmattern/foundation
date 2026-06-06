@@ -136,6 +136,9 @@ Low-level utilities and configuration.
 
 Examples:
 - supabaseClient.ts
+- eventMetrics.ts
+
+Reusable derived metric helpers that span pages/components may live in `src/lib/`.
 
 ---
 
@@ -344,6 +347,7 @@ Sources
     <-> Events v1
        -> Event Refinement v1
        -> Events v1.1 Intelligence Summary
+       -> Events v1.2 Activity & Analyst Workflow
 ```
 
 Long-term direction:
@@ -488,15 +492,15 @@ Use this procedure when starting or resuming work with ChatGPT, Codex, or anothe
 
 ## Current Priority Alignment
 
-Standalone Tags CRUD, Article <-> Tag relationships, Filtering & Search v1, Article Management v1, Event v1, Event Refinement v1, and Events v1.1 Intelligence Summary are complete for the current stage.
+Standalone Tags CRUD, Article <-> Tag relationships, Filtering & Search v1, Article Management v1, Event v1, Event Refinement v1, Events v1.1 Intelligence Summary, and Events v1.2 Activity & Analyst Workflow are complete for the current stage.
 
 The next milestone is:
 
 ```txt
-Dashboard v1 / Events v1.2 decision point
+Seed Data Script / Dashboard v1 decision point
 ```
 
-Neither Dashboard v1 nor Events v1.2 has started. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly reprioritizes.
+Neither Seed Data Script nor Dashboard v1 has started. Ingestion is elevated as a roadmap layer, but URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are not implemented. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly reprioritizes.
 
 ---
 

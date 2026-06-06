@@ -58,6 +58,7 @@ Current frontend architecture uses:
 - event detail pages for analyst-created intelligence objects
 - client-side event filtering/search over loaded event records
 - event detail intelligence summaries derived from supporting articles
+- event list activity indicators and sorting derived from loaded event/article data
 
 ### Current Folder Structure
 
@@ -185,6 +186,9 @@ Current functionality:
 - Display supporting article count, newest/oldest article, event age, and last activity
 - Aggregate related tags from supporting article tags
 - Display a chronological supporting article timeline
+- Display event status overview cards
+- Display event activity indicators on the Events list page
+- Sort events by newest activity, newest event, oldest event, and most supporting articles
 
 Not implemented:
 - Event-owned tags
@@ -209,6 +213,7 @@ Sources
     <-> Events v1
        -> Event Refinement v1
        -> Events v1.1 Intelligence Summary
+       -> Events v1.2 Activity & Analyst Workflow
 ```
 
 Long-term relational direction:
@@ -237,11 +242,12 @@ Completed:
 7. Event v1
 8. Event Refinement v1
 9. Events v1.1 Intelligence Summary
+10. Events v1.2 Activity & Analyst Workflow
 
 Next milestone:
-- Dashboard v1 / Events v1.2 decision point
+- Seed Data Script / Dashboard v1 decision point
 
-Neither Dashboard v1 nor Events v1.2 has started.
+Neither Seed Data Script nor Dashboard v1 has started.
 
 ---
 
@@ -268,6 +274,29 @@ Event service currently composes events with linked articles from events, articl
 Event Refinement v1 keeps event filtering/search client-side in EventsPage and does not require eventService changes.
 
 Events v1.1 enriches event detail pages with linked articles that include tags. Related tags and supporting article timelines are derived from supporting articles, not stored as event-owned tags or global timeline records.
+
+Events v1.2 adds event list activity indicators, status overview cards, sorting, and shared event metric helpers. Metrics are derived client-side from loaded event/article data.
+
+---
+
+# Ingestion Architecture Direction
+
+Ingestion is elevated as a first-class long-term architecture layer, but automation is not implemented yet.
+
+Current ingestion:
+- manual source entry
+- manual article entry
+- manual event creation and article linking
+
+Planned ingestion layers:
+- Seed Data Script for repeatable prototype/test data
+- URL import
+- RSS ingestion
+- browser extension capture
+- review queue
+- custom connectors
+
+The future ingestion layer should preserve analyst review and avoid automatically turning external content into trusted intelligence records without human oversight.
 
 ---
 
@@ -354,7 +383,8 @@ Examples:
 - More consistent type organization
 - Better form validation
 - Improved UI consistency
-- Events v1.2 refinement scope
+- Dashboard v1 / Seed Data Script scope
+- Ingestion roadmap implementation scope
 - Timeline schema design
 - Article creation and tag assignment are frontend-driven separate operations
 - Article update and tag replacement are frontend-driven separate operations

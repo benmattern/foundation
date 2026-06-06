@@ -2,6 +2,12 @@ import type { Article, ArticleWithTags } from "./article";
 
 export type EventStatus = "draft" | "active" | "resolved" | "archived";
 
+export type EventSortOption =
+  | "newest_activity"
+  | "newest_event"
+  | "oldest_event"
+  | "most_supporting_articles";
+
 export const eventStatusOptions: EventStatus[] = [
   "draft",
   "active",
@@ -46,4 +52,9 @@ export type FoundationEventWithArticles = FoundationEvent & {
 
 export type FoundationEventWithArticleTags = FoundationEvent & {
   articles: ArticleWithTags[];
+};
+
+export type EventListItem = FoundationEventWithArticles & {
+  supportingArticleCount: number;
+  lastActivityAt: Date | null;
 };

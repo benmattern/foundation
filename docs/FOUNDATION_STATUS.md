@@ -4,7 +4,7 @@
 
 FOUNDATION is currently in early Phase 1 development.
 
-The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, Article Management v1, Event v1 with Article <-> Event relationships, Event Refinement v1, and Events v1.1 Intelligence Summary.
+The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, Article Management v1, Event v1 with Article <-> Event relationships, Event Refinement v1, Events v1.1 Intelligence Summary, and Events v1.2 Activity & Analyst Workflow.
 
 The current focus is:
 - establishing core intelligence data structures,
@@ -159,6 +159,7 @@ Sources
     <-> Events v1
        -> Event Refinement v1
        -> Events v1.1 Intelligence Summary
+       -> Events v1.2 Activity & Analyst Workflow
 ```
 
 ---
@@ -287,6 +288,44 @@ Complete for v1.
 ## Current Status
 
 Complete for v1.1. Event detail pages now function as early analytical workspaces using existing linked article data.
+
+---
+
+# Events v1.2 Activity & Analyst Workflow
+
+## Implemented
+- `src/lib/eventMetrics.ts` shared event/date/activity helpers
+- `EventSortOption` type
+- `EventListItem` type
+- EventStatusOverview component
+- Status overview cards for Draft, Active, Resolved, and Archived
+- Event activity indicators on list cards
+- Supporting article count on event list cards
+- Last activity on event list cards
+- Occurred date on event list cards
+- Status, type, and location metadata on event list cards
+- Sort control in EventFilters
+- Event sorting by newest activity
+- Event sorting by newest event
+- Event sorting by oldest event
+- Event sorting by most supporting articles
+- Client-side event activity/count/sort computation in EventsPage
+- EventDetailPage reuses shared metric helpers
+
+## Not Yet Implemented
+- Dashboard improvements
+- Seed data script
+- Event-owned tags
+- Event entity linking
+- Global timeline module
+- Event AI suggestions
+- Event severity/confidence scoring
+- Event date ranges
+- Server-side event sorting/filtering
+
+## Current Status
+
+Complete for v1.2. The Events list page now supports richer analyst scanning before Dashboard v1.
 
 ---
 
@@ -422,11 +461,12 @@ Sources
     <-> Events v1
        -> Event Refinement v1
        -> Events v1.1 Intelligence Summary
+       -> Events v1.2 Activity & Analyst Workflow
 ```
 
 ## Next Milestone
 
-The next milestone is a decision point between Dashboard v1 and Events v1.2. Neither has started.
+The next milestone is a decision point between Seed Data Script and Dashboard v1. Neither has started.
 
 ## Expanded Long-Term Direction
 
@@ -445,9 +485,14 @@ Sources
 # Immediate Priorities
 
 Next priority:
-1. Dashboard v1 / Events v1.2 decision point
+1. Seed Data Script / Dashboard v1 decision point
 2. Dashboard Improvements v1
 3. Article detail page / advanced article workflows
+
+Ingestion roadmap status:
+- Manual entry is the current ingestion workflow.
+- Seed Data Script is a near-term support task, not implemented.
+- URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are elevated roadmap items, not implemented.
 
 Open Filtering/Search follow-ups:
 - Date filtering
@@ -487,7 +532,7 @@ Open Filtering/Search follow-ups:
 - Data normalization
 - UI consistency
 - Empty shared UI primitives for Button, Input, Textarea, and EmptyState
-- Events v1.2 refinement scope
+- Dashboard v1 / Seed Data Script scope
 - Timeline schema design
 - Form validation consistency
 - Better typing standardization across components

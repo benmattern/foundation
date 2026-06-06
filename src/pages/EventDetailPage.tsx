@@ -10,6 +10,15 @@ import type { Article, ArticleWithTags } from "../types/article";
 import { getArticles } from "../services/articleService";
 import type { FoundationEventWithArticleTags } from "../types/event";
 import {
+  formatArticleDate,
+  formatDate,
+  getLastActivityDate,
+  getNewestArticle,
+  getOldestArticle,
+  getRelativeDateLabel,
+  getTimelineArticles,
+} from "../lib/eventMetrics";
+import {
   deleteEvent as deleteEventRecord,
   getEventWithArticleTagsById,
   updateEvent as updateEventRecord,
@@ -197,7 +206,9 @@ export default function EventDetailPage() {
             newestArticle={newestArticle}
             oldestArticle={oldestArticle}
             eventAge={getRelativeDateLabel(event.occurred_at)}
-            lastActivity={getLastActivityLabel(event, newestArticle)}
+            lastActivity={formatDate(
+              getLastActivityDate(event, event.articles)
+            )}
             relatedTags={relatedTags}
             formatArticleDate={formatArticleDate}
           />
@@ -210,59 +221,6 @@ export default function EventDetailPage() {
       )}
     </>
   );
-}
-
-function getEffectiveArticleDate(article: ArticleWithTags): Date | null {
-  return getValidDate(article.published_at ?? article.created_at);
-}
-
-function getValidDate(value: string | null): Date | null {
-  if (!value) return null;
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-
-  return date;
-}
-
-function getNewestArticle(articles: ArticleWithTags[]): ArticleWithTags | null {
-  return getDatedArticles(articles).sort(
-    (a, b) => b.date.getTime() - a.date.getTime()
-  )[0]?.article ?? null;
-}
-
-function getOldestArticle(articles: ArticleWithTags[]): ArticleWithTags | null {
-  return getDatedArticles(articles).sort(
-    (a, b) => a.date.getTime() - b.date.getTime()
-  )[0]?.article ?? null;
-}
-
-function getDatedArticles(articles: ArticleWithTags[]) {
-  return articles
-    .map((article) => ({
-      article,
-      date: getEffectiveArticleDate(article),
-    }))
-    .filter(
-      (item): item is { article: ArticleWithTags; date: Date } =>
-        item.date !== null
-    );
-}
-
-function getTimelineArticles(articles: ArticleWithTags[]): ArticleWithTags[] {
-  return [...articles].sort((a, b) => {
-    const aDate = getEffectiveArticleDate(a);
-    const bDate = getEffectiveArticleDate(b);
-
-    if (!aDate && !bDate) return a.title.localeCompare(b.title);
-    if (!aDate) return 1;
-    if (!bDate) return -1;
-
-    return aDate.getTime() - bDate.getTime();
-  });
 }
 
 function getRelatedTags(articles: ArticleWithTags[]): RelatedTagSummary[] {
@@ -287,60 +245,5 @@ function getRelatedTags(articles: ArticleWithTags[]): RelatedTagSummary[] {
 
   return [...tagsById.values()].sort(
     (a, b) => b.count - a.count || a.name.localeCompare(b.name)
-  );
-}
-
-function formatArticleDate(article: ArticleWithTags | null): string {
-  if (!article) return "No supporting article";
-
-  return formatDate(getEffectiveArticleDate(article));
-}
-
-function formatDate(date: Date | null): string {
-  if (!date) return "Unknown date";
-
-  return date.toLocaleDateString();
-}
-
-function getRelativeDateLabel(dateValue: string | null): string {
-  const date = getValidDate(dateValue);
-
-  if (!date) return "Unknown";
-
-  const today = new Date();
-  const millisecondsPerDay = 1000 * 60 * 60 * 24;
-  const dayDifference = Math.round(
-    (today.getTime() - date.getTime()) / millisecondsPerDay
-  );
-
-  if (dayDifference === 0) return "Today";
-  if (dayDifference > 0) {
-    return `${dayDifference} day${dayDifference === 1 ? "" : "s"} ago`;
-  }
-
-  const futureDays = Math.abs(dayDifference);
-  return `In ${futureDays} day${futureDays === 1 ? "" : "s"}`;
-}
-
-function getLastActivityLabel(
-  event: FoundationEventWithArticleTags,
-  newestArticle: ArticleWithTags | null
-): string {
-  const eventUpdatedAt = getValidDate(event.updated_at);
-  const newestArticleDate = newestArticle
-    ? getEffectiveArticleDate(newestArticle)
-    : null;
-
-  if (!eventUpdatedAt && !newestArticleDate) {
-    return "Unknown";
-  }
-
-  if (!eventUpdatedAt) return formatDate(newestArticleDate);
-  if (!newestArticleDate) return formatDate(eventUpdatedAt);
-
-  return formatDate(
-    eventUpdatedAt.getTime() >= newestArticleDate.getTime()
-      ? eventUpdatedAt
-      : newestArticleDate
   );
 }

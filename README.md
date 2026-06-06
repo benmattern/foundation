@@ -33,6 +33,11 @@ Implemented:
 - Supporting article count, newest/oldest article, event age, and last activity.
 - Related tag aggregation inferred from supporting article tags.
 - Chronological supporting article timeline.
+- Events v1.2 Activity & Analyst Workflow on the Events list page.
+- Event status overview cards for Draft, Active, Resolved, and Archived.
+- Event activity indicators, including supporting article count, last activity, occurred date, status, type, and location.
+- Event sorting by newest activity, newest event, oldest event, and most supporting articles.
+- Shared event/date/activity helpers in `src/lib/eventMetrics.ts`.
 - Client-side article search by title and summary.
 - Client-side article filtering by one tag.
 - Client-side article filtering by one source.
@@ -55,11 +60,12 @@ Not implemented yet:
 - Article detail page.
 - Entity, timeline, notes, and settings workflows.
 - RSS ingestion.
+- URL import, browser extension capture, review queue, custom connectors, and seed data script.
 - Financial Signals.
 - Authentication, app auth flows, and RLS-managed access.
 - AI-assisted ingestion, summarization, tagging, or entity extraction.
 
-The next milestone is a decision point between Dashboard v1 and Events v1.2. Neither has started.
+The next milestone is a decision point between Seed Data Script and Dashboard v1. Neither has started.
 
 ## Tech Stack
 
@@ -134,9 +140,13 @@ Key files:
 ## Roadmap
 
 Near term:
+- Seed Data Script: repeatable prototype data for sources, articles, tags, events, and relationships.
 - Dashboard v1: real article/tag/event counts and recent intelligence views.
-- Events v1.2: additional event workflow polish after Intelligence Summary.
 - Article detail page and advanced article workflows.
+
+Ingestion roadmap:
+- Manual entry is the current collection workflow.
+- URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are elevated roadmap items but are not implemented yet.
 
 Still open in Filtering/Search:
 - Date filtering.
