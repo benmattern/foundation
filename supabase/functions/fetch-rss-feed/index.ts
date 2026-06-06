@@ -327,37 +327,31 @@ function parseFeedXml(
   finalUrl: URL,
   warnings: string[]
 ): { feedTitle: string | null; items: RssFeedItem[] } {
-  const document = new DOMParser().parseFromString(xml, "application/xml");
-
-  if (document.querySelector("parsererror")) {
-    throw new Error("RSS feed XML could not be parsed.");
-  }
-
-  const rssItems = Array.from(document.getElementsByTagName("item"));
+  const rssItems = getElementBlocks(xml, "item");
 
   if (rssItems.length > 0) {
-    return parseRss(document, rssItems, finalUrl, warnings);
+    return parseRss(xml, rssItems, finalUrl, warnings);
   }
 
-  const atomEntries = Array.from(document.getElementsByTagName("entry"));
+  const atomEntries = getElementBlocks(xml, "entry");
 
   if (atomEntries.length > 0) {
-    return parseAtom(document, atomEntries, finalUrl, warnings);
+    return parseAtom(xml, atomEntries, finalUrl, warnings);
   }
 
   return {
-    feedTitle: textFromFirst(document, "title"),
+    feedTitle: textFromFirst(xml, "title"),
     items: [],
   };
 }
 
 function parseRss(
-  document: Document,
-  rssItems: Element[],
+  xml: string,
+  rssItems: string[],
   finalUrl: URL,
   warnings: string[]
 ): { feedTitle: string | null; items: RssFeedItem[] } {
-  const channel = document.getElementsByTagName("channel")[0] ?? document;
+  const channel = getElementBlocks(xml, "channel")[0] ?? xml;
   const feedTitle = textFromFirst(channel, "title");
 
   if (rssItems.length > maxItems) {
@@ -404,12 +398,12 @@ function parseRss(
 }
 
 function parseAtom(
-  document: Document,
-  atomEntries: Element[],
+  xml: string,
+  atomEntries: string[],
   finalUrl: URL,
   warnings: string[]
 ): { feedTitle: string | null; items: RssFeedItem[] } {
-  const feedTitle = textFromFirst(document, "title");
+  const feedTitle = textFromFirst(xml, "title");
 
   if (atomEntries.length > maxItems) {
     warnings.push(`Only the first ${maxItems} Atom entries were processed.`);
@@ -459,21 +453,70 @@ function parseAtom(
   return { feedTitle: cleanText(feedTitle), items };
 }
 
-function getAtomEntryLink(entry: Element): string | null {
-  const links = Array.from(entry.getElementsByTagName("link"));
+function getAtomEntryLink(entry: string): string | null {
+  const links = getElementTags(entry, "link");
   const alternate =
     links.find((link) => {
-      const rel = link.getAttribute("rel");
+      const rel = getAttributeValue(link, "rel");
       return !rel || rel === "alternate";
     }) ?? links[0];
 
-  return alternate?.getAttribute("href") ?? alternate?.textContent ?? null;
+  if (!alternate) return null;
+
+  return getAttributeValue(alternate, "href") ?? textFromBlock(alternate);
 }
 
-function textFromFirst(parent: Document | Element, tagName: string): string | null {
-  const element = parent.getElementsByTagName(tagName)[0];
+function getElementTags(xml: string, tagName: string): string[] {
+  const blockPattern = new RegExp(
+    `<(?:[\\w.-]+:)?${escapeRegExp(tagName)}\\b[^>]*>[\\s\\S]*?<\\/(?:[\\w.-]+:)?${escapeRegExp(tagName)}>`,
+    "gi"
+  );
+  const selfClosingPattern = new RegExp(
+    `<(?:[\\w.-]+:)?${escapeRegExp(tagName)}\\b[^>]*/>`,
+    "gi"
+  );
 
-  return element?.textContent ?? null;
+  return [
+    ...(xml.match(blockPattern) ?? []),
+    ...(xml.match(selfClosingPattern) ?? []),
+  ];
+}
+
+function getElementBlocks(xml: string, tagName: string): string[] {
+  const pattern = new RegExp(
+    `<(?:[\\w.-]+:)?${escapeRegExp(tagName)}\\b[^>]*>[\\s\\S]*?<\\/(?:[\\w.-]+:)?${escapeRegExp(tagName)}>`,
+    "gi"
+  );
+
+  return xml.match(pattern) ?? [];
+}
+
+function textFromFirst(xml: string, tagName: string): string | null {
+  const block = getElementBlocks(xml, tagName)[0];
+
+  return block ? textFromBlock(block) : null;
+}
+
+function textFromBlock(block: string): string | null {
+  const content = block.replace(/^<[^>]*>/, "").replace(/<\/[^>]*>$/, "");
+  const decodedCdata = content.replace(
+    /<!\[CDATA\[([\s\S]*?)\]\]>/g,
+    (_match, cdata: string) => cdata
+  );
+  const withoutNestedTags = decodedCdata.replace(/<[^>]*>/g, " ");
+
+  return decodeXml(withoutNestedTags);
+}
+
+function getAttributeValue(block: string, attributeName: string): string | null {
+  const openTag = block.match(/^<[^>]*>/)?.[0] ?? "";
+  const pattern = new RegExp(
+    `\\b${escapeRegExp(attributeName)}\\s*=\\s*(["'])(.*?)\\1`,
+    "i"
+  );
+  const value = pattern.exec(openTag)?.[2] ?? null;
+
+  return decodeXml(value);
 }
 
 function absolutizeUrl(value: string | null, baseUrl: URL): string | null {
@@ -514,4 +557,20 @@ function excerptHtml(value: string | null): string | null {
   if (!cleaned) return null;
 
   return cleaned.length > 600 ? `${cleaned.slice(0, 600).trim()}...` : cleaned;
+}
+
+function decodeXml(value: string | null): string | null {
+  if (!value) return null;
+
+  return value
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, "\"")
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'");
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
