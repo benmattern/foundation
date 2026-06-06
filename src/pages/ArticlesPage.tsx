@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { PageHeader } from "../components/PageHeader";
 import { ArticleForm } from "../components/ArticleForm";
+import type { ArticleFormDraftValues } from "../components/ArticleForm";
 import { ArticleList } from "../components/ArticleList";
 import { ArticleFilters } from "../components/ArticleFilters";
+import { ArticleUrlImport } from "../components/ArticleUrlImport";
+import type { UrlImportResult } from "../lib/urlImport";
+import type { UrlMetadataResponse } from "../types/urlMetadata";
 import type { ArticleWithTags } from "../types/article";
 import {
   getArticlesWithTags,
@@ -26,6 +30,8 @@ export default function ArticlesPage() {
   const [selectedSourceId, setSelectedSourceId] = useState("");
   const [editingArticle, setEditingArticle] =
     useState<ArticleWithTags | null>(null);
+  const [articleDraft, setArticleDraft] =
+    useState<ArticleFormDraftValues | null>(null);
 
   const normalizedSearchQuery = searchQuery.trim().toLowerCase();
   const filteredArticles = articles.filter((article) => {
@@ -75,6 +81,7 @@ export default function ArticlesPage() {
   async function createArticle(article: ArticleFormValues) {
     try {
       await createArticleRecord(article);
+      setArticleDraft(null);
       await loadArticles();
     } catch (error) {
       console.error("Error adding article:", error);
@@ -113,6 +120,30 @@ export default function ArticlesPage() {
     }
   }
 
+  function importArticleDraft(
+    result: UrlImportResult,
+    metadata?: UrlMetadataResponse
+  ) {
+    const metadataUrl =
+      metadata?.canonicalUrl ?? metadata?.finalUrl ?? result.normalizedUrl;
+
+    setEditingArticle(null);
+    setArticleDraft({
+      source_id: result.matchedSource?.id ?? null,
+      title: metadata?.title ?? "",
+      url: metadataUrl,
+      summary: metadata?.description ?? "",
+      published_at: metadata?.publishedAt
+        ? metadata.publishedAt.slice(0, 10)
+        : "",
+    });
+  }
+
+  function editArticle(article: ArticleWithTags) {
+    setArticleDraft(null);
+    setEditingArticle(article);
+  }
+
   return (
     <>
       <PageHeader
@@ -139,20 +170,31 @@ export default function ArticlesPage() {
           />
 
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            <ArticleForm
-              sources={sources}
-              tags={tags}
-              mode={editingArticle ? "edit" : "create"}
-              initialArticle={editingArticle}
-              onSubmit={editingArticle ? updateArticle : createArticle}
-              onCancel={
-                editingArticle ? () => setEditingArticle(null) : undefined
-              }
-            />
+            <div className="space-y-6">
+              {!editingArticle && (
+                <ArticleUrlImport
+                  articles={articles}
+                  sources={sources}
+                  onImportDraft={importArticleDraft}
+                />
+              )}
+
+              <ArticleForm
+                sources={sources}
+                tags={tags}
+                mode={editingArticle ? "edit" : "create"}
+                initialArticle={editingArticle}
+                initialDraft={articleDraft}
+                onSubmit={editingArticle ? updateArticle : createArticle}
+                onCancel={
+                  editingArticle ? () => setEditingArticle(null) : undefined
+                }
+              />
+            </div>
             <ArticleList
               articles={filteredArticles}
               emptyMessage="No articles match the current filters."
-              onEditArticle={setEditingArticle}
+              onEditArticle={editArticle}
               onDeleteArticle={deleteArticle}
             />
           </div>

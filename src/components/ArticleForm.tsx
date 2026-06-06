@@ -13,11 +13,14 @@ export type ArticleFormValues = {
   tag_ids: string[];
 };
 
+export type ArticleFormDraftValues = Partial<ArticleFormValues>;
+
 type Props = {
   sources: Source[];
   tags: Tag[];
   mode?: "create" | "edit";
   initialArticle?: ArticleWithTags | null;
+  initialDraft?: ArticleFormDraftValues | null;
   onSubmit: (article: ArticleFormValues) => Promise<void>;
   onCancel?: () => void;
 };
@@ -33,6 +36,7 @@ export function ArticleForm({
   tags,
   mode = "create",
   initialArticle = null,
+  initialDraft = null,
   onSubmit,
   onCancel,
 }: Props) {
@@ -46,12 +50,12 @@ export function ArticleForm({
 
   useEffect(() => {
     if (!initialArticle) {
-      setSourceId("");
-      setTitle("");
-      setUrl("");
-      setSummary("");
-      setPublishedAt("");
-      setSelectedTagIds([]);
+      setSourceId(initialDraft?.source_id ?? "");
+      setTitle(initialDraft?.title ?? "");
+      setUrl(initialDraft?.url ?? "");
+      setSummary(initialDraft?.summary ?? "");
+      setPublishedAt(initialDraft?.published_at ?? "");
+      setSelectedTagIds(initialDraft?.tag_ids ?? []);
       return;
     }
 
@@ -61,7 +65,7 @@ export function ArticleForm({
     setSummary(initialArticle.summary ?? "");
     setPublishedAt(formatDateForInput(initialArticle.published_at));
     setSelectedTagIds(initialArticle.tags.map((tag) => tag.id));
-  }, [initialArticle]);
+  }, [initialArticle, initialDraft]);
 
   function toggleTag(tagId: string) {
     setSelectedTagIds((prev) =>
