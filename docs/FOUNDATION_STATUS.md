@@ -4,7 +4,7 @@
 
 FOUNDATION is currently in early Phase 1 development.
 
-The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, Article Management v1, Event v1 with Article <-> Event relationships, Event Refinement v1, Events v1.1 Intelligence Summary, and Events v1.2 Activity & Analyst Workflow.
+The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, Article Management v1, Event v1 with Article <-> Event relationships, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, and Seed Data Script v1.
 
 The current focus is:
 - establishing core intelligence data structures,
@@ -314,7 +314,6 @@ Complete for v1.1. Event detail pages now function as early analytical workspace
 
 ## Not Yet Implemented
 - Dashboard improvements
-- Seed data script
 - Event-owned tags
 - Event entity linking
 - Global timeline module
@@ -326,6 +325,29 @@ Complete for v1.1. Event detail pages now function as early analytical workspace
 ## Current Status
 
 Complete for v1.2. The Events list page now supports richer analyst scanning before Dashboard v1.
+
+---
+
+# Seed Data Script v1
+
+## Implemented
+- `supabase/seed.sql`
+- Repeatable fictional Taiwan-focused demo dataset
+- 6 demo sources
+- 12 demo tags
+- 18 demo articles
+- 6 demo events
+- `article_tags` relationship seed data
+- `article_events` relationship seed data
+- Fixed UUID strategy for seeded base records
+- Seed-only cleanup strategy that targets known demo UUIDs
+- Fictional source names and fictional article URLs under `https://example.com/foundation-demo/`
+- `[DEMO]` prefixes on seeded article and event titles
+- Dataset loaded and validated in the application
+
+## Current Status
+
+Complete for v1. The seed script provides repeatable prototype/demo data for testing article, tag, event, filtering, sorting, and event intelligence-summary workflows.
 
 ---
 
@@ -462,11 +484,12 @@ Sources
        -> Event Refinement v1
        -> Events v1.1 Intelligence Summary
        -> Events v1.2 Activity & Analyst Workflow
+       -> Seed Data Script v1
 ```
 
 ## Next Milestone
 
-The next milestone is a decision point between Seed Data Script and Dashboard v1. Neither has started.
+The next milestone is Dashboard v1 planning/implementation.
 
 ## Expanded Long-Term Direction
 
@@ -485,13 +508,13 @@ Sources
 # Immediate Priorities
 
 Next priority:
-1. Seed Data Script / Dashboard v1 decision point
-2. Dashboard Improvements v1
-3. Article detail page / advanced article workflows
+1. Dashboard v1 planning/implementation
+2. Article detail page / advanced article workflows
+3. Source search/filtering or source delete planning
 
 Ingestion roadmap status:
 - Manual entry is the current ingestion workflow.
-- Seed Data Script is a near-term support task, not implemented.
+- Seed Data Script v1 is implemented as repeatable fictional prototype/demo data.
 - URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are elevated roadmap items, not implemented.
 
 Open Filtering/Search follow-ups:
@@ -532,7 +555,7 @@ Open Filtering/Search follow-ups:
 - Data normalization
 - UI consistency
 - Empty shared UI primitives for Button, Input, Textarea, and EmptyState
-- Dashboard v1 / Seed Data Script scope
+- Dashboard v1 scope
 - Timeline schema design
 - Form validation consistency
 - Better typing standardization across components

@@ -21,6 +21,7 @@ Sources
        -> Event Refinement v1
        -> Events v1.1 Intelligence Summary
        -> Events v1.2 Activity & Analyst Workflow
+       -> Seed Data Script v1
 ```
 
 The long-term direction is:
@@ -187,9 +188,12 @@ Standalone Tags CRUD, Article <-> Tag relationships, Filtering & Search v1, and 
 - Events list cards show supporting article count, last activity, occurred date, status, type, and location
 - EventFilters includes sort control
 - Events can be sorted by newest activity, newest event, oldest event, and most supporting articles
+- Seed Data Script v1 exists at `supabase/seed.sql`
+- Repeatable fictional Taiwan-focused demo dataset is available
+- Seed data includes demo sources, articles, tags, events, article_tags, and article_events
+- Seed data uses fixed UUIDs and seed-only cleanup
 
 Not yet implemented:
-- Seed data script
 - Event-owned tags
 - Event entity linking
 - Global timeline module
@@ -205,9 +209,9 @@ Not yet implemented:
 
 ## Next Milestone
 
-The next priority is a decision point between Seed Data Script and Dashboard v1.
+The next priority is Dashboard v1 planning/implementation.
 
-Neither Seed Data Script nor Dashboard v1 has started. Ingestion is elevated as a roadmap layer, but URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are not implemented. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly changes priority.
+Seed Data Script v1 is complete and available for repeatable demo data. Dashboard v1 has not started. Ingestion is elevated as a roadmap layer, but URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are not implemented. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly changes priority.
 
 ---
 
@@ -227,7 +231,7 @@ RSS ingestion, AI-assisted workflows, and Financial Signals are future-phase con
 
 ## Ingestion
 
-Manual entry is the current ingestion workflow. Seed data is a near-term support task. URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are elevated roadmap items only.
+Manual entry is the current ingestion workflow. Seed Data Script v1 provides repeatable fictional prototype/demo data. URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are elevated roadmap items only.
 
 ---
 
@@ -296,7 +300,7 @@ When starting a new ChatGPT or Codex session:
 2. Read FOUNDATION_STATUS.md and FOUNDATION_BACKLOG.md.
 3. Inspect the relevant source files before making changes.
 4. Do not infer that planned features are implemented.
-5. Treat Seed Data Script / Dashboard v1 as the next milestone decision point unless the user explicitly chooses a different direction.
+5. Treat Dashboard v1 as the next milestone unless the user explicitly chooses a different direction.
 
 ---
 

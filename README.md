@@ -38,6 +38,9 @@ Implemented:
 - Event activity indicators, including supporting article count, last activity, occurred date, status, type, and location.
 - Event sorting by newest activity, newest event, oldest event, and most supporting articles.
 - Shared event/date/activity helpers in `src/lib/eventMetrics.ts`.
+- Seed Data Script v1 in `supabase/seed.sql`.
+- Repeatable fictional Taiwan-focused demo dataset for sources, articles, tags, events, and relationships.
+- Fixed UUID seed strategy with seed-only cleanup.
 - Client-side article search by title and summary.
 - Client-side article filtering by one tag.
 - Client-side article filtering by one source.
@@ -60,12 +63,12 @@ Not implemented yet:
 - Article detail page.
 - Entity, timeline, notes, and settings workflows.
 - RSS ingestion.
-- URL import, browser extension capture, review queue, custom connectors, and seed data script.
+- URL import, browser extension capture, review queue, and custom connectors.
 - Financial Signals.
 - Authentication, app auth flows, and RLS-managed access.
 - AI-assisted ingestion, summarization, tagging, or entity extraction.
 
-The next milestone is a decision point between Seed Data Script and Dashboard v1. Neither has started.
+The next milestone is Dashboard v1 planning/implementation.
 
 ## Tech Stack
 
@@ -140,12 +143,12 @@ Key files:
 ## Roadmap
 
 Near term:
-- Seed Data Script: repeatable prototype data for sources, articles, tags, events, and relationships.
 - Dashboard v1: real article/tag/event counts and recent intelligence views.
 - Article detail page and advanced article workflows.
 
 Ingestion roadmap:
 - Manual entry is the current collection workflow.
+- Seed Data Script v1 is available at `supabase/seed.sql` for repeatable fictional prototype/demo data.
 - URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are elevated roadmap items but are not implemented yet.
 
 Still open in Filtering/Search:

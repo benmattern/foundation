@@ -256,7 +256,6 @@ Build a stable platform capable of:
 
 ## Still Open
 - [ ] Dashboard improvements
-- [ ] Seed data script
 - [ ] Event-owned tags
 - [ ] Event entity linking
 - [ ] Global timeline module
@@ -267,17 +266,39 @@ Build a stable platform capable of:
 
 ---
 
+# Seed Data Script v1
+
+## Completed Tasks
+- [x] Create `supabase/seed.sql`
+- [x] Seed sources
+- [x] Seed articles
+- [x] Seed tags
+- [x] Seed `article_tags` relationships
+- [x] Seed events
+- [x] Seed `article_events` relationships
+- [x] Use fixed UUIDs for seeded base records
+- [x] Use seed-only cleanup targeting known demo UUIDs
+- [x] Keep seeded data clearly marked as fictional prototype/demo data
+- [x] Use fictional article URLs under `https://example.com/foundation-demo/`
+- [x] Validate seeded dataset in the application
+
+## Current Status
+
+Complete for v1.
+
+---
+
 # Immediate Backlog
 
 # Next Milestone
 
-## Seed Data Script / Dashboard v1 Decision Point
-- [ ] Decide whether the next milestone is Seed Data Script
-- [ ] Decide whether the next milestone is Dashboard v1
-- [ ] Define repeatable prototype seed data scope if Seed Data Script is chosen
-- [ ] Define Dashboard v1 metrics and recent intelligence views if chosen
+## Dashboard v1 Planning / Implementation
+- [ ] Define Dashboard v1 metrics and recent intelligence views
+- [ ] Decide which seed-backed metrics should appear first
+- [ ] Connect dashboard article/tag/event counts to real data
+- [ ] Add recent intelligence views using current sources, articles, tags, and events
 
-Neither Seed Data Script nor Dashboard v1 has started.
+Seed Data Script v1 is complete. Dashboard v1 has not started.
 
 ---
 
@@ -287,16 +308,16 @@ Neither Seed Data Script nor Dashboard v1 has started.
 
 Create repeatable prototype data for testing and demonstration.
 
-## Planned Scope
-- [ ] Seed sources
-- [ ] Seed articles
-- [ ] Seed tags
-- [ ] Seed article_tags relationships
-- [ ] Seed events
-- [ ] Seed article_events relationships
-- [ ] Keep seed data clearly marked as prototype/test-only
+## Completed Scope
+- [x] Seed sources
+- [x] Seed articles
+- [x] Seed tags
+- [x] Seed article_tags relationships
+- [x] Seed events
+- [x] Seed article_events relationships
+- [x] Keep seed data clearly marked as prototype/test-only
 
-Current status: not implemented.
+Current status: complete for v1.
 
 ---
 
@@ -346,7 +367,7 @@ Improve how intelligence enters FOUNDATION after manual workflows and schema fou
 - [x] Manual source/article/event entry
 
 ## Near-Term Support
-- [ ] Seed Data Script
+- [x] Seed Data Script v1
 
 ## Planned Ingestion Layers
 - [ ] URL import

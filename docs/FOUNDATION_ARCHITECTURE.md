@@ -59,6 +59,7 @@ Current frontend architecture uses:
 - client-side event filtering/search over loaded event records
 - event detail intelligence summaries derived from supporting articles
 - event list activity indicators and sorting derived from loaded event/article data
+- repeatable fictional demo data through `supabase/seed.sql`
 
 ### Current Folder Structure
 
@@ -214,6 +215,7 @@ Sources
        -> Event Refinement v1
        -> Events v1.1 Intelligence Summary
        -> Events v1.2 Activity & Analyst Workflow
+       -> Seed Data Script v1
 ```
 
 Long-term relational direction:
@@ -243,11 +245,12 @@ Completed:
 8. Event Refinement v1
 9. Events v1.1 Intelligence Summary
 10. Events v1.2 Activity & Analyst Workflow
+11. Seed Data Script v1
 
 Next milestone:
-- Seed Data Script / Dashboard v1 decision point
+- Dashboard v1 planning/implementation
 
-Neither Seed Data Script nor Dashboard v1 has started.
+Seed Data Script v1 is complete. Dashboard v1 has not started.
 
 ---
 
@@ -279,7 +282,7 @@ Events v1.2 adds event list activity indicators, status overview cards, sorting,
 
 ---
 
-# Ingestion Architecture Direction
+# Ingestion And Acquisition Architecture Direction
 
 Ingestion is elevated as a first-class long-term architecture layer, but automation is not implemented yet.
 
@@ -288,8 +291,13 @@ Current ingestion:
 - manual article entry
 - manual event creation and article linking
 
+Current demo/acquisition support:
+- Seed Data Script v1 at `supabase/seed.sql`
+- repeatable fictional Taiwan-focused prototype data
+- demo sources, articles, tags, events, article_tags, and article_events
+- fixed UUID seed strategy and seed-only cleanup
+
 Planned ingestion layers:
-- Seed Data Script for repeatable prototype/test data
 - URL import
 - RSS ingestion
 - browser extension capture
@@ -383,7 +391,7 @@ Examples:
 - More consistent type organization
 - Better form validation
 - Improved UI consistency
-- Dashboard v1 / Seed Data Script scope
+- Dashboard v1 scope
 - Ingestion roadmap implementation scope
 - Timeline schema design
 - Article creation and tag assignment are frontend-driven separate operations

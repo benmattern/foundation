@@ -793,11 +793,11 @@ Shared helpers:
 # Ingestion Elevated As Strategic Roadmap Layer
 
 ## Decision
-Elevate ingestion as a strategic roadmap layer, while keeping it unimplemented for now.
+Elevate ingestion as a strategic roadmap layer, while keeping automation unimplemented for now.
 
 Planned ingestion direction:
 - manual entry remains current
-- Seed Data Script as near-term support
+- Seed Data Script v1 is implemented as near-term support
 - URL import
 - RSS ingestion
 - browser extension capture
@@ -812,6 +812,72 @@ Elevating ingestion now:
 - separates test data needs from production ingestion,
 - avoids premature automation,
 - and keeps future ingestion aligned with analyst-controlled workflows.
+
+---
+
+# Seed Data Script Before Dashboard v1
+
+## Decision
+Implement Seed Data Script v1 before Dashboard v1.
+
+## Reasoning
+Dashboard v1 needs realistic data to validate useful metrics, recent intelligence views, event activity indicators, and article/tag/event counts.
+
+Adding seed data first:
+- gives the dashboard a stable demo corpus,
+- improves manual testing of article and event workflows,
+- validates event intelligence summaries with linked articles and tags,
+- and avoids designing dashboard widgets against empty or inconsistent data.
+
+---
+
+# Fixed UUID Seed Strategy
+
+## Decision
+Use fixed UUIDs for all seeded sources, tags, articles, and events in `supabase/seed.sql`.
+
+## Reasoning
+Fixed UUIDs make the seed script repeatable and make relationship rows deterministic.
+
+They also allow seed-only cleanup to target known demo records without deleting manually-created data.
+
+---
+
+# Demo-Only Seed Data Policy
+
+## Decision
+Seed data must be clearly fictional prototype/demo data.
+
+Current policy:
+- fictional source names,
+- fictional article titles,
+- fictional event titles,
+- fictional summaries and event descriptions,
+- article URLs under `https://example.com/foundation-demo/`,
+- `[DEMO]` prefixes on seeded article and event titles.
+
+## Reasoning
+FOUNDATION works in an OSINT/geopolitical domain, so sample data can easily be mistaken for real intelligence.
+
+The seed dataset must support testing and demonstration without implying current real-world reporting or analysis.
+
+---
+
+# Seed-Only Cleanup Strategy
+
+## Decision
+Make `supabase/seed.sql` rerunnable by deleting only rows matching the fixed seed UUID set.
+
+The script:
+- deletes join-table rows before base records,
+- does not truncate tables,
+- does not delete manually-created records outside the seed UUID set,
+- and reinserts the fictional demo dataset in a transaction.
+
+## Reasoning
+This keeps the demo dataset predictable while preserving manual analyst-created data.
+
+Rerunning the script is allowed to refresh seeded demo records because those records are seed-owned by design.
 
 ---
 

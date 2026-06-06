@@ -330,6 +330,26 @@ Examples:
 
 Use UUID primary keys.
 
+Seed data should use fixed UUIDs for seeded base records so demo data can be safely refreshed without truncating tables or deleting manually-created records.
+
+---
+
+# Seed Data
+
+Repeatable prototype/demo seed data lives in:
+
+```txt
+supabase/seed.sql
+```
+
+Seed data conventions:
+- clearly mark records as fictional prototype/demo data
+- use fixed UUIDs for seeded sources, tags, articles, and events
+- delete only known seed UUIDs during cleanup
+- do not truncate tables
+- do not delete manually-created data
+- use fictional article URLs under `https://example.com/foundation-demo/`
+
 ---
 
 # Relationship Philosophy
@@ -348,6 +368,7 @@ Sources
        -> Event Refinement v1
        -> Events v1.1 Intelligence Summary
        -> Events v1.2 Activity & Analyst Workflow
+       -> Seed Data Script v1
 ```
 
 Long-term direction:
@@ -492,15 +513,15 @@ Use this procedure when starting or resuming work with ChatGPT, Codex, or anothe
 
 ## Current Priority Alignment
 
-Standalone Tags CRUD, Article <-> Tag relationships, Filtering & Search v1, Article Management v1, Event v1, Event Refinement v1, Events v1.1 Intelligence Summary, and Events v1.2 Activity & Analyst Workflow are complete for the current stage.
+Standalone Tags CRUD, Article <-> Tag relationships, Filtering & Search v1, Article Management v1, Event v1, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, and Seed Data Script v1 are complete for the current stage.
 
 The next milestone is:
 
 ```txt
-Seed Data Script / Dashboard v1 decision point
+Dashboard v1 planning/implementation
 ```
 
-Neither Seed Data Script nor Dashboard v1 has started. Ingestion is elevated as a roadmap layer, but URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are not implemented. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly reprioritizes.
+Seed Data Script v1 is complete. Dashboard v1 has not started. Ingestion is elevated as a roadmap layer, but URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are not implemented. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly reprioritizes.
 
 ---
 

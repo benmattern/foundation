@@ -30,6 +30,7 @@ Sources
        -> Event Refinement v1
        -> Events v1.1 Intelligence Summary
        -> Events v1.2 Activity & Analyst Workflow
+       -> Seed Data Script v1
 ```
 
 The schema is intentionally evolving in layers:
@@ -443,7 +444,30 @@ Not implemented:
 - event severity/confidence scoring
 - event date ranges
 - dashboard improvements
-- seed data script
+
+---
+
+# Seed Data Script v1
+
+Seed Data Script v1 required no schema changes.
+
+The repeatable demo seed file exists at:
+
+```txt
+supabase/seed.sql
+```
+
+Current implementation:
+- seeds fictional prototype/demo data only
+- uses fixed UUIDs for seeded sources, tags, articles, and events
+- uses seed-only cleanup targeting known demo UUIDs
+- does not truncate tables
+- does not delete manually-created data outside the seed UUID set
+- seeds `sources`, `articles`, `tags`, `events`, `article_tags`, and `article_events`
+- uses fictional source names and fictional article URLs under `https://example.com/foundation-demo/`
+- prefixes seeded article and event titles with `[DEMO]`
+
+The seed file supports the existing implemented schema and relationship model. It is not a migration and does not create or alter tables.
 
 ---
 
@@ -692,10 +716,11 @@ Sources
        -> Event Refinement v1
        -> Events v1.1 Intelligence Summary
        -> Events v1.2 Activity & Analyst Workflow
+       -> Seed Data Script v1
 ```
 
 Next milestone:
-- Seed Data Script / Dashboard v1 decision point
+- Dashboard v1 planning/implementation
 
 Entities, timelines, and advanced event refinements intentionally come later unless explicitly reprioritized.
 
@@ -813,8 +838,8 @@ until:
 The next schema-impacting direction has not started.
 
 Current candidate directions:
-1. Seed Data Script / Dashboard v1 decision point
-2. Dashboard Improvements v1
-3. Article detail page / advanced article workflows
+1. Dashboard Improvements v1
+2. Article detail page / advanced article workflows
+3. Source search/filtering or source delete planning
 
-Filtering & Search v1, Article Management v1, Event Refinement v1, Events v1.1 Intelligence Summary, and Events v1.2 Activity & Analyst Workflow are complete and required no schema changes. Event v1 is implemented with `events` and `article_events`.
+Filtering & Search v1, Article Management v1, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, and Seed Data Script v1 are complete and required no schema changes. Event v1 is implemented with `events` and `article_events`.
