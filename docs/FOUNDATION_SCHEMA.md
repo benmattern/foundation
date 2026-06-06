@@ -32,6 +32,8 @@ Sources
        -> Events v1.2 Activity & Analyst Workflow
        -> Seed Data Script v1
        -> Dashboard v1
+       -> URL Import v1
+       -> URL Metadata Fetch v1.1
 ```
 
 The schema is intentionally evolving in layers:
@@ -491,6 +493,39 @@ Dashboard v1 is client-side for prototype scale. Server-side dashboard aggregati
 
 ---
 
+# URL Import v1
+
+URL Import v1 required no schema changes.
+
+Current implementation:
+- creates transient article draft data in the frontend
+- normalizes URLs and removes common UTM tracking parameters
+- detects duplicate existing articles by normalized URL
+- matches existing sources by hostname
+- prefills ArticleForm with URL and matched source
+- requires analyst review before article save
+
+URL Import v1 does not store separate ingestion records and does not create articles automatically.
+
+---
+
+# URL Metadata Fetch v1.1
+
+URL Metadata Fetch v1.1 required no schema changes.
+
+Current implementation:
+- uses the deployed `fetch-url-metadata` Supabase Edge Function
+- fetches lightweight URL metadata
+- returns title, description, site name, published date, canonical URL, final URL, source hints, and warnings
+- keeps metadata as transient draft data
+- does not write to the database from the Edge Function
+- does not store raw metadata automatically
+- requires analyst review before article save
+
+The Edge Function is an acquisition helper, not a schema object or ingestion persistence layer.
+
+---
+
 # events
 
 ## Current Implementation Status
@@ -615,6 +650,54 @@ Event/article linking is operational through Event v1:
 
 # Planned Tables
 
+# ingestion_candidates
+
+## Purpose
+
+Planned staging table for ingestion candidates before they become approved article records.
+
+An ingestion candidate is a pre-article intake record produced by URL Import, RSS, browser extension capture, or future connectors. Candidates are not approved intelligence records until an analyst reviews and accepts them.
+
+---
+
+## Planned Fields
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| url | text | Original or normalized candidate URL |
+| canonical_url | text | Optional canonical URL from metadata |
+| final_url | text | Optional final URL after redirects |
+| source_id | uuid | Nullable FK to sources.id for matched source |
+| title | text | Candidate title from metadata or analyst edit |
+| description | text | Candidate description/summary draft |
+| published_at | timestamptz | Optional candidate published timestamp |
+| import_source | text | manual_url, rss, browser_extension, connector |
+| status | text | pending, accepted, rejected, duplicate; stale later/optional |
+| raw_metadata | jsonb | Lightweight fetched metadata, not full article body |
+| warnings | jsonb | Metadata/import warnings |
+| converted_article_id | uuid | Nullable FK to articles.id after acceptance |
+| rejection_reason | text | Optional analyst rejection note |
+| created_at | timestamptz | Creation timestamp |
+| updated_at | timestamptz | Update timestamp |
+| reviewed_at | timestamptz | Optional review timestamp |
+
+---
+
+## Planned Workflow
+
+```txt
+URL Import / RSS / Browser Extension / Connector
+  -> ingestion_candidates
+    -> analyst review
+      -> accepted candidate creates article
+      -> rejected/duplicate/stale candidates stay out of articles
+```
+
+Future automated ingestion should create candidates, not approved articles directly.
+
+---
+
 # entities
 
 ## Purpose
@@ -738,10 +821,12 @@ Sources
        -> Events v1.2 Activity & Analyst Workflow
        -> Seed Data Script v1
        -> Dashboard v1
+       -> URL Import v1
+       -> URL Metadata Fetch v1.1
 ```
 
 Next milestone:
-- Decision point between Ingestion Planning / URL Import v1, Article Detail Pages, Source Management cleanup, and Events v1.3
+- Decision point between Ingestion Review Queue / `ingestion_candidates`, Article Detail Pages, Source Management cleanup, and Events v1.3
 
 Entities, timelines, and advanced event refinements intentionally come later unless explicitly reprioritized.
 
@@ -856,12 +941,12 @@ until:
 
 # Current Schema Priority
 
-The next schema-impacting direction has not started.
+The next likely schema-impacting direction has not started.
 
 Current candidate directions:
-1. Ingestion Planning / URL Import v1
+1. Ingestion Review Queue / `ingestion_candidates`
 2. Article detail page / advanced article workflows
 3. Source search/filtering or source delete planning
 4. Events v1.3
 
-Filtering & Search v1, Article Management v1, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, and Dashboard v1 are complete. Dashboard v1 required no schema changes. Event v1 is implemented with `events` and `article_events`.
+Filtering & Search v1, Article Management v1, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, Dashboard v1, URL Import v1, and URL Metadata Fetch v1.1 are complete. Dashboard v1, URL Import v1, and URL Metadata Fetch v1.1 required no schema changes. Event v1 is implemented with `events` and `article_events`.

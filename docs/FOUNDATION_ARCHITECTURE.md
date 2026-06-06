@@ -61,6 +61,8 @@ Current frontend architecture uses:
 - event list activity indicators and sorting derived from loaded event/article data
 - repeatable fictional demo data through `supabase/seed.sql`
 - Dashboard v1 analyst overview derived from loaded source, article, tag, and event data
+- URL Import v1 analyst-reviewed article draft workflow
+- URL Metadata Fetch v1.1 through a deployed Supabase Edge Function
 
 ### Current Folder Structure
 
@@ -155,6 +157,9 @@ Current functionality:
 - Retag existing articles
 - Delete articles
 - Link articles to events
+- Start article drafts from imported URLs
+- Fetch lightweight URL metadata through `fetch-url-metadata`
+- Preview/apply metadata before article save
 
 Not implemented:
 - Article detail page
@@ -226,6 +231,8 @@ Sources
        -> Events v1.2 Activity & Analyst Workflow
        -> Seed Data Script v1
        -> Dashboard v1
+       -> URL Import v1
+       -> URL Metadata Fetch v1.1
 ```
 
 Long-term relational direction:
@@ -257,11 +264,13 @@ Completed:
 10. Events v1.2 Activity & Analyst Workflow
 11. Seed Data Script v1
 12. Dashboard v1
+13. URL Import v1
+14. URL Metadata Fetch v1.1
 
 Next milestone:
-- Decision point between Ingestion Planning / URL Import v1, Article Detail Pages, Source Management cleanup, and Events v1.3
+- Decision point between Ingestion Review Queue / `ingestion_candidates`, Article Detail Pages, Source Management cleanup, and Events v1.3
 
-Seed Data Script v1 and Dashboard v1 are complete. The next milestone has not started.
+Seed Data Script v1, Dashboard v1, URL Import v1, and URL Metadata Fetch v1.1 are complete. The next milestone has not started.
 
 ---
 
@@ -297,12 +306,15 @@ Dashboard v1 is the Presentation Layer's first analyst overview. It loads existi
 
 # Ingestion And Acquisition Architecture Direction
 
-Ingestion is elevated as a first-class long-term architecture layer, but automation is not implemented yet.
+Ingestion is elevated as a first-class long-term architecture layer. The current implementation supports analyst-reviewed URL intake, but automated collection is not implemented yet.
 
 Current ingestion:
 - manual source entry
 - manual article entry
 - manual event creation and article linking
+- URL Import v1 for article draft creation
+- URL Metadata Fetch v1.1 through the deployed `fetch-url-metadata` Supabase Edge Function
+- metadata preview/apply workflow with analyst review before save
 
 Current demo/acquisition support:
 - Seed Data Script v1 at `supabase/seed.sql`
@@ -311,13 +323,14 @@ Current demo/acquisition support:
 - fixed UUID seed strategy and seed-only cleanup
 
 Planned ingestion layers:
-- URL import
+- Review Queue using `ingestion_candidates`
 - RSS ingestion
 - browser extension capture
-- review queue
 - custom connectors
 
 The future ingestion layer should preserve analyst review and avoid automatically turning external content into trusted intelligence records without human oversight.
+
+Future RSS ingestion, browser extension capture, and custom connectors should feed Review Queue candidates rather than creating articles directly. Accepted candidates can later convert into approved article records; rejected, duplicate, or stale candidates should remain outside `articles`.
 
 ---
 

@@ -373,6 +373,8 @@ Sources
        -> Events v1.2 Activity & Analyst Workflow
        -> Seed Data Script v1
        -> Dashboard v1
+       -> URL Import v1
+       -> URL Metadata Fetch v1.1
 ```
 
 Long-term direction:
@@ -517,15 +519,15 @@ Use this procedure when starting or resuming work with ChatGPT, Codex, or anothe
 
 ## Current Priority Alignment
 
-Standalone Tags CRUD, Article <-> Tag relationships, Filtering & Search v1, Article Management v1, Event v1, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, and Dashboard v1 are complete for the current stage.
+Standalone Tags CRUD, Article <-> Tag relationships, Filtering & Search v1, Article Management v1, Event v1, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, Dashboard v1, URL Import v1, and URL Metadata Fetch v1.1 are complete for the current stage.
 
 The next milestone is:
 
 ```txt
-Decision point: Ingestion Planning / URL Import v1, Article Detail Pages, Source Management cleanup, or Events v1.3
+Decision point: Ingestion Review Queue / ingestion_candidates, Article Detail Pages, Source Management cleanup, or Events v1.3
 ```
 
-Seed Data Script v1 and Dashboard v1 are complete. Ingestion is elevated as a roadmap layer, but URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are not implemented. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly reprioritizes.
+Seed Data Script v1, Dashboard v1, URL Import v1, and URL Metadata Fetch v1.1 are complete. Ingestion is elevated as a roadmap layer. Review Queue is planned, not implemented. Future RSS ingestion, browser extension capture, and custom connectors should feed Review Queue candidates rather than approved articles directly. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly reprioritizes.
 
 ---
 

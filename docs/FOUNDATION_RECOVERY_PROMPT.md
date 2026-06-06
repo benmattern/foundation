@@ -23,6 +23,8 @@ Sources
        -> Events v1.2 Activity & Analyst Workflow
        -> Seed Data Script v1
        -> Dashboard v1
+       -> URL Import v1
+       -> URL Metadata Fetch v1.1
 ```
 
 The long-term direction is:
@@ -136,6 +138,12 @@ Not yet implemented:
 - Reused ArticleForm for create/edit modes
 - Edit/cancel support
 - Supabase persistence
+- URL Import v1 exists on Articles page
+- URL import normalizes URLs, removes common UTM parameters, warns on duplicate article URLs, and matches existing sources by hostname
+- URL Metadata Fetch v1.1 exists through the deployed `fetch-url-metadata` Supabase Edge Function
+- Metadata preview/apply workflow exists for title, summary, published date, canonical/final URL, site name, and source hints
+- Metadata remains transient draft data and article save still requires analyst review
+- URL-only fallback still works when metadata fetch fails or returns weak metadata
 
 Not yet implemented:
 - Article detail page
@@ -210,7 +218,7 @@ Not yet implemented:
 - Event AI suggestions
 - Event severity/confidence scoring
 - Event date ranges
-- URL import, RSS ingestion, browser extension capture, review queue, and custom connectors
+- Review Queue, RSS ingestion, browser extension capture, and custom connectors
 
 ---
 
@@ -218,9 +226,9 @@ Not yet implemented:
 
 ## Next Milestone
 
-The next priority is a decision point between Ingestion Planning / URL Import v1, Article Detail Pages, Source Management cleanup, and Events v1.3.
+The next priority is a decision point between Ingestion Review Queue / `ingestion_candidates`, Article Detail Pages, Source Management cleanup, and Events v1.3.
 
-Seed Data Script v1 and Dashboard v1 are complete. Ingestion is elevated as a roadmap layer, but URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are not implemented. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly changes priority.
+Seed Data Script v1, Dashboard v1, URL Import v1, and URL Metadata Fetch v1.1 are complete. Ingestion is elevated as a roadmap layer. Review Queue is planned, not implemented. Future RSS ingestion, browser extension capture, and custom connectors should feed Review Queue candidates rather than creating articles directly. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly changes priority.
 
 ---
 
@@ -240,7 +248,9 @@ RSS ingestion, AI-assisted workflows, and Financial Signals are future-phase con
 
 ## Ingestion
 
-Manual entry is the current ingestion workflow. Seed Data Script v1 provides repeatable fictional prototype/demo data. URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are elevated roadmap items only.
+Manual entry, Seed Data Script v1, URL Import v1, and URL Metadata Fetch v1.1 are implemented acquisition capabilities.
+
+Review Queue is planned as the next likely ingestion milestone. Planned `ingestion_candidates` should be pre-article records separate from approved `articles`, with pending, accepted, rejected, duplicate, and optional stale statuses. Accepted candidates may convert to articles after analyst review. Rejected, duplicate, and stale candidates should stay out of `articles`.
 
 ---
 
@@ -309,7 +319,7 @@ When starting a new ChatGPT or Codex session:
 2. Read FOUNDATION_STATUS.md and FOUNDATION_BACKLOG.md.
 3. Inspect the relevant source files before making changes.
 4. Do not infer that planned features are implemented.
-5. Treat the next milestone as a decision point between Ingestion Planning / URL Import v1, Article Detail Pages, Source Management cleanup, and Events v1.3 unless the user explicitly chooses a different direction.
+5. Treat the next milestone as a decision point between Ingestion Review Queue / `ingestion_candidates`, Article Detail Pages, Source Management cleanup, and Events v1.3 unless the user explicitly chooses a different direction.
 
 ---
 

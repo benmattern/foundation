@@ -318,17 +318,58 @@ Complete for v1.
 
 ---
 
+# URL Import v1
+
+## Completed Tasks
+- [x] Add Import from URL workflow on Articles page
+- [x] Validate URL input
+- [x] Normalize obvious URL formatting
+- [x] Remove common UTM tracking parameters
+- [x] Detect duplicate existing article by normalized URL
+- [x] Match existing source by hostname
+- [x] Prefill ArticleForm draft with normalized URL and matched source
+- [x] Preserve analyst review before save
+- [x] Avoid auto-save
+- [x] Avoid source auto-creation
+
+## Current Status
+
+Complete for v1.
+
+---
+
+# URL Metadata Fetch v1.1
+
+## Completed Tasks
+- [x] Add Supabase Edge Function `fetch-url-metadata`
+- [x] Deploy and validate Edge Function
+- [x] Add frontend metadata response type
+- [x] Add frontend metadata service wrapper
+- [x] Fetch lightweight metadata from URL
+- [x] Extract title, description, site name, published date, canonical URL, final URL, and source hints
+- [x] Add metadata loading, error, warning, preview, and apply states
+- [x] Preserve URL-only fallback
+- [x] Keep metadata transient as draft data
+- [x] Require analyst review before article save
+- [x] Avoid full article scraping, paywall bypass, auto-summary, auto-tagging, source auto-creation, and auto-save
+
+## Current Status
+
+Complete for v1.1.
+
+---
+
 # Immediate Backlog
 
 # Next Milestone
 
 ## Next Milestone Decision Point
-- [ ] Decide whether the next milestone is Ingestion Planning / URL Import v1
+- [ ] Decide whether the next milestone is Ingestion Review Queue / `ingestion_candidates`
 - [ ] Decide whether the next milestone is Article Detail Pages
 - [ ] Decide whether the next milestone is Source Management cleanup
 - [ ] Decide whether the next milestone is Events v1.3
 
-Seed Data Script v1 and Dashboard v1 are complete. The next milestone has not started.
+Seed Data Script v1, Dashboard v1, URL Import v1, and URL Metadata Fetch v1.1 are complete. The next milestone has not started.
 
 ---
 
@@ -399,15 +440,28 @@ Improve how intelligence enters FOUNDATION after manual workflows and schema fou
 
 ## Near-Term Support
 - [x] Seed Data Script v1
+- [x] URL Import v1
+- [x] URL Metadata Fetch v1.1
 
 ## Planned Ingestion Layers
-- [ ] URL import
-- [ ] RSS ingestion
-- [ ] Browser extension capture
 - [ ] Review queue
+- [ ] `ingestion_candidates` schema
+- [ ] RSS ingestion into Review Queue candidates
+- [ ] Browser extension capture into Review Queue candidates
 - [ ] Custom connectors
 
-Current status: elevated roadmap layer only. No ingestion automation is implemented yet.
+Current status: URL Import v1 and URL Metadata Fetch v1.1 are implemented as analyst-reviewed draft workflows. Review Queue is planned, not implemented, and should become the staging layer for future URL, RSS, browser extension, and connector intake before approved article creation.
+
+## Planned Review Queue v1
+- [ ] Create `ingestion_candidates` table
+- [ ] Store candidates separately from approved articles
+- [ ] Track candidate status: pending, accepted, rejected, duplicate
+- [ ] Consider stale as later/optional status
+- [ ] Store original URL, canonical URL, final URL, source match, title, description, published date, import source, raw metadata, and warnings
+- [ ] Convert accepted candidates into articles through analyst action
+- [ ] Keep rejected, duplicate, and stale candidates out of `articles`
+- [ ] Detect duplicate candidates and duplicate articles
+- [ ] Preserve analyst review before article creation
 
 ---
 
@@ -444,11 +498,11 @@ Refine discrete geopolitical, technological, and operational developments after 
 Automate intelligence collection after manual collection workflows are stable.
 
 ## Planned Features
-- [ ] RSS source ingestion
-- [ ] Automatic article creation
+- [ ] RSS source ingestion into Review Queue candidates
 - [ ] Duplicate detection
 - [ ] Metadata normalization
 - [ ] Feed health monitoring
+- [ ] Analyst approval before article creation
 
 ## Potential Sources
 - Reuters

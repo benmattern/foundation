@@ -4,7 +4,7 @@
 
 FOUNDATION is currently in early Phase 1 development.
 
-The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, Article Management v1, Event v1 with Article <-> Event relationships, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, and Dashboard v1.
+The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, Article Management v1, Event v1 with Article <-> Event relationships, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, Dashboard v1, URL Import v1, and URL Metadata Fetch v1.1.
 
 The current focus is:
 - establishing core intelligence data structures,
@@ -145,6 +145,11 @@ Operational for create, list, detail, and edit workflows.
 - Filtered result count
 - Filtered empty state
 - Link articles to analyst-created events through Event v1
+- URL Import v1 for analyst-reviewed article drafts
+- URL normalization, UTM cleanup, duplicate warning, and source matching by hostname
+- URL Metadata Fetch v1.1 through the deployed `fetch-url-metadata` Supabase Edge Function
+- Metadata preview/apply workflow for title, summary, published date, canonical/final URL, and site/source hints
+- URL-only fallback when metadata fetch is unavailable or incomplete
 
 ## Not Yet Implemented
 - Article detail page
@@ -166,6 +171,8 @@ Sources
     <-> Tags
        -> Filtering/Search v1
        -> Article Management v1
+       -> URL Import v1
+       -> URL Metadata Fetch v1.1
     <-> Events v1
        -> Event Refinement v1
        -> Events v1.1 Intelligence Summary
@@ -360,6 +367,61 @@ Complete for v1. The seed script provides repeatable prototype/demo data for tes
 
 ---
 
+# URL Import v1
+
+## Implemented
+- Import from URL card on the Articles page
+- URL validation and normalization
+- Automatic `https://` prefix when protocol is missing
+- Common UTM tracking parameter cleanup
+- Duplicate article warning based on normalized URL
+- Existing source matching by hostname
+- ArticleForm draft prefill with normalized URL and matched source
+- Analyst review remains required before article save
+- No source auto-creation
+- No auto-save
+
+## Current Status
+
+Complete for v1. URL Import improves manual article creation while preserving analyst-reviewed ingestion.
+
+---
+
+# URL Metadata Fetch v1.1
+
+## Implemented
+- Deployed Supabase Edge Function at `supabase/functions/fetch-url-metadata`
+- Frontend metadata service wrapper
+- Metadata preview/apply workflow in ArticleUrlImport
+- Lightweight metadata extraction for title, description, site name, canonical/final URL, source hints, and published date
+- Metadata warnings for unavailable metadata, URL differences, weak/missing published date, and fetch failures
+- URL-only fallback remains available
+- Metadata remains transient draft data and is not stored automatically
+- No database writes from the Edge Function
+- No full article body extraction, paywall bypass, auto-summary, auto-tagging, source auto-creation, or auto-save
+
+## Current Status
+
+Complete for v1.1. The Edge Function has been deployed and validated with live article metadata.
+
+---
+
+# Ingestion Review Queue
+
+## Planned
+- `ingestion_candidates` as pre-article intake records
+- Candidates remain separate from approved `articles`
+- Candidate statuses: pending, accepted, rejected, duplicate, and optional stale
+- Accepted candidates convert to articles after analyst review
+- Rejected, duplicate, and stale candidates stay out of article records
+- Future URL, RSS, browser extension, and connector intake should create candidates rather than articles directly
+
+## Current Status
+
+Planned, not implemented. This is the next likely ingestion schema milestone.
+
+---
+
 # Filtering & Search v1
 
 ## Implemented
@@ -495,12 +557,14 @@ Sources
        -> Events v1.2 Activity & Analyst Workflow
        -> Seed Data Script v1
        -> Dashboard v1
+       -> URL Import v1
+       -> URL Metadata Fetch v1.1
 ```
 
 ## Next Milestone
 
 The next milestone is a decision point between:
-- Ingestion Planning / URL Import v1
+- Ingestion Review Queue / `ingestion_candidates`
 - Article Detail Pages
 - Source Management cleanup
 - Events v1.3
@@ -522,14 +586,17 @@ Sources
 # Immediate Priorities
 
 Next priority:
-1. Next milestone decision point
+1. Ingestion Review Queue / `ingestion_candidates` planning or implementation
 2. Article detail page / advanced article workflows
 3. Source search/filtering or source delete planning
 
 Ingestion roadmap status:
 - Manual entry is the current ingestion workflow.
 - Seed Data Script v1 is implemented as repeatable fictional prototype/demo data.
-- URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are elevated roadmap items, not implemented.
+- URL Import v1 is implemented.
+- URL Metadata Fetch v1.1 is implemented through a deployed Supabase Edge Function.
+- Review Queue is planned as the next likely ingestion layer.
+- RSS ingestion, browser extension capture, and custom connectors remain planned and should feed Review Queue candidates rather than articles directly.
 
 Open Filtering/Search follow-ups:
 - Date filtering

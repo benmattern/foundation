@@ -793,16 +793,17 @@ Shared helpers:
 # Ingestion Elevated As Strategic Roadmap Layer
 
 ## Decision
-Elevate ingestion as a strategic roadmap layer, while keeping automation unimplemented for now.
+Elevate ingestion as a strategic roadmap layer, while keeping automated collection behind analyst review.
 
-Planned ingestion direction:
+Current and planned ingestion direction:
 - manual entry remains current
 - Seed Data Script v1 is implemented as near-term support
-- URL import
-- RSS ingestion
-- browser extension capture
-- review queue
-- custom connectors
+- URL Import v1 is implemented
+- URL Metadata Fetch v1.1 is implemented through a Supabase Edge Function
+- Review Queue / `ingestion_candidates` is planned
+- RSS ingestion should feed Review Queue candidates
+- browser extension capture should feed Review Queue candidates
+- custom connectors should feed Review Queue candidates
 
 ## Reasoning
 FOUNDATION will eventually need reliable intake workflows, but the current priority remains stable schema, relationships, and analyst review.
@@ -971,6 +972,106 @@ Keeping this logic in `src/lib/dashboardMetrics.ts`:
 - avoids scattering metric logic across UI components,
 - matches the existing `eventMetrics.ts` pattern,
 - and preserves a path to reuse or replace dashboard derivation later.
+
+---
+
+# Analyst-Reviewed Ingestion
+
+## Decision
+FOUNDATION ingestion should remain analyst-reviewed rather than auto-saving external content as approved articles.
+
+Current implemented ingestion behavior:
+- URL Import v1 starts an article draft from a URL.
+- URL Metadata Fetch v1.1 fetches lightweight metadata through an Edge Function.
+- Metadata is previewed and explicitly applied by the analyst.
+- Article save remains a separate analyst action.
+
+## Reasoning
+FOUNDATION operates in an OSINT/intelligence domain where source material, metadata, and summaries should not become trusted records without human review.
+
+Analyst-reviewed ingestion:
+- prevents noisy or low-quality external content from polluting `articles`,
+- keeps human judgment central,
+- avoids over-trusting metadata,
+- and preserves a clean boundary between intake and approved intelligence records.
+
+---
+
+# Supabase Edge Function For URL Metadata
+
+## Decision
+Use the `fetch-url-metadata` Supabase Edge Function for URL Metadata Fetch v1.1 instead of frontend-only fetching or third-party metadata services.
+
+## Reasoning
+Frontend-only metadata fetching is unreliable because many websites block browser cross-origin requests.
+
+A Supabase Edge Function:
+- fits the existing Supabase backend stack,
+- avoids adding a separate Render backend service,
+- keeps metadata fetching under project control,
+- supports SSRF protections, timeouts, redirect limits, and response-size limits,
+- and avoids sending analyst URLs to a third-party metadata vendor.
+
+The Edge Function does not write to the database and does not scrape full article bodies.
+
+---
+
+# Metadata As Transient Draft Data
+
+## Decision
+URL metadata fetched in v1.1 remains transient draft data and is not stored automatically.
+
+## Reasoning
+Metadata from external pages may be incomplete, inaccurate, stale, misleading, or different from the analyst's interpretation.
+
+Keeping metadata transient:
+- reinforces analyst review,
+- avoids storing raw ingestion artifacts before a Review Queue exists,
+- keeps the current schema unchanged,
+- and preserves the `articles` table as approved analyst-created records.
+
+---
+
+# Ingestion Candidates Separate From Articles
+
+## Decision
+Plan Review Queue around `ingestion_candidates` as pre-article records separate from approved `articles`.
+
+Planned candidate statuses:
+- pending
+- accepted
+- rejected
+- duplicate
+- stale as later/optional
+
+## Reasoning
+Candidates represent possible intake items, not approved intelligence records.
+
+Separating candidates from articles:
+- prevents automated collection from polluting the article corpus,
+- allows rejection, deduplication, and stale cleanup,
+- supports future RSS, browser extension, and connector intake,
+- and preserves a clear analyst approval boundary before article creation.
+
+Accepted candidates can convert into articles. Rejected, duplicate, and stale candidates should remain outside `articles`.
+
+---
+
+# RSS Should Feed Review Queue
+
+## Decision
+Future RSS ingestion should create Review Queue candidates, not articles directly.
+
+## Reasoning
+RSS feeds can be noisy, duplicated, incomplete, stale, or irrelevant.
+
+Routing RSS items into Review Queue:
+- keeps analysts in control,
+- avoids automatic article creation from unreviewed feed items,
+- enables duplicate candidate and duplicate article checks,
+- and keeps final article records cleaner.
+
+The same pattern should apply to future browser extension capture and custom connectors.
 
 ---
 
