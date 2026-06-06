@@ -31,6 +31,7 @@ Sources
        -> Events v1.1 Intelligence Summary
        -> Events v1.2 Activity & Analyst Workflow
        -> Seed Data Script v1
+       -> Dashboard v1
 ```
 
 The schema is intentionally evolving in layers:
@@ -471,6 +472,25 @@ The seed file supports the existing implemented schema and relationship model. I
 
 ---
 
+# Dashboard v1
+
+Dashboard v1 required no schema changes.
+
+Current implementation:
+- loads existing sources, articles with tags, tags, and events with linked articles
+- derives metric cards for Active Events, Total Events, Articles, and Sources
+- derives Events by status from loaded event status values
+- derives Most Active Events from supporting article counts
+- derives Recently Updated Events from event/article activity dates
+- derives Top Tags from article tag occurrence counts
+- derives Recent Articles from effective article dates
+
+The `dashboardMetrics` helpers in `src/lib/dashboardMetrics.ts` are application logic, not schema.
+
+Dashboard v1 is client-side for prototype scale. Server-side dashboard aggregation, materialized views, or dashboard-specific tables are not implemented.
+
+---
+
 # events
 
 ## Current Implementation Status
@@ -717,10 +737,11 @@ Sources
        -> Events v1.1 Intelligence Summary
        -> Events v1.2 Activity & Analyst Workflow
        -> Seed Data Script v1
+       -> Dashboard v1
 ```
 
 Next milestone:
-- Dashboard v1 planning/implementation
+- Decision point between Ingestion Planning / URL Import v1, Article Detail Pages, Source Management cleanup, and Events v1.3
 
 Entities, timelines, and advanced event refinements intentionally come later unless explicitly reprioritized.
 
@@ -838,8 +859,9 @@ until:
 The next schema-impacting direction has not started.
 
 Current candidate directions:
-1. Dashboard Improvements v1
+1. Ingestion Planning / URL Import v1
 2. Article detail page / advanced article workflows
 3. Source search/filtering or source delete planning
+4. Events v1.3
 
-Filtering & Search v1, Article Management v1, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, and Seed Data Script v1 are complete and required no schema changes. Event v1 is implemented with `events` and `article_events`.
+Filtering & Search v1, Article Management v1, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, and Dashboard v1 are complete. Dashboard v1 required no schema changes. Event v1 is implemented with `events` and `article_events`.

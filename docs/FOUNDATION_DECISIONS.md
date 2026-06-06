@@ -881,6 +881,99 @@ Rerunning the script is allowed to refresh seeded demo records because those rec
 
 ---
 
+# Dashboard v1 After Event Intelligence And Seed Data
+
+## Decision
+Implement Dashboard v1 after Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, and Seed Data Script v1.
+
+## Reasoning
+Dashboard v1 needs meaningful event and article signals before it can be useful.
+
+Completing event intelligence and seed data first ensured the dashboard could summarize:
+- active events,
+- event status distribution,
+- supporting article counts,
+- recent event activity,
+- article recency,
+- and tag concentration.
+
+This avoided building a generic dashboard against incomplete or empty data.
+
+---
+
+# Dashboard v1 As Analyst Workflow Overview
+
+## Decision
+Build Dashboard v1 as an analyst workflow overview rather than a generic admin dashboard.
+
+Implemented dashboard signals:
+- Active Events
+- Total Events
+- Articles
+- Sources
+- Events by status
+- Most Active Events
+- Recently Updated Events
+- Top Tags
+- Recent Articles
+
+## Reasoning
+FOUNDATION is an intelligence platform, not a generic CRUD/admin system.
+
+Dashboard v1 should help an analyst decide what to inspect next, so it emphasizes active developments, supporting evidence, recent activity, and topic concentration instead of decorative placeholder metrics.
+
+---
+
+# Client-Side Dashboard Metrics For Prototype Scale
+
+## Decision
+Derive Dashboard v1 metrics client-side from loaded source, article/tag, tag, and event/article data.
+
+## Reasoning
+The current dataset is prototype-scale, and the required data is already available through existing services:
+- `getSources()`
+- `getArticlesWithTags()`
+- `getTags()`
+- `getEventsWithArticles()`
+
+Client-side derivation:
+- avoids premature aggregation APIs,
+- avoids schema changes,
+- keeps Supabase access in services,
+- and matches prior article/event filtering and event activity patterns.
+
+Server-side dashboard aggregation can be revisited when data volume, pagination, RLS, or performance requires it.
+
+---
+
+# Event-Centered Dashboard v1
+
+## Decision
+Make Dashboard v1 event-centered and avoid entity, timeline, financial, ingestion-health, AI, or event-type placeholder widgets.
+
+## Reasoning
+Events are the most mature analytical object currently implemented.
+
+Entity, timeline, financial, ingestion-health, and AI widgets would be placeholders because those workflows are not implemented. Event type analytics were also deferred because event type normalization still needs cleanup.
+
+---
+
+# Dashboard Metrics Helper
+
+## Decision
+Introduce `src/lib/dashboardMetrics.ts` to keep DashboardPage focused on orchestration and rendering.
+
+## Reasoning
+Dashboard v1 needs several derived metrics and sorted lists.
+
+Keeping this logic in `src/lib/dashboardMetrics.ts`:
+- keeps DashboardPage readable,
+- avoids scattering metric logic across UI components,
+- matches the existing `eventMetrics.ts` pattern,
+- and preserves a path to reuse or replace dashboard derivation later.
+
+---
+
 # Intelligence Workflow Philosophy
 
 ## Decision

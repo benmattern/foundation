@@ -137,8 +137,11 @@ Low-level utilities and configuration.
 Examples:
 - supabaseClient.ts
 - eventMetrics.ts
+- dashboardMetrics.ts
 
 Reusable derived metric helpers that span pages/components may live in `src/lib/`.
+
+Derived dashboard metrics may live in `src/lib/` when they are reused, complex enough to make a page harder to read, or useful for keeping route pages focused on orchestration.
 
 ---
 
@@ -369,6 +372,7 @@ Sources
        -> Events v1.1 Intelligence Summary
        -> Events v1.2 Activity & Analyst Workflow
        -> Seed Data Script v1
+       -> Dashboard v1
 ```
 
 Long-term direction:
@@ -513,15 +517,15 @@ Use this procedure when starting or resuming work with ChatGPT, Codex, or anothe
 
 ## Current Priority Alignment
 
-Standalone Tags CRUD, Article <-> Tag relationships, Filtering & Search v1, Article Management v1, Event v1, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, and Seed Data Script v1 are complete for the current stage.
+Standalone Tags CRUD, Article <-> Tag relationships, Filtering & Search v1, Article Management v1, Event v1, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, and Dashboard v1 are complete for the current stage.
 
 The next milestone is:
 
 ```txt
-Dashboard v1 planning/implementation
+Decision point: Ingestion Planning / URL Import v1, Article Detail Pages, Source Management cleanup, or Events v1.3
 ```
 
-Seed Data Script v1 is complete. Dashboard v1 has not started. Ingestion is elevated as a roadmap layer, but URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are not implemented. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly reprioritizes.
+Seed Data Script v1 and Dashboard v1 are complete. Ingestion is elevated as a roadmap layer, but URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are not implemented. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly reprioritizes.
 
 ---
 

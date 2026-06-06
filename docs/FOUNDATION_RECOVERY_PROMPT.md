@@ -22,6 +22,7 @@ Sources
        -> Events v1.1 Intelligence Summary
        -> Events v1.2 Activity & Analyst Workflow
        -> Seed Data Script v1
+       -> Dashboard v1
 ```
 
 The long-term direction is:
@@ -85,7 +86,16 @@ Architecture conventions:
 - reusable Card component
 - reusable PageHeader component
 - route-based navigation
-- basic source count
+- Dashboard v1 analyst workflow overview
+- loads sources, articles with tags, tags, and events with articles using `Promise.all`
+- real metric cards for Active Events, Total Events, Articles, and Sources
+- events by status overview
+- Most Active Events by supporting article count
+- Recently Updated Events by last activity
+- Top Tags by article tag occurrence
+- Recent Articles by effective article date
+- friendly loading/error/empty states
+- dashboardMetrics helpers exist in src/lib/dashboardMetrics.ts
 
 ## Sources
 - Create source
@@ -200,7 +210,6 @@ Not yet implemented:
 - Event AI suggestions
 - Event severity/confidence scoring
 - Event date ranges
-- Dashboard improvements
 - URL import, RSS ingestion, browser extension capture, review queue, and custom connectors
 
 ---
@@ -209,9 +218,9 @@ Not yet implemented:
 
 ## Next Milestone
 
-The next priority is Dashboard v1 planning/implementation.
+The next priority is a decision point between Ingestion Planning / URL Import v1, Article Detail Pages, Source Management cleanup, and Events v1.3.
 
-Seed Data Script v1 is complete and available for repeatable demo data. Dashboard v1 has not started. Ingestion is elevated as a roadmap layer, but URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are not implemented. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly changes priority.
+Seed Data Script v1 and Dashboard v1 are complete. Ingestion is elevated as a roadmap layer, but URL import, RSS ingestion, browser extension capture, review queue, and custom connectors are not implemented. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly changes priority.
 
 ---
 
@@ -300,7 +309,7 @@ When starting a new ChatGPT or Codex session:
 2. Read FOUNDATION_STATUS.md and FOUNDATION_BACKLOG.md.
 3. Inspect the relevant source files before making changes.
 4. Do not infer that planned features are implemented.
-5. Treat Dashboard v1 as the next milestone unless the user explicitly chooses a different direction.
+5. Treat the next milestone as a decision point between Ingestion Planning / URL Import v1, Article Detail Pages, Source Management cleanup, and Events v1.3 unless the user explicitly chooses a different direction.
 
 ---
 

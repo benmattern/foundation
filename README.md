@@ -38,6 +38,10 @@ Implemented:
 - Event activity indicators, including supporting article count, last activity, occurred date, status, type, and location.
 - Event sorting by newest activity, newest event, oldest event, and most supporting articles.
 - Shared event/date/activity helpers in `src/lib/eventMetrics.ts`.
+- Dashboard v1 analyst workflow overview.
+- Dashboard v1 real metric cards for Active Events, Total Events, Articles, and Sources.
+- Dashboard v1 event status overview, most active events, recently updated events, top tags, and recent articles.
+- Dashboard v1 client-side derived metrics through `src/lib/dashboardMetrics.ts`.
 - Seed Data Script v1 in `supabase/seed.sql`.
 - Repeatable fictional Taiwan-focused demo dataset for sources, articles, tags, events, and relationships.
 - Fixed UUID seed strategy with seed-only cleanup.
@@ -68,7 +72,7 @@ Not implemented yet:
 - Authentication, app auth flows, and RLS-managed access.
 - AI-assisted ingestion, summarization, tagging, or entity extraction.
 
-The next milestone is Dashboard v1 planning/implementation.
+The next milestone is a decision point between Ingestion Planning / URL Import v1, Article Detail Pages, Source Management cleanup, and Events v1.3.
 
 ## Tech Stack
 
@@ -143,8 +147,9 @@ Key files:
 ## Roadmap
 
 Near term:
-- Dashboard v1: real article/tag/event counts and recent intelligence views.
+- Decide next milestone: Ingestion Planning / URL Import v1, Article Detail Pages, Source Management cleanup, or Events v1.3.
 - Article detail page and advanced article workflows.
+- Source management cleanup.
 
 Ingestion roadmap:
 - Manual entry is the current collection workflow.

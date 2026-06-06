@@ -229,7 +229,7 @@ Build a stable platform capable of:
 - [ ] Event AI suggestions
 - [ ] Event severity/confidence scoring
 - [ ] Event date ranges
-- [ ] Dashboard improvements
+- [ ] Future dashboard expansion
 
 ---
 
@@ -255,7 +255,6 @@ Build a stable platform capable of:
 - [x] Reuse shared event metric helpers in EventDetailPage
 
 ## Still Open
-- [ ] Dashboard improvements
 - [ ] Event-owned tags
 - [ ] Event entity linking
 - [ ] Global timeline module
@@ -288,17 +287,48 @@ Complete for v1.
 
 ---
 
+# Dashboard v1
+
+## Completed Tasks
+- [x] Build analyst workflow overview dashboard
+- [x] Load sources, articles with tags, tags, and events with articles using `Promise.all`
+- [x] Add real metric cards for Active Events, Total Events, Articles, and Sources
+- [x] Add Events by status overview
+- [x] Add Most Active Events by supporting article count
+- [x] Add Recently Updated Events by last activity
+- [x] Add Top Tags by article tag occurrence
+- [x] Add Recent Articles by effective article date
+- [x] Add friendly loading states
+- [x] Add friendly error states
+- [x] Add friendly empty states
+- [x] Reuse EventStatusOverview
+- [x] Add `dashboardMetrics` helper for client-side derived metrics
+
+## Current Status
+
+Complete for v1.
+
+## Future Dashboard Work
+- [ ] Entity metrics
+- [ ] Timeline widgets
+- [ ] Ingestion health widgets
+- [ ] Financial widgets
+- [ ] AI summaries/alerts
+- [ ] Server-side dashboard aggregation
+
+---
+
 # Immediate Backlog
 
 # Next Milestone
 
-## Dashboard v1 Planning / Implementation
-- [ ] Define Dashboard v1 metrics and recent intelligence views
-- [ ] Decide which seed-backed metrics should appear first
-- [ ] Connect dashboard article/tag/event counts to real data
-- [ ] Add recent intelligence views using current sources, articles, tags, and events
+## Next Milestone Decision Point
+- [ ] Decide whether the next milestone is Ingestion Planning / URL Import v1
+- [ ] Decide whether the next milestone is Article Detail Pages
+- [ ] Decide whether the next milestone is Source Management cleanup
+- [ ] Decide whether the next milestone is Events v1.3
 
-Seed Data Script v1 is complete. Dashboard v1 has not started.
+Seed Data Script v1 and Dashboard v1 are complete. The next milestone has not started.
 
 ---
 
@@ -329,12 +359,13 @@ Current status: complete for v1.
 
 ---
 
-# Dashboard Improvements v1
-- [ ] Real article count
-- [ ] Real tag count
-- [ ] Recent articles
-- [ ] Recent sources
-- [ ] Basic activity overview
+# Future Dashboard Improvements
+- [ ] Entity metrics
+- [ ] Timeline widgets
+- [ ] Ingestion health widgets
+- [ ] Financial widgets
+- [ ] AI summaries/alerts
+- [ ] Server-side dashboard aggregation
 
 ---
 

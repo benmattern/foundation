@@ -4,7 +4,7 @@
 
 FOUNDATION is currently in early Phase 1 development.
 
-The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, Article Management v1, Event v1 with Article <-> Event relationships, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, and Seed Data Script v1.
+The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, Article Management v1, Event v1 with Article <-> Event relationships, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, and Dashboard v1.
 
 The current focus is:
 - establishing core intelligence data structures,
@@ -63,11 +63,21 @@ Required:
 - Route-based page structure
 - Reusable Card component
 - Reusable PageHeader component
-- Basic source count metric
+- Analyst workflow overview dashboard
+- Loads sources, articles with tags, tags, and events with articles using `Promise.all`
+- Real metric cards for Active Events, Total Events, Articles, and Sources
+- Events by status overview
+- Most Active Events by supporting article count
+- Recently Updated Events by last activity
+- Top Tags by article tag occurrence
+- Recent Articles by effective article date
+- Friendly loading, error, and empty states
+- Reuses EventStatusOverview
+- Uses `src/lib/dashboardMetrics.ts` for client-side derived dashboard metrics
 
 ## Current Status
 
-Operational but minimal. Article and entity metrics are not yet connected to real dashboard data.
+Complete for v1. Dashboard now provides an event-centered analyst overview using current source, article, tag, and event data.
 
 ---
 
@@ -283,7 +293,7 @@ Complete for v1.
 - Event AI suggestions
 - Event severity/confidence scoring
 - Event date ranges
-- Dashboard improvements
+- Future dashboard expansion
 
 ## Current Status
 
@@ -313,7 +323,6 @@ Complete for v1.1. Event detail pages now function as early analytical workspace
 - EventDetailPage reuses shared metric helpers
 
 ## Not Yet Implemented
-- Dashboard improvements
 - Event-owned tags
 - Event entity linking
 - Global timeline module
@@ -485,11 +494,16 @@ Sources
        -> Events v1.1 Intelligence Summary
        -> Events v1.2 Activity & Analyst Workflow
        -> Seed Data Script v1
+       -> Dashboard v1
 ```
 
 ## Next Milestone
 
-The next milestone is Dashboard v1 planning/implementation.
+The next milestone is a decision point between:
+- Ingestion Planning / URL Import v1
+- Article Detail Pages
+- Source Management cleanup
+- Events v1.3
 
 ## Expanded Long-Term Direction
 
@@ -508,7 +522,7 @@ Sources
 # Immediate Priorities
 
 Next priority:
-1. Dashboard v1 planning/implementation
+1. Next milestone decision point
 2. Article detail page / advanced article workflows
 3. Source search/filtering or source delete planning
 
@@ -555,7 +569,7 @@ Open Filtering/Search follow-ups:
 - Data normalization
 - UI consistency
 - Empty shared UI primitives for Button, Input, Textarea, and EmptyState
-- Dashboard v1 scope
+- Future dashboard expansion scope
 - Timeline schema design
 - Form validation consistency
 - Better typing standardization across components

@@ -60,6 +60,7 @@ Current frontend architecture uses:
 - event detail intelligence summaries derived from supporting articles
 - event list activity indicators and sorting derived from loaded event/article data
 - repeatable fictional demo data through `supabase/seed.sql`
+- Dashboard v1 analyst overview derived from loaded source, article, tag, and event data
 
 ### Current Folder Structure
 
@@ -100,7 +101,15 @@ Design themes:
 - Reusable Card component
 - Reusable PageHeader component
 - Route-based navigation
-- Basic source count metric
+- Analyst workflow overview dashboard
+- Real metric cards for Active Events, Total Events, Articles, and Sources
+- Events by status overview
+- Most Active Events by supporting article count
+- Recently Updated Events by last activity
+- Top Tags by article tag occurrence
+- Recent Articles by effective article date
+- Friendly loading, error, and empty states
+- Client-side derived dashboard metrics through `src/lib/dashboardMetrics.ts`
 
 ## Sources
 
@@ -216,6 +225,7 @@ Sources
        -> Events v1.1 Intelligence Summary
        -> Events v1.2 Activity & Analyst Workflow
        -> Seed Data Script v1
+       -> Dashboard v1
 ```
 
 Long-term relational direction:
@@ -246,11 +256,12 @@ Completed:
 9. Events v1.1 Intelligence Summary
 10. Events v1.2 Activity & Analyst Workflow
 11. Seed Data Script v1
+12. Dashboard v1
 
 Next milestone:
-- Dashboard v1 planning/implementation
+- Decision point between Ingestion Planning / URL Import v1, Article Detail Pages, Source Management cleanup, and Events v1.3
 
-Seed Data Script v1 is complete. Dashboard v1 has not started.
+Seed Data Script v1 and Dashboard v1 are complete. The next milestone has not started.
 
 ---
 
@@ -279,6 +290,8 @@ Event Refinement v1 keeps event filtering/search client-side in EventsPage and d
 Events v1.1 enriches event detail pages with linked articles that include tags. Related tags and supporting article timelines are derived from supporting articles, not stored as event-owned tags or global timeline records.
 
 Events v1.2 adds event list activity indicators, status overview cards, sorting, and shared event metric helpers. Metrics are derived client-side from loaded event/article data.
+
+Dashboard v1 is the Presentation Layer's first analyst overview. It loads existing source, article/tag, tag, and event/article data and derives event-centered dashboard metrics client-side for prototype scale.
 
 ---
 
@@ -391,7 +404,7 @@ Examples:
 - More consistent type organization
 - Better form validation
 - Improved UI consistency
-- Dashboard v1 scope
+- Future dashboard expansion scope
 - Ingestion roadmap implementation scope
 - Timeline schema design
 - Article creation and tag assignment are frontend-driven separate operations
