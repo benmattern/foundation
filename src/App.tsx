@@ -12,6 +12,7 @@ import ArticlesPage from "./pages/ArticlesPage";
 import EntitiesPage from "./pages/EntitiesPage";
 import EventDetailPage from "./pages/EventDetailPage";
 import EventsPage from "./pages/EventsPage";
+import IngestionQueuePage from "./pages/IngestionQueuePage";
 import SourceDetailPage from "./pages/SourceDetailPage";
 import TagsPage from "./pages/TagsPage";
 
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="/tags" element={<TagsPage />} />
           <Route path="/events" element={<EventsPage />} />
           <Route path="/events/:id" element={<EventDetailPage />} />
+          <Route path="/ingestion" element={<IngestionQueuePage />} />
           <Route path="/entities" element={<EntitiesPage />} />
         </Route>
       </Routes>

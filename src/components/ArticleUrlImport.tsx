@@ -14,12 +14,17 @@ type Props = {
     result: UrlImportResult,
     metadata?: UrlMetadataResponse
   ) => void;
+  onSaveToQueue?: (
+    result: UrlImportResult,
+    metadata?: UrlMetadataResponse
+  ) => Promise<void>;
 };
 
 export function ArticleUrlImport({
   articles,
   sources,
   onImportDraft,
+  onSaveToQueue,
 }: Props) {
   const [url, setUrl] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -27,6 +32,8 @@ export function ArticleUrlImport({
   const [metadata, setMetadata] = useState<UrlMetadataResponse | null>(null);
   const [metadataError, setMetadataError] = useState("");
   const [metadataLoading, setMetadataLoading] = useState(false);
+  const [queueLoading, setQueueLoading] = useState(false);
+  const [queueMessage, setQueueMessage] = useState("");
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -41,12 +48,14 @@ export function ArticleUrlImport({
       setErrorMessage("");
       setMetadata(null);
       setMetadataError("");
+      setQueueMessage("");
       setLastResult(result);
       onImportDraft(result);
     } catch (error) {
       setLastResult(null);
       setMetadata(null);
       setMetadataError("");
+      setQueueMessage("");
       setErrorMessage(
         error instanceof Error ? error.message : "Unable to import this URL."
       );
@@ -87,6 +96,27 @@ export function ArticleUrlImport({
     setMetadata(null);
     setMetadataError("");
     setErrorMessage("");
+    setQueueMessage("");
+  }
+
+  async function saveToQueue() {
+    if (!lastResult || !onSaveToQueue) return;
+
+    setQueueLoading(true);
+    setQueueMessage("");
+
+    try {
+      await onSaveToQueue(lastResult, metadata ?? undefined);
+      setQueueMessage("Saved to Review Queue.");
+    } catch (error) {
+      setQueueMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to save this URL to the Review Queue."
+      );
+    } finally {
+      setQueueLoading(false);
+    }
   }
 
   return (
@@ -137,6 +167,10 @@ export function ArticleUrlImport({
             <p className="text-sm text-amber-300">
               {metadataError} Continue with manual entry if needed.
             </p>
+          )}
+
+          {queueMessage && (
+            <p className="text-sm text-emerald-300">{queueMessage}</p>
           )}
 
           {metadata && (
@@ -225,6 +259,17 @@ export function ArticleUrlImport({
               className="rounded-lg border border-slate-700 px-4 py-2 font-medium text-slate-300 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {metadataLoading ? "Fetching Metadata..." : "Fetch Metadata"}
+            </button>
+          )}
+
+          {lastResult && onSaveToQueue && (
+            <button
+              type="button"
+              onClick={saveToQueue}
+              disabled={queueLoading}
+              className="rounded-lg border border-blue-500/50 bg-blue-500/10 px-4 py-2 font-medium text-blue-200 transition hover:bg-blue-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {queueLoading ? "Saving..." : "Save to Review Queue"}
             </button>
           )}
         </div>

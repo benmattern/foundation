@@ -14,6 +14,7 @@ import {
   updateArticle as updateArticleRecord,
   deleteArticle as deleteArticleRecord,
 } from "../services/articleService";
+import { createIngestionCandidate } from "../services/ingestionCandidateService";
 import type { ArticleFormValues } from "../components/ArticleForm";
 import type { Source } from "../types/source";
 import { getSources } from "../services/sourceService";
@@ -144,6 +145,31 @@ export default function ArticlesPage() {
     setEditingArticle(article);
   }
 
+  async function saveImportToQueue(
+    result: UrlImportResult,
+    metadata?: UrlMetadataResponse
+  ) {
+    const warnings = [
+      ...(metadata?.warnings ?? []),
+      ...(result.duplicateArticle
+        ? [`Possible duplicate article: ${result.duplicateArticle.title}`]
+        : []),
+    ];
+
+    await createIngestionCandidate({
+      url: result.normalizedUrl,
+      canonical_url: metadata?.canonicalUrl ?? null,
+      final_url: metadata?.finalUrl ?? null,
+      source_id: result.matchedSource?.id ?? null,
+      title: metadata?.title ?? null,
+      description: metadata?.description ?? null,
+      published_at: metadata?.publishedAt ?? null,
+      import_source: "manual_url",
+      raw_metadata: metadata ? { ...metadata } : {},
+      warnings,
+    });
+  }
+
   return (
     <>
       <PageHeader
@@ -176,6 +202,7 @@ export default function ArticlesPage() {
                   articles={articles}
                   sources={sources}
                   onImportDraft={importArticleDraft}
+                  onSaveToQueue={saveImportToQueue}
                 />
               )}
 
