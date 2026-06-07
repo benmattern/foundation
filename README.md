@@ -58,6 +58,15 @@ Implemented:
 - Reject candidate.
 - Mark candidate duplicate.
 - Candidate-to-article conversion after analyst review.
+- RSS Ingestion v1 through the `rss_feeds` table.
+- RSS feed management UI, `/rss` route, and RSS sidebar navigation.
+- Manual Fetch Feed Now workflow through the deployed `fetch-rss-feed` Supabase Edge Function.
+- RSS 2.0 and Atom parsing into Review Queue candidates.
+- RSS duplicate skipping against existing ingestion candidates and articles.
+- RSS fetch summary UI and end-to-end validated RSS feed-to-candidate workflow.
+- Review Queue UX v1.1 status tabs for Pending, Accepted, Rejected, and Duplicate candidates with status counts.
+- Pending remains the default Review Queue view and reviewed candidates move out of Pending after action.
+- Review Queue UX v1.2 with narrower queue list, wider review panel, sticky review panel on larger screens, and independently scrolling queue list.
 - Direct ArticleForm creation preserved.
 - Client-side article search by title and summary.
 - Client-side article filtering by one tag.
@@ -80,7 +89,6 @@ Not implemented yet:
 - URL query params or saved filters.
 - Article detail page.
 - Entity, timeline, notes, and settings workflows.
-- RSS ingestion.
 - Browser extension capture and custom connectors.
 - Batch import and review analytics.
 - Event linking during candidate acceptance.
@@ -89,7 +97,7 @@ Not implemented yet:
 - Authentication, app auth flows, and RLS-managed access.
 - AI-assisted ingestion, summarization, tagging, or entity extraction.
 
-The next milestone is a decision point between RSS Planning, Browser Extension Planning, Article Detail Pages, Source Management cleanup, and Auth/RLS Planning.
+The next milestone is a decision point between Review Queue UX v1.3, RSS Automation Planning, Article Detail Pages, Source Management cleanup, and Auth/RLS Planning.
 
 ## Tech Stack
 
@@ -164,7 +172,7 @@ Key files:
 ## Roadmap
 
 Near term:
-- Decide next milestone: RSS Planning, Browser Extension Planning, Article Detail Pages, Source Management cleanup, or Auth/RLS Planning.
+- Decide next milestone: Review Queue UX v1.3, RSS Automation Planning, Article Detail Pages, Source Management cleanup, or Auth/RLS Planning.
 - Article detail page and advanced article workflows.
 - Source management cleanup.
 
@@ -175,8 +183,10 @@ Ingestion roadmap:
 - URL Metadata Fetch v1.1 is implemented through the deployed `fetch-url-metadata` Supabase Edge Function.
 - Metadata remains transient draft data and is not stored automatically.
 - Review Queue v1 is implemented as a staging layer for ingestion candidates before approved article creation.
-- Current ingestion flow: URL -> normalize/validate -> fetch metadata -> preview/apply metadata -> save to Review Queue -> review candidate -> accept/reject/duplicate -> accepted candidate becomes an article.
-- RSS ingestion, browser extension capture, and custom connectors should feed Review Queue candidates in the future rather than creating articles directly.
+- RSS Ingestion v1 is implemented through RSS feed management, manual Fetch Feed Now, the deployed `fetch-rss-feed` Supabase Edge Function, RSS/Atom parsing, duplicate skipping, and candidate creation.
+- Review Queue UX v1.1/v1.2 improves analyst throughput with status tabs, status counts, Pending workflow behavior, a sticky wider review panel, and a scrollable narrower queue list.
+- Current ingestion flow: Manual URL -> Metadata Fetch -> Save to Review Queue; RSS Feed -> Fetch Feed Now -> ingestion_candidates; Review Queue -> accept/reject/duplicate; Accepted -> Article.
+- Browser extension capture and custom connectors should feed Review Queue candidates in the future rather than creating articles directly.
 
 Still open in Filtering/Search:
 - Date filtering.
@@ -188,7 +198,7 @@ Still open in Filtering/Search:
 Mid term:
 - Add structured entities after source, article, tag, filtering, and event workflows stabilize.
 - Improve UI consistency and shared form components.
-- Add RSS ingestion after manual collection workflows mature.
+- Plan RSS automation after manual RSS ingestion has been validated.
 
 Long term:
 - Timeline intelligence.

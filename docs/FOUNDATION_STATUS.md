@@ -4,7 +4,7 @@
 
 FOUNDATION is currently in early Phase 1 development.
 
-The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, Article Management v1, Event v1 with Article <-> Event relationships, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, and Review Queue v1.
+The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, Article Management v1, Event v1 with Article <-> Event relationships, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, and Review Queue UX v1.1/v1.2.
 
 The current focus is:
 - establishing core intelligence data structures,
@@ -153,6 +153,11 @@ Operational for create, list, detail, and edit workflows.
 - Save URL candidates to Review Queue
 - Review Queue v1 using `ingestion_candidates`
 - Candidate-to-article conversion after analyst review
+- RSS Ingestion v1 using `rss_feeds`
+- RSS feed management and manual Fetch Feed Now workflow
+- RSS and Atom feed items stage as ingestion candidates
+- Review Queue UX v1.1 status tabs and Pending workflow behavior
+- Review Queue UX v1.2 sticky review panel and scrollable queue list
 
 ## Not Yet Implemented
 - Article detail page
@@ -434,6 +439,70 @@ Complete for v1. Review Queue now acts as the staging layer between URL intake a
 
 ---
 
+# RSS Ingestion v1
+
+## Implemented
+- `rss_feeds` table created
+- RSS feed TypeScript types added
+- rssFeedService added
+- RSS feed management UI added
+- `/rss` route added
+- RSS sidebar navigation added
+- Manual Fetch Feed Now workflow
+- Deployed Supabase Edge Function at `supabase/functions/fetch-rss-feed`
+- RSS 2.0 parsing
+- Atom parsing
+- RSS feed items create `ingestion_candidates`
+- RSS candidates use `import_source = rss`
+- Duplicate skipping against existing ingestion candidates and existing articles
+- RSS fetch summary UI with fetched, created, skipped, warning, and error counts
+- RSS workflow validated end-to-end
+
+## Not Yet Implemented
+- RSS scheduling/automation
+- Feed discovery
+- OPML import/export
+- Feed health monitoring beyond last checked timestamp
+
+## Current Status
+
+Complete for v1. RSS feeds now create Review Queue candidates, not articles, and remain behind analyst review.
+
+---
+
+# Review Queue UX v1.1
+
+## Implemented
+- Pending tab
+- Accepted tab
+- Rejected tab
+- Duplicate tab
+- Counts by status
+- Pending as default view
+- Items disappear from Pending after Accept, Reject, or Mark Duplicate
+- Automatic workflow-style queue behavior selects the next pending candidate after review
+
+## Current Status
+
+Complete for v1.1. Review Queue now separates pending work from reviewed history.
+
+---
+
+# Review Queue UX v1.2
+
+## Implemented
+- Narrower queue list on larger screens
+- Wider review panel on larger screens
+- Sticky candidate review panel on larger screens
+- Independently scrolling queue list
+- Mobile single-column layout preserved
+
+## Current Status
+
+Complete for v1.2. Review Queue now reduces scrolling and keeps the active review form in view for analyst efficiency.
+
+---
+
 # Filtering & Search v1
 
 ## Implemented
@@ -502,7 +571,7 @@ Events v1 is implemented. Timeline, notes, and settings workflows are not implem
 
 ## RSS, AI, Financial Signals
 
-RSS ingestion, AI-assisted workflows, and Financial Signals are future-phase concepts only.
+RSS Ingestion v1 is implemented for manual feed fetching into Review Queue candidates. RSS scheduling/automation, AI-assisted workflows, and Financial Signals remain future-phase concepts.
 
 ---
 
@@ -574,13 +643,15 @@ Sources
        -> URL Import v1
        -> URL Metadata Fetch v1.1
        -> Review Queue v1
+       -> RSS Ingestion v1
+       -> Review Queue UX v1.1/v1.2
 ```
 
 ## Next Milestone
 
 The next milestone is a decision point between:
-- RSS Planning
-- Browser Extension Planning
+- Review Queue UX v1.3
+- RSS Automation Planning
 - Article Detail Pages
 - Source Management cleanup
 - Auth/RLS Planning
@@ -602,7 +673,7 @@ Sources
 # Immediate Priorities
 
 Next priority:
-1. Decide next milestone: RSS Planning, Browser Extension Planning, Article Detail Pages, Source Management cleanup, or Auth/RLS Planning
+1. Decide next milestone: Review Queue UX v1.3, RSS Automation Planning, Article Detail Pages, Source Management cleanup, or Auth/RLS Planning
 2. Article detail page / advanced article workflows
 3. Source search/filtering or source delete planning
 
@@ -612,8 +683,10 @@ Ingestion roadmap status:
 - URL Import v1 is implemented.
 - URL Metadata Fetch v1.1 is implemented through a deployed Supabase Edge Function.
 - Review Queue v1 is implemented as the staging layer for ingestion candidates.
-- Current ingestion flow: URL -> normalize/validate -> fetch metadata -> preview/apply metadata -> save to Review Queue -> review candidate -> accept/reject/duplicate -> accepted candidate becomes an article.
-- RSS ingestion, browser extension capture, and custom connectors remain planned and should feed Review Queue candidates rather than articles directly.
+- RSS Ingestion v1 is implemented with manual Fetch Feed Now into Review Queue candidates.
+- Review Queue UX v1.1/v1.2 is implemented with status tabs, status counts, Pending workflow behavior, sticky review panel, and scrollable queue list.
+- Current ingestion flow: Manual URL -> Metadata Fetch -> Save to Review Queue; RSS Feed -> Fetch Feed Now -> ingestion_candidates; Review Queue -> accept/reject/duplicate; Accepted -> Article.
+- RSS scheduling, browser extension capture, and custom connectors remain planned and should feed Review Queue candidates rather than articles directly.
 
 Open Filtering/Search follow-ups:
 - Date filtering

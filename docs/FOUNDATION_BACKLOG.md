@@ -393,18 +393,105 @@ Complete for v1. Review Queue now provides a staging layer between URL intake an
 
 ---
 
+# RSS Ingestion v1
+
+## Completed Tasks
+- [x] Create `rss_feeds` table
+- [x] Add RSS feed TypeScript types
+- [x] Add rssFeedService
+- [x] Add RSS feed management UI
+- [x] Add `/rss` route
+- [x] Add RSS sidebar navigation
+- [x] Add manual RSS ingestion through Fetch Feed Now
+- [x] Add Supabase Edge Function `fetch-rss-feed`
+- [x] Parse RSS 2.0 feeds
+- [x] Parse Atom feeds
+- [x] Create Review Queue candidates from feed items
+- [x] Use `import_source = rss` for RSS-created candidates
+- [x] Skip duplicates against existing ingestion candidates
+- [x] Skip duplicates against existing articles
+- [x] Display RSS fetch summary UI
+- [x] Validate RSS ingestion end-to-end
+
+## Still Open
+- [ ] RSS scheduling
+- [ ] Feed discovery
+- [ ] OPML import/export
+- [ ] Feed health monitoring beyond last checked timestamp
+
+## Current Status
+
+Complete for v1. Manual RSS ingestion now feeds Review Queue candidates rather than creating articles directly.
+
+---
+
+# Review Queue UX v1.1
+
+## Completed Tasks
+- [x] Add Review Queue status tabs
+- [x] Add Pending tab
+- [x] Add Accepted tab
+- [x] Add Rejected tab
+- [x] Add Duplicate tab
+- [x] Add counts by status
+- [x] Make Pending the default view
+- [x] Remove reviewed items from Pending after action
+- [x] Add Pending workflow behavior that advances the queue after review
+
+## Still Open
+- [ ] Queue search/filter
+- [ ] Source filters
+- [ ] Bulk actions
+- [ ] Keyboard shortcuts
+- [ ] AI relevance scoring
+- [ ] Priority queues
+- [ ] Auto-tagging
+- [ ] Review analytics
+
+## Current Status
+
+Complete for v1.1. Pending work is separated from accepted, rejected, and duplicate history.
+
+---
+
+# Review Queue UX v1.2
+
+## Completed Tasks
+- [x] Add sticky review panel on larger screens
+- [x] Add narrower queue list
+- [x] Add wider review panel
+- [x] Add independently scrolling queue list
+- [x] Preserve mobile layout
+- [x] Improve review layout efficiency
+
+## Still Open
+- [ ] Queue search/filter
+- [ ] Source filters
+- [ ] Bulk actions
+- [ ] Keyboard shortcuts
+- [ ] AI relevance scoring
+- [ ] Priority queues
+- [ ] Auto-tagging
+- [ ] Review analytics
+
+## Current Status
+
+Complete for v1.2. The review surface now reduces scrolling during candidate review.
+
+---
+
 # Immediate Backlog
 
 # Next Milestone
 
 ## Next Milestone Decision Point
-- [ ] Decide whether the next milestone is RSS Planning
-- [ ] Decide whether the next milestone is Browser Extension Planning
+- [ ] Decide whether the next milestone is Review Queue UX v1.3
+- [ ] Decide whether the next milestone is RSS Automation Planning
 - [ ] Decide whether the next milestone is Article Detail Pages
 - [ ] Decide whether the next milestone is Source Management cleanup
 - [ ] Decide whether the next milestone is Auth/RLS Planning
 
-Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, and Review Queue v1 are complete. The next milestone has not started.
+Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, and Review Queue UX v1.1/v1.2 are complete. The next milestone has not started.
 
 ---
 
@@ -481,9 +568,20 @@ Improve how intelligence enters FOUNDATION after manual workflows and schema fou
 - [x] `ingestion_candidates` schema
 - [x] Accept/reject/duplicate workflow
 - [x] Candidate-to-article conversion
+- [x] `rss_feeds` schema
+- [x] RSS feed management
+- [x] Manual RSS ingestion
+- [x] fetch-rss-feed Edge Function
+- [x] Feed-to-candidate workflow
+- [x] Review Queue status tabs
+- [x] Pending workflow behavior
+- [x] Sticky review panel
+- [x] Review layout improvements
 
 ## Planned Ingestion Layers
-- [ ] RSS ingestion into Review Queue candidates
+- [ ] RSS scheduling
+- [ ] Feed discovery
+- [ ] OPML import/export
 - [ ] Browser extension capture into Review Queue candidates
 - [ ] Custom connectors
 - [ ] Batch import
@@ -491,7 +589,7 @@ Improve how intelligence enters FOUNDATION after manual workflows and schema fou
 - [ ] Event linking during candidate acceptance
 - [ ] Transactional candidate conversion
 
-Current status: URL Import v1, URL Metadata Fetch v1.1, and Review Queue v1 are implemented as analyst-reviewed ingestion workflows. RSS ingestion, browser extension capture, and custom connectors remain planned and should feed Review Queue candidates rather than approved articles directly.
+Current status: URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, and Review Queue UX v1.1/v1.2 are implemented as analyst-reviewed ingestion workflows. RSS scheduling, feed discovery, OPML import/export, browser extension capture, and custom connectors remain planned and should feed Review Queue candidates rather than approved articles directly.
 
 ---
 
@@ -521,16 +619,19 @@ Refine discrete geopolitical, technological, and operational developments after 
 
 ---
 
-# Future RSS Ingestion
+# Future RSS Automation
 
 ## Goal
 
-Automate intelligence collection after manual collection workflows are stable.
+Automate and broaden RSS collection after manual RSS ingestion is validated.
 
 ## Planned Features
-- [ ] RSS source ingestion into Review Queue candidates
-- [ ] Duplicate detection
-- [ ] Metadata normalization
+- [x] RSS source ingestion into Review Queue candidates
+- [x] Duplicate detection against candidates and articles
+- [x] Basic metadata normalization into candidate fields
+- [ ] RSS scheduling
+- [ ] Feed discovery
+- [ ] OPML import/export
 - [ ] Feed health monitoring
 - [ ] Analyst approval before article creation
 

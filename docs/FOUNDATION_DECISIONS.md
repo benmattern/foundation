@@ -801,7 +801,8 @@ Current and planned ingestion direction:
 - URL Import v1 is implemented
 - URL Metadata Fetch v1.1 is implemented through a Supabase Edge Function
 - Review Queue v1 / `ingestion_candidates` is implemented
-- RSS ingestion should feed Review Queue candidates
+- RSS Ingestion v1 / `rss_feeds` is implemented and feeds Review Queue candidates
+- RSS scheduling remains future planning
 - browser extension capture should feed Review Queue candidates
 - custom connectors should feed Review Queue candidates
 
@@ -986,6 +987,7 @@ Current implemented ingestion behavior:
 - Metadata is previewed and explicitly applied by the analyst.
 - Article save remains a separate analyst action.
 - URL Import can save candidates to Review Queue.
+- RSS Ingestion v1 can save feed items to Review Queue candidates.
 - Review Queue candidates can be accepted, rejected, or marked duplicate.
 - Accepted candidates become articles only after analyst action.
 
@@ -1038,16 +1040,16 @@ Keeping metadata transient:
 # Review Queue Before Automated Collection
 
 ## Decision
-Implement Review Queue v1 before RSS ingestion, browser extension capture, or custom connectors.
+Implement Review Queue v1 before automated or semi-automated collection, then route RSS Ingestion v1 through that Review Queue staging layer.
 
 ## Reasoning
 Automated and semi-automated intake will create noisy, duplicate, incomplete, or irrelevant records.
 
 Adding Review Queue first:
-- creates a staging layer before automated collection arrives,
+- created a staging layer before RSS ingestion arrived,
 - validates the candidate review workflow with manual URL intake,
 - protects approved article records from unreviewed content,
-- and gives RSS/browser/connectors a clear future destination.
+- and gives RSS/browser/connectors a clear destination.
 
 ---
 
@@ -1068,7 +1070,7 @@ Candidates represent possible intake items, not approved intelligence records.
 Separating candidates from articles:
 - prevents automated collection from polluting the article corpus,
 - allows rejection, deduplication, and stale cleanup,
-- supports future RSS, browser extension, and connector intake,
+- supports RSS, future browser extension, and future connector intake,
 - and preserves a clear analyst approval boundary before article creation.
 
 Accepted candidates can convert into articles. Rejected and duplicate candidates remain outside `articles`. A stale status can be considered later if cleanup workflows need it.
@@ -1129,10 +1131,18 @@ Transactional candidate conversion should be revisited before multi-user or prod
 
 ---
 
-# RSS Should Feed Review Queue
+# RSS Feeds Stage Candidates Before Article Creation
 
 ## Decision
-Future RSS ingestion should create Review Queue candidates, not articles directly.
+RSS ingestion creates Review Queue candidates, not articles directly.
+
+Current implemented behavior:
+- RSS feed configuration is stored in `rss_feeds`.
+- Manual Fetch Feed Now invokes `fetch-rss-feed`.
+- RSS 2.0 and Atom items are parsed.
+- Non-duplicate feed items create `ingestion_candidates`.
+- RSS-created candidates use `import_source = rss`.
+- Accepted candidates become articles only after analyst review.
 
 ## Reasoning
 RSS feeds can be noisy, duplicated, incomplete, stale, or irrelevant.
@@ -1144,6 +1154,77 @@ Routing RSS items into Review Queue:
 - and keeps final article records cleaner.
 
 The same pattern should apply to future browser extension capture and custom connectors.
+
+---
+
+# Manual RSS Fetch Before Scheduling
+
+## Decision
+Implement manual Fetch Feed Now before RSS scheduling or background automation.
+
+## Reasoning
+Manual fetch validates the feed model, Edge Function behavior, parser coverage, duplicate checks, and Review Queue staging before adding scheduling complexity.
+
+This sequence:
+- keeps RSS ingestion observable during v1,
+- avoids background jobs before feed quality is understood,
+- makes analyst review the default operating pattern,
+- and leaves room for later scheduling, feed health, retry, and monitoring decisions.
+
+---
+
+# Review Queue As Analyst Inbox
+
+## Decision
+Treat Review Queue as an analyst inbox for intake candidates.
+
+Current implemented behavior:
+- Pending is the default queue view.
+- Accepted, Rejected, and Duplicate candidates remain available as reviewed history.
+- Status counts show queue state.
+- After Accept, Reject, or Mark Duplicate, reviewed items move out of Pending.
+- The workflow advances toward the next pending candidate.
+
+## Reasoning
+Analysts need to process new intake efficiently without losing reviewed history.
+
+Inbox-style Review Queue behavior:
+- keeps active work focused,
+- reduces repeated scanning of already-reviewed candidates,
+- preserves auditability of accepted/rejected/duplicate decisions,
+- and makes RSS/manual URL intake feel like one consistent workflow.
+
+---
+
+# Pending Queue Separated From Reviewed History
+
+## Decision
+Separate Pending candidates from Accepted, Rejected, and Duplicate candidates in Review Queue status tabs.
+
+## Reasoning
+Pending candidates represent work still awaiting analyst judgment. Accepted, Rejected, and Duplicate candidates are review history.
+
+Separating these views:
+- keeps the main queue smaller,
+- supports faster review sessions,
+- avoids accidental reprocessing,
+- and preserves reviewed records for follow-up or audit needs.
+
+---
+
+# Sticky Review Panel For Analyst Efficiency
+
+## Decision
+Use a sticky candidate review panel on larger screens, paired with a narrower independently scrolling queue list and wider review panel.
+
+## Reasoning
+Candidate review is the primary action surface during ingestion triage.
+
+Keeping the review panel visible:
+- reduces page scrolling,
+- keeps metadata fields and action buttons close at hand,
+- improves side-by-side comparison between queue item and review form,
+- and preserves mobile usability through the existing single-column responsive layout.
 
 ---
 

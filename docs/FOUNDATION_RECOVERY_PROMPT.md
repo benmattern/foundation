@@ -26,6 +26,8 @@ Sources
        -> URL Import v1
        -> URL Metadata Fetch v1.1
        -> Review Queue v1
+       -> RSS Ingestion v1
+       -> Review Queue UX v1.1/v1.2
 ```
 
 The long-term direction is:
@@ -150,11 +152,40 @@ Not yet implemented:
 - Ingestion sidebar navigation exists
 - `ingestion_candidates` table exists
 - Candidate list/review UI exists
+- Review Queue status tabs exist for Pending, Accepted, Rejected, and Duplicate candidates
+- Review Queue displays counts by status
+- Pending is the default Review Queue view
+- Reviewed candidates move out of Pending after Accept, Reject, or Mark Duplicate
+- Review Queue automatically advances to the next pending candidate after review
+- Review Queue v1.2 uses a narrower queue list and wider review panel on larger screens
+- Review Queue review panel is sticky on larger screens
+- Review Queue candidate list scrolls independently on larger screens
+- Review Queue preserves mobile single-column usability
 - Candidates can be accepted as articles
 - Candidates can be rejected
 - Candidates can be marked duplicate
 - Accepted candidates store `converted_article_id`
 - Direct ArticleForm creation remains available
+
+## RSS
+- `rss_feeds` table exists
+- RSS feed management UI exists
+- RSS route exists at `/rss`
+- RSS sidebar navigation exists
+- Manual Fetch Feed Now workflow exists
+- `fetch-rss-feed` Supabase Edge Function exists
+- RSS 2.0 and Atom parsing are implemented
+- RSS feed items create Review Queue candidates
+- RSS candidates use `import_source = rss`
+- Duplicate RSS items are skipped against existing ingestion candidates and articles
+- RSS fetch summary UI shows fetched, created, skipped, warning, and error information
+- RSS ingestion has been validated end-to-end
+
+Not yet implemented:
+- RSS scheduling
+- Feed discovery
+- OPML import/export
+- Browser extension capture and custom connectors
 
 Not yet implemented:
 - Article detail page
@@ -229,7 +260,7 @@ Not yet implemented:
 - Event AI suggestions
 - Event severity/confidence scoring
 - Event date ranges
-- RSS ingestion, browser extension capture, and custom connectors
+- RSS scheduling, browser extension capture, and custom connectors
 
 ---
 
@@ -237,9 +268,9 @@ Not yet implemented:
 
 ## Next Milestone
 
-The next priority is a decision point between RSS Planning, Browser Extension Planning, Article Detail Pages, Source Management cleanup, and Auth/RLS Planning.
+The next priority is a decision point between Review Queue UX v1.3, RSS Automation Planning, Article Detail Pages, Source Management cleanup, and Auth/RLS Planning.
 
-Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, and Review Queue v1 are complete. Ingestion is elevated as a roadmap layer. Future RSS ingestion, browser extension capture, and custom connectors should feed Review Queue candidates rather than creating articles directly. Do not skip ahead to entities, timelines, RSS ingestion, Financial Signals, or AI workflows unless the user explicitly changes priority.
+Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, and Review Queue UX v1.1/v1.2 are complete. Ingestion is elevated as a roadmap layer. RSS scheduling, browser extension capture, and custom connectors should feed Review Queue candidates rather than creating articles directly. Do not skip ahead to entities, timelines, RSS automation, Financial Signals, or AI workflows unless the user explicitly changes priority.
 
 ---
 
@@ -255,26 +286,35 @@ Timeline, notes, and settings workflows are not implemented.
 
 ## RSS, AI, Financial Signals
 
-RSS ingestion, AI-assisted workflows, and Financial Signals are future-phase concepts only.
+RSS Ingestion v1 is implemented for manual feed fetching into Review Queue candidates. RSS scheduling/automation, AI-assisted workflows, and Financial Signals remain future-phase concepts.
 
 ## Ingestion
 
-Manual entry, Seed Data Script v1, URL Import v1, URL Metadata Fetch v1.1, and Review Queue v1 are implemented acquisition capabilities.
+Manual entry, Seed Data Script v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, and Review Queue UX v1.1/v1.2 are implemented acquisition/review capabilities.
 
 Current ingestion flow:
 
 ```txt
-URL
-  -> normalize/validate
-    -> fetch metadata
-      -> preview/apply metadata
-        -> save to Review Queue
-          -> review candidate
-            -> accept/reject/duplicate
-              -> accepted candidate becomes Article
+Manual URL
+  -> Metadata Fetch
+    -> Save to Review Queue
+
+RSS Feed
+  -> Fetch Feed Now
+    -> ingestion_candidates
+
+Review Queue
+  -> Accept
+  -> Reject
+  -> Duplicate
+
+Accepted
+  -> Article
 ```
 
 Review Queue candidates are pre-article records separate from approved `articles`, with pending, accepted, rejected, and duplicate statuses. Accepted candidates convert to articles after analyst review. Rejected and duplicate candidates stay out of `articles`.
+
+RSS feeds create candidates, not articles. The Review Queue is the central analyst gate for URL and RSS intake.
 
 ---
 
@@ -343,7 +383,7 @@ When starting a new ChatGPT or Codex session:
 2. Read FOUNDATION_STATUS.md and FOUNDATION_BACKLOG.md.
 3. Inspect the relevant source files before making changes.
 4. Do not infer that planned features are implemented.
-5. Treat the next milestone as a decision point between RSS Planning, Browser Extension Planning, Article Detail Pages, Source Management cleanup, and Auth/RLS Planning unless the user explicitly chooses a different direction.
+5. Treat the next milestone as a decision point between Review Queue UX v1.3, RSS Automation Planning, Article Detail Pages, Source Management cleanup, and Auth/RLS Planning unless the user explicitly chooses a different direction.
 
 ---
 

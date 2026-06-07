@@ -35,6 +35,8 @@ Sources
        -> URL Import v1
        -> URL Metadata Fetch v1.1
        -> Review Queue v1
+       -> RSS Ingestion v1
+       -> Review Queue UX v1.1/v1.2
 ```
 
 The schema is intentionally evolving in layers:
@@ -534,6 +536,7 @@ Review Queue v1 uses the implemented `ingestion_candidates` table.
 Current implementation:
 - stores pre-article ingestion candidates separately from approved articles
 - supports manual URL candidates from URL Import
+- supports RSS candidates from RSS Ingestion v1
 - stores transient URL metadata as reviewable candidate data
 - allows analysts to accept, reject, or mark candidates duplicate
 - converts accepted candidates into records in the existing `articles` table
@@ -544,14 +547,109 @@ Review Queue uses the existing articles schema on acceptance. It does not create
 Current ingestion flow:
 
 ```txt
-URL Import / Metadata Fetch
+Manual URL
+  -> Metadata Fetch
+    -> ingestion_candidates
+
+RSS Feed
+  -> Fetch Feed Now
   -> ingestion_candidates
-    -> analyst review
-      -> accepted candidate creates article
-      -> rejected/duplicate candidates stay out of articles
+
+Review Queue
+  -> analyst review
+    -> accepted candidate creates article
+    -> rejected/duplicate candidates stay out of articles
 ```
 
 Candidate conversion is implemented in the service layer as sequential prototype-scale operations, not as a database transaction or stored procedure.
+
+---
+
+# RSS Ingestion v1
+
+RSS Ingestion v1 uses the implemented `rss_feeds` table and the existing `ingestion_candidates` table.
+
+Current implementation:
+- stores RSS feed configuration in `rss_feeds`
+- fetches feeds manually through Fetch Feed Now
+- uses the deployed `fetch-rss-feed` Supabase Edge Function
+- parses RSS 2.0 and Atom feed items
+- creates `ingestion_candidates` for non-duplicate feed items
+- marks RSS-created candidates with `import_source = rss`
+- skips duplicates already present in ingestion candidates or approved articles
+- records feed/item metadata in candidate `raw_metadata`
+
+RSS feeds create candidates, not articles. Analyst review in Review Queue remains the central ingestion gate before approved article creation.
+
+Current RSS-to-candidate workflow:
+
+```txt
+rss_feeds
+  -> Fetch Feed Now
+    -> fetch-rss-feed Edge Function
+      -> RSS/Atom items
+        -> duplicate check against ingestion_candidates and articles
+          -> ingestion_candidates with import_source = rss
+            -> analyst review
+              -> accepted candidate creates article
+```
+
+RSS scheduling, feed discovery, OPML import/export, and broader feed-health workflows are not implemented.
+
+---
+
+# rss_feeds
+
+## Purpose
+
+Stores RSS/Atom feed configuration for manual feed ingestion.
+
+Feed records are acquisition configuration, not approved intelligence records. Items fetched from feeds are staged as Review Queue candidates.
+
+---
+
+## Current Fields
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| feed_url | text | RSS or Atom feed URL |
+| source_id | uuid | Nullable FK to sources.id for source association |
+| title | text | Optional analyst/feed title |
+| is_active | boolean | Whether the feed is active for ingestion planning |
+| last_checked_at | timestamptz | Last manual fetch timestamp |
+| created_at | timestamptz | Creation timestamp |
+| updated_at | timestamptz | Update timestamp |
+
+---
+
+## Current Relationships
+
+```txt
+rss_feeds
+  -> sources
+```
+
+Optional source association through `source_id`.
+
+```txt
+rss_feeds
+  -> ingestion_candidates
+```
+
+RSS-created candidates reference the feed in `raw_metadata.feed_id`; there is no dedicated foreign key from `ingestion_candidates` to `rss_feeds` in the documented app type.
+
+---
+
+## Current App Status
+
+RSS Ingestion v1 is operational:
+- Analysts can create RSS feed records.
+- Analysts can list and edit RSS feed records.
+- Analysts can manually fetch a feed.
+- Feed items are parsed from RSS 2.0 or Atom.
+- Non-duplicate feed items create Review Queue candidates.
+- Fetch summary UI reports fetched, created, skipped, warning, and error information.
 
 ---
 
@@ -561,7 +659,7 @@ Candidate conversion is implemented in the service layer as sequential prototype
 
 Staging table for ingestion candidates before they become approved article records.
 
-An ingestion candidate is a pre-article intake record produced by URL Import or future RSS, browser extension, or connector workflows. Candidates are not approved intelligence records until an analyst reviews and accepts them.
+An ingestion candidate is a pre-article intake record produced by URL Import, RSS ingestion, or future browser extension or connector workflows. Candidates are not approved intelligence records until an analyst reviews and accepts them.
 
 ---
 
@@ -609,7 +707,13 @@ Implemented import source values:
 - browser_extension
 - connector
 
-Only `manual_url` is currently used by the implemented UI. RSS, browser extension capture, and custom connectors are future ingestion sources.
+Implemented current sources:
+- manual_url
+- rss
+
+Future planned sources:
+- browser_extension
+- connector
 
 ---
 
@@ -643,13 +747,19 @@ Accepted candidates may reference the approved article they created through `con
 
 ## Current App Status
 
-Review Queue v1 is operational:
+Review Queue v1 and Review Queue UX v1.1/v1.2 are operational:
 - URL Import can save candidates to Review Queue.
+- RSS Fetch Feed Now can save candidates to Review Queue.
 - The Ingestion page lists candidates.
+- The Ingestion page separates Pending, Accepted, Rejected, and Duplicate candidates into status tabs.
+- Pending is the default view.
+- Counts by status are displayed.
 - Analysts can review and edit candidate fields.
 - Analysts can accept candidates as articles.
 - Analysts can reject candidates.
 - Analysts can mark candidates duplicate.
+- Reviewed candidates move out of Pending after action.
+- Larger screens use a sticky review panel and independently scrolling queue list.
 - Direct ArticleForm creation remains available.
 
 ---
@@ -904,10 +1014,12 @@ Sources
        -> URL Import v1
        -> URL Metadata Fetch v1.1
        -> Review Queue v1
+       -> RSS Ingestion v1
+       -> Review Queue UX v1.1/v1.2
 ```
 
 Next milestone:
-- Decision point between RSS Planning, Browser Extension Planning, Article Detail Pages, Source Management cleanup, and Auth/RLS Planning
+- Decision point between Review Queue UX v1.3, RSS Automation Planning, Article Detail Pages, Source Management cleanup, and Auth/RLS Planning
 
 Entities, timelines, and advanced event refinements intentionally come later unless explicitly reprioritized.
 
@@ -1025,10 +1137,10 @@ until:
 The next likely schema-impacting direction has not started.
 
 Current candidate directions:
-1. RSS Planning
-2. Browser Extension Planning
+1. Review Queue UX v1.3
+2. RSS Automation Planning
 3. Article detail page / advanced article workflows
 4. Source search/filtering or source delete planning
 5. Auth/RLS Planning
 
-Filtering & Search v1, Article Management v1, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, and Review Queue v1 are complete. Dashboard v1, URL Import v1, and URL Metadata Fetch v1.1 required no schema changes. Event v1 is implemented with `events` and `article_events`; Review Queue v1 is implemented with `ingestion_candidates`.
+Filtering & Search v1, Article Management v1, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, and Review Queue UX v1.1/v1.2 are complete. Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, and Review Queue UX v1.1/v1.2 required no schema changes. Event v1 is implemented with `events` and `article_events`; Review Queue v1 is implemented with `ingestion_candidates`; RSS Ingestion v1 is implemented with `rss_feeds` and RSS-created `ingestion_candidates`.

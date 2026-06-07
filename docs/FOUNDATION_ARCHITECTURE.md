@@ -64,6 +64,8 @@ Current frontend architecture uses:
 - URL Import v1 analyst-reviewed article draft workflow
 - URL Metadata Fetch v1.1 through a deployed Supabase Edge Function
 - Review Queue v1 for analyst-reviewed ingestion candidates
+- RSS Ingestion v1 for manual feed-to-candidate ingestion
+- Review Queue UX v1.1/v1.2 for status tabs, Pending workflow behavior, sticky review, and scrollable queue review
 
 ### Current Folder Structure
 
@@ -163,6 +165,8 @@ Current functionality:
 - Preview/apply metadata before article save
 - Save imported URL candidates to Review Queue
 - Accept reviewed candidates as articles
+- Manage RSS feeds
+- Manually fetch RSS/Atom feeds into Review Queue candidates
 
 Not implemented:
 - Article detail page
@@ -218,6 +222,27 @@ Not implemented:
 
 ---
 
+## RSS
+
+Current functionality:
+- RSS feed management
+- RSS route at `/rss`
+- RSS sidebar navigation
+- Manual Fetch Feed Now workflow
+- Supabase Edge Function feed fetching through `fetch-rss-feed`
+- RSS 2.0 parsing
+- Atom parsing
+- Feed item staging as Review Queue candidates
+- Duplicate skipping against existing candidates and articles
+- Fetch summary UI
+
+Not implemented:
+- RSS scheduling/automation
+- Feed discovery
+- OPML import/export
+
+---
+
 # Current Data And Workflow Model
 
 Current implemented flow:
@@ -237,6 +262,8 @@ Sources
        -> URL Import v1
        -> URL Metadata Fetch v1.1
        -> Review Queue v1
+       -> RSS Ingestion v1
+       -> Review Queue UX v1.1/v1.2
 ```
 
 Long-term relational direction:
@@ -271,11 +298,14 @@ Completed:
 13. URL Import v1
 14. URL Metadata Fetch v1.1
 15. Review Queue v1
+16. RSS Ingestion v1
+17. Review Queue UX v1.1
+18. Review Queue UX v1.2
 
 Next milestone:
-- Decision point between RSS Planning, Browser Extension Planning, Article Detail Pages, Source Management cleanup, and Auth/RLS Planning
+- Decision point between Review Queue UX v1.3, RSS Automation Planning, Article Detail Pages, Source Management cleanup, and Auth/RLS Planning
 
-Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, and Review Queue v1 are complete. The next milestone has not started.
+Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, and Review Queue UX v1.1/v1.2 are complete. The next milestone has not started.
 
 ---
 
@@ -290,6 +320,7 @@ Current services include:
 - eventService.ts
 - urlMetadataService.ts
 - ingestionCandidateService.ts
+- rssFeedService.ts
 
 Service layer is intended to:
 - isolate Supabase logic
@@ -311,21 +342,63 @@ Dashboard v1 is the Presentation Layer's first analyst overview. It loads existi
 
 URL metadata and ingestion candidate workflows use service wrappers to keep Edge Function calls and candidate database access out of page/component code.
 
+RSS feed workflows use `rssFeedService.ts` to keep feed persistence, Edge Function invocation, duplicate checks, and feed-to-candidate creation out of page/component code.
+
 ---
 
 # Ingestion And Acquisition Architecture Direction
 
-Ingestion is elevated as a first-class long-term architecture layer. The current implementation supports analyst-reviewed URL intake, but automated collection is not implemented yet.
+Ingestion is elevated as a first-class architecture layer. The current implementation supports analyst-reviewed manual entry, URL intake, seed data, RSS intake, and Review Queue staging.
 
-Current ingestion:
+## Acquisition Layer
+
+Current acquisition surfaces:
+- Manual Entry
+- Seed Data
+- URL Import
+- URL Metadata Fetch
+- RSS Ingestion
+- Review Queue
+
+Manual Entry:
 - manual source entry
-- manual article entry
+- manual article entry through ArticleForm
 - manual event creation and article linking
+- direct article creation preserved for analyst-authored records
+
+Seed Data:
+- Seed Data Script v1 at `supabase/seed.sql`
+- repeatable fictional Taiwan-focused prototype data
+- demo sources, articles, tags, events, article_tags, and article_events
+- fixed UUID seed strategy and seed-only cleanup
+
+URL Import:
 - URL Import v1 for article draft creation
+- URL normalization and duplicate article warning
+- source matching by hostname
+- Save to Review Queue from URL Import
+
+URL Metadata Fetch:
 - URL Metadata Fetch v1.1 through the deployed `fetch-url-metadata` Supabase Edge Function
 - metadata preview/apply workflow with analyst review before save
+- metadata remains transient draft data
+
+RSS Ingestion:
+- RSS Ingestion v1 through `rss_feeds`
+- RSS feed management UI
+- manual Fetch Feed Now workflow
+- `fetch-rss-feed` Supabase Edge Function
+- RSS 2.0 and Atom parsing
+- duplicate skipping against candidates and articles
+- RSS feed items create `ingestion_candidates`
+
+Review Queue:
 - Review Queue v1 through `ingestion_candidates`
 - candidate list/review UI
+- Pending, Accepted, Rejected, and Duplicate tabs with counts
+- Pending as the default analyst inbox
+- reviewed candidates move out of Pending after action
+- sticky review panel and independently scrolling queue list on larger screens
 - accept/reject/duplicate workflow
 - candidate-to-article conversion after analyst review
 
@@ -336,13 +409,15 @@ Current demo/acquisition support:
 - fixed UUID seed strategy and seed-only cleanup
 
 Planned ingestion layers:
-- RSS ingestion
+- RSS scheduling/automation
+- feed discovery
+- OPML import/export
 - browser extension capture
 - custom connectors
 
 Review Queue candidates are staging records, not approved intelligence. Accepted candidates become articles through analyst action. Rejected and duplicate candidates remain outside `articles`.
 
-Future RSS ingestion, browser extension capture, and custom connectors should feed Review Queue candidates rather than creating articles directly.
+RSS feeds create candidates, not articles. Analyst review is the central ingestion gate for Manual URL and RSS intake. Future RSS scheduling, browser extension capture, and custom connectors should feed Review Queue candidates rather than creating articles directly.
 
 ---
 
