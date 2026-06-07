@@ -3,7 +3,10 @@ import { PageHeader } from "../components/PageHeader";
 import { IngestionCandidateList } from "../components/IngestionCandidateList";
 import { IngestionCandidateReview } from "../components/IngestionCandidateReview";
 import type { IngestionCandidateReviewValues } from "../components/IngestionCandidateReview";
-import type { IngestionCandidate } from "../types/ingestionCandidate";
+import type {
+  IngestionCandidate,
+  IngestionCandidateStatus,
+} from "../types/ingestionCandidate";
 import type { Source } from "../types/source";
 import type { Tag } from "../types/tag";
 import { getSources } from "../services/sourceService";
@@ -16,16 +19,28 @@ import {
   updateIngestionCandidate,
 } from "../services/ingestionCandidateService";
 
+const candidateStatuses: IngestionCandidateStatus[] = [
+  "pending",
+  "accepted",
+  "rejected",
+  "duplicate",
+];
+
 export default function IngestionQueuePage() {
   const [candidates, setCandidates] = useState<IngestionCandidate[]>([]);
   const [sources, setSources] = useState<Source[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
+  const [selectedStatus, setSelectedStatus] =
+    useState<IngestionCandidateStatus>("pending");
   const [selectedCandidate, setSelectedCandidate] =
     useState<IngestionCandidate | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
-  async function loadQueue() {
+  async function loadQueue(options?: {
+    selectedStatus?: IngestionCandidateStatus;
+    selectedCandidateId?: string | null;
+  }) {
     try {
       const [candidateData, sourceData, tagData] = await Promise.all([
         getIngestionCandidates(),
@@ -37,12 +52,23 @@ export default function IngestionQueuePage() {
       setSources(sourceData);
       setTags(tagData);
 
-      if (selectedCandidate) {
-        setSelectedCandidate(
-          candidateData.find((candidate) => candidate.id === selectedCandidate.id) ??
-            null
-        );
+      const nextStatus = options?.selectedStatus ?? selectedStatus;
+      const selectedCandidateId =
+        options && "selectedCandidateId" in options
+          ? options.selectedCandidateId
+          : selectedCandidate?.id;
+
+      if (options?.selectedStatus) {
+        setSelectedStatus(options.selectedStatus);
       }
+
+      setSelectedCandidate(
+        selectCandidateForStatus(
+          candidateData,
+          nextStatus,
+          selectedCandidateId ?? null
+        )
+      );
     } catch (error) {
       console.error("Error loading ingestion queue:", error);
       setErrorMessage("Unable to load the ingestion queue.");
@@ -54,6 +80,41 @@ export default function IngestionQueuePage() {
   useEffect(() => {
     loadQueue();
   }, []);
+
+  function selectStatus(status: IngestionCandidateStatus) {
+    setSelectedStatus(status);
+    setSelectedCandidate(selectCandidateForStatus(candidates, status, null));
+  }
+
+  async function reloadAfterReview(reviewedCandidateId: string) {
+    const [candidateData, sourceData, tagData] = await Promise.all([
+      getIngestionCandidates(),
+      getSources(),
+      getTags(),
+    ]);
+    const nextPending =
+      candidateData.find(
+        (candidate) =>
+          candidate.status === "pending" && candidate.id !== reviewedCandidateId
+      ) ?? null;
+
+    setCandidates(candidateData);
+    setSources(sourceData);
+    setTags(tagData);
+    setSelectedStatus("pending");
+    setSelectedCandidate(nextPending);
+  }
+
+  function moveReviewedCandidateOutOfPending(
+    candidateId: string,
+    status: Exclude<IngestionCandidateStatus, "pending">
+  ) {
+    setCandidates((current) =>
+      current.map((candidate) =>
+        candidate.id === candidateId ? { ...candidate, status } : candidate
+      )
+    );
+  }
 
   async function acceptCandidate(
     candidate: IngestionCandidate,
@@ -79,7 +140,8 @@ export default function IngestionQueuePage() {
         tag_ids: values.tag_ids,
       });
 
-      await loadQueue();
+      moveReviewedCandidateOutOfPending(candidate.id, "accepted");
+      await reloadAfterReview(candidate.id);
     } catch (error) {
       console.error("Error accepting ingestion candidate:", error);
       setErrorMessage("Unable to accept this candidate.");
@@ -92,7 +154,8 @@ export default function IngestionQueuePage() {
   ) {
     try {
       await rejectIngestionCandidate(candidate.id, rejectionReason);
-      await loadQueue();
+      moveReviewedCandidateOutOfPending(candidate.id, "rejected");
+      await reloadAfterReview(candidate.id);
     } catch (error) {
       console.error("Error rejecting ingestion candidate:", error);
       setErrorMessage("Unable to reject this candidate.");
@@ -102,12 +165,32 @@ export default function IngestionQueuePage() {
   async function markDuplicate(candidate: IngestionCandidate) {
     try {
       await markIngestionCandidateDuplicate(candidate.id);
-      await loadQueue();
+      moveReviewedCandidateOutOfPending(candidate.id, "duplicate");
+      await reloadAfterReview(candidate.id);
     } catch (error) {
       console.error("Error marking ingestion candidate duplicate:", error);
       setErrorMessage("Unable to mark this candidate as duplicate.");
     }
   }
+
+  const statusCounts = candidateStatuses.reduce<
+    Record<IngestionCandidateStatus, number>
+  >(
+    (counts, status) => ({
+      ...counts,
+      [status]: candidates.filter((candidate) => candidate.status === status)
+        .length,
+    }),
+    {
+      pending: 0,
+      accepted: 0,
+      rejected: 0,
+      duplicate: 0,
+    }
+  );
+  const filteredCandidates = candidates.filter(
+    (candidate) => candidate.status === selectedStatus
+  );
 
   return (
     <>
@@ -126,25 +209,52 @@ export default function IngestionQueuePage() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] 2xl:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
             <IngestionCandidateList
-              candidates={candidates}
+              candidates={filteredCandidates}
               sources={sources}
+              selectedStatus={selectedStatus}
+              statusCounts={statusCounts}
               selectedCandidateId={selectedCandidate?.id ?? null}
+              onSelectStatus={selectStatus}
               onSelectCandidate={setSelectedCandidate}
             />
 
-            <IngestionCandidateReview
-              candidate={selectedCandidate}
-              sources={sources}
-              tags={tags}
-              onAcceptCandidate={acceptCandidate}
-              onRejectCandidate={rejectCandidate}
-              onMarkDuplicate={markDuplicate}
-            />
+            <div className="lg:sticky lg:top-6 lg:self-start">
+              <IngestionCandidateReview
+                candidate={selectedCandidate}
+                sources={sources}
+                tags={tags}
+                onAcceptCandidate={acceptCandidate}
+                onRejectCandidate={rejectCandidate}
+                onMarkDuplicate={markDuplicate}
+              />
+            </div>
           </div>
         </div>
       )}
     </>
   );
+}
+
+function selectCandidateForStatus(
+  candidates: IngestionCandidate[],
+  status: IngestionCandidateStatus,
+  selectedCandidateId: string | null
+): IngestionCandidate | null {
+  const candidatesForStatus = candidates.filter(
+    (candidate) => candidate.status === status
+  );
+
+  if (selectedCandidateId) {
+    const existingSelection = candidatesForStatus.find(
+      (candidate) => candidate.id === selectedCandidateId
+    );
+
+    if (existingSelection) {
+      return existingSelection;
+    }
+  }
+
+  return candidatesForStatus[0] ?? null;
 }

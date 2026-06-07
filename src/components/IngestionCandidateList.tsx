@@ -1,19 +1,38 @@
-import type { IngestionCandidate } from "../types/ingestionCandidate";
+import type {
+  IngestionCandidate,
+  IngestionCandidateStatus,
+} from "../types/ingestionCandidate";
 import type { Source } from "../types/source";
 import { IngestionCandidateStatusBadge } from "./IngestionCandidateStatusBadge";
 import { Card } from "./ui/Card";
 
+const statusTabs: Array<{
+  status: IngestionCandidateStatus;
+  label: string;
+}> = [
+  { status: "pending", label: "Pending" },
+  { status: "accepted", label: "Accepted" },
+  { status: "rejected", label: "Rejected" },
+  { status: "duplicate", label: "Duplicate" },
+];
+
 type Props = {
   candidates: IngestionCandidate[];
   sources: Source[];
+  selectedStatus: IngestionCandidateStatus;
+  statusCounts: Record<IngestionCandidateStatus, number>;
   selectedCandidateId?: string | null;
+  onSelectStatus: (status: IngestionCandidateStatus) => void;
   onSelectCandidate: (candidate: IngestionCandidate) => void;
 };
 
 export function IngestionCandidateList({
   candidates,
   sources,
+  selectedStatus,
+  statusCounts,
   selectedCandidateId = null,
+  onSelectStatus,
   onSelectCandidate,
 }: Props) {
   function getSourceName(sourceId: string | null): string {
@@ -23,15 +42,39 @@ export function IngestionCandidateList({
   }
 
   return (
-    <Card>
-      <h2 className="mb-6 text-2xl font-semibold text-white">
-        Review Queue
-      </h2>
+    <Card className="lg:flex lg:max-h-[calc(100vh-8rem)] lg:min-h-0 lg:flex-col">
+      <div className="mb-6 lg:flex-none">
+        <h2 className="text-2xl font-semibold text-white">
+          Review Queue
+        </h2>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {statusTabs.map((tab) => {
+            const selected = selectedStatus === tab.status;
+
+            return (
+              <button
+                key={tab.status}
+                type="button"
+                onClick={() => onSelectStatus(tab.status)}
+                className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${
+                  selected
+                    ? "border-blue-500 bg-blue-500/20 text-blue-200"
+                    : "border-slate-700 bg-slate-950 text-slate-300 hover:border-slate-500"
+                }`}
+              >
+                {tab.label} {statusCounts[tab.status]}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       {candidates.length === 0 ? (
-        <p className="text-slate-400">No ingestion candidates yet.</p>
+        <p className="text-slate-400">
+          No {selectedStatus} ingestion candidates.
+        </p>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-3 lg:min-h-0 lg:overflow-y-auto lg:pr-2">
           {candidates.map((candidate) => {
             const selected = candidate.id === selectedCandidateId;
 
