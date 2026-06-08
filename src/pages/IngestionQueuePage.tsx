@@ -5,10 +5,12 @@ import { IngestionCandidateReview } from "../components/IngestionCandidateReview
 import type { IngestionCandidateReviewValues } from "../components/IngestionCandidateReview";
 import type {
   IngestionCandidate,
+  IngestionImportSource,
   IngestionCandidateStatus,
 } from "../types/ingestionCandidate";
 import type { Source } from "../types/source";
 import type { Tag } from "../types/tag";
+import { getIngestionCandidatePreview } from "../lib/ingestionCandidatePreview";
 import { getSources } from "../services/sourceService";
 import { getTags } from "../services/tagService";
 import {
@@ -26,12 +28,20 @@ const candidateStatuses: IngestionCandidateStatus[] = [
   "duplicate",
 ];
 
+type SourceFilterValue = "all" | "unknown" | string;
+type ImportSourceFilterValue = "all" | IngestionImportSource;
+
 export default function IngestionQueuePage() {
   const [candidates, setCandidates] = useState<IngestionCandidate[]>([]);
   const [sources, setSources] = useState<Source[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [selectedStatus, setSelectedStatus] =
     useState<IngestionCandidateStatus>("pending");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedSourceFilter, setSelectedSourceFilter] =
+    useState<SourceFilterValue>("all");
+  const [selectedImportSourceFilter, setSelectedImportSourceFilter] =
+    useState<ImportSourceFilterValue>("all");
   const [selectedCandidate, setSelectedCandidate] =
     useState<IngestionCandidate | null>(null);
   const [loading, setLoading] = useState(true);
@@ -84,6 +94,12 @@ export default function IngestionQueuePage() {
   function selectStatus(status: IngestionCandidateStatus) {
     setSelectedStatus(status);
     setSelectedCandidate(selectCandidateForStatus(candidates, status, null));
+  }
+
+  function clearFilters() {
+    setSearchQuery("");
+    setSelectedSourceFilter("all");
+    setSelectedImportSourceFilter("all");
   }
 
   async function reloadAfterReview(reviewedCandidateId: string) {
@@ -188,9 +204,19 @@ export default function IngestionQueuePage() {
       duplicate: 0,
     }
   );
-  const filteredCandidates = candidates.filter(
+  const candidatesForSelectedStatus = candidates.filter(
     (candidate) => candidate.status === selectedStatus
   );
+  const filteredCandidates = filterCandidates(
+    candidatesForSelectedStatus,
+    searchQuery,
+    selectedSourceFilter,
+    selectedImportSourceFilter
+  );
+  const hasActiveFilters =
+    searchQuery.trim() !== "" ||
+    selectedSourceFilter !== "all" ||
+    selectedImportSourceFilter !== "all";
 
   return (
     <>
@@ -215,8 +241,16 @@ export default function IngestionQueuePage() {
               sources={sources}
               selectedStatus={selectedStatus}
               statusCounts={statusCounts}
+              searchQuery={searchQuery}
+              selectedSourceFilter={selectedSourceFilter}
+              selectedImportSourceFilter={selectedImportSourceFilter}
+              hasActiveFilters={hasActiveFilters}
               selectedCandidateId={selectedCandidate?.id ?? null}
               onSelectStatus={selectStatus}
+              onSearchQueryChange={setSearchQuery}
+              onSourceFilterChange={setSelectedSourceFilter}
+              onImportSourceFilterChange={setSelectedImportSourceFilter}
+              onClearFilters={clearFilters}
               onSelectCandidate={setSelectedCandidate}
             />
 
@@ -235,6 +269,58 @@ export default function IngestionQueuePage() {
       )}
     </>
   );
+}
+
+function filterCandidates(
+  candidates: IngestionCandidate[],
+  searchQuery: string,
+  selectedSourceFilter: SourceFilterValue,
+  selectedImportSourceFilter: ImportSourceFilterValue
+): IngestionCandidate[] {
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+
+  return candidates.filter((candidate) => {
+    if (
+      selectedSourceFilter === "unknown" &&
+      candidate.source_id !== null
+    ) {
+      return false;
+    }
+
+    if (
+      selectedSourceFilter !== "all" &&
+      selectedSourceFilter !== "unknown" &&
+      candidate.source_id !== selectedSourceFilter
+    ) {
+      return false;
+    }
+
+    if (
+      selectedImportSourceFilter !== "all" &&
+      candidate.import_source !== selectedImportSourceFilter
+    ) {
+      return false;
+    }
+
+    if (!normalizedQuery) {
+      return true;
+    }
+
+    const preview = getIngestionCandidatePreview(candidate);
+    const searchableText = [
+      candidate.title,
+      candidate.url,
+      candidate.canonical_url,
+      candidate.final_url,
+      candidate.description,
+      preview,
+    ]
+      .filter((value): value is string => Boolean(value))
+      .join(" ")
+      .toLowerCase();
+
+    return searchableText.includes(normalizedQuery);
+  });
 }
 
 function selectCandidateForStatus(

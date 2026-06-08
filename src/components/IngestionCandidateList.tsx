@@ -1,5 +1,6 @@
 import type {
   IngestionCandidate,
+  IngestionImportSource,
   IngestionCandidateStatus,
 } from "../types/ingestionCandidate";
 import type { Source } from "../types/source";
@@ -17,13 +18,32 @@ const statusTabs: Array<{
   { status: "duplicate", label: "Duplicate" },
 ];
 
+const importSourceOptions: Array<{
+  value: "all" | IngestionImportSource;
+  label: string;
+}> = [
+  { value: "all", label: "All import sources" },
+  { value: "manual_url", label: "Manual URL" },
+  { value: "rss", label: "RSS" },
+  { value: "browser_extension", label: "Browser Extension" },
+  { value: "connector", label: "Connector" },
+];
+
 type Props = {
   candidates: IngestionCandidate[];
   sources: Source[];
   selectedStatus: IngestionCandidateStatus;
   statusCounts: Record<IngestionCandidateStatus, number>;
+  searchQuery: string;
+  selectedSourceFilter: string;
+  selectedImportSourceFilter: "all" | IngestionImportSource;
+  hasActiveFilters: boolean;
   selectedCandidateId?: string | null;
   onSelectStatus: (status: IngestionCandidateStatus) => void;
+  onSearchQueryChange: (value: string) => void;
+  onSourceFilterChange: (value: string) => void;
+  onImportSourceFilterChange: (value: "all" | IngestionImportSource) => void;
+  onClearFilters: () => void;
   onSelectCandidate: (candidate: IngestionCandidate) => void;
 };
 
@@ -32,8 +52,16 @@ export function IngestionCandidateList({
   sources,
   selectedStatus,
   statusCounts,
+  searchQuery,
+  selectedSourceFilter,
+  selectedImportSourceFilter,
+  hasActiveFilters,
   selectedCandidateId = null,
   onSelectStatus,
+  onSearchQueryChange,
+  onSourceFilterChange,
+  onImportSourceFilterChange,
+  onClearFilters,
   onSelectCandidate,
 }: Props) {
   function getSourceName(sourceId: string | null): string {
@@ -70,9 +98,63 @@ export function IngestionCandidateList({
         </div>
       </div>
 
+      <div className="mb-4 space-y-3 lg:flex-none">
+        <input
+          type="search"
+          placeholder="Search candidates"
+          value={searchQuery}
+          onChange={(event) => onSearchQueryChange(event.target.value)}
+          className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <select
+            value={selectedSourceFilter}
+            onChange={(event) => onSourceFilterChange(event.target.value)}
+            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">All sources</option>
+            {sources.map((source) => (
+              <option key={source.id} value={source.id}>
+                {source.name}
+              </option>
+            ))}
+            <option value="unknown">Unknown source</option>
+          </select>
+
+          <select
+            value={selectedImportSourceFilter}
+            onChange={(event) =>
+              onImportSourceFilterChange(
+                event.target.value as "all" | IngestionImportSource
+              )
+            }
+            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {importSourceOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={onClearFilters}
+            className="text-sm font-medium text-blue-300 transition hover:text-blue-200"
+          >
+            Clear filters
+          </button>
+        )}
+      </div>
+
       {candidates.length === 0 ? (
         <p className="text-slate-400">
-          No {selectedStatus} ingestion candidates.
+          {hasActiveFilters
+            ? "No candidates match the current filters."
+            : `No ${selectedStatus} ingestion candidates.`}
         </p>
       ) : (
         <div className="space-y-3 lg:min-h-0 lg:overflow-y-auto lg:pr-2">
