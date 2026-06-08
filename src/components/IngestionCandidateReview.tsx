@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { IngestionCandidate } from "../types/ingestionCandidate";
 import type { Source } from "../types/source";
 import type { Tag } from "../types/tag";
+import { getIngestionCandidatePreview } from "../lib/ingestionCandidatePreview";
 import { Card } from "./ui/Card";
 import { IngestionCandidateStatusBadge } from "./IngestionCandidateStatusBadge";
 
@@ -108,6 +109,8 @@ export function IngestionCandidateReview({
   }
 
   const actionable = candidate.status === "pending";
+  const preview =
+    getIngestionCandidatePreview(candidate) ?? "No preview available.";
 
   return (
     <Card>
@@ -124,6 +127,15 @@ export function IngestionCandidateReview({
       </div>
 
       <div className="space-y-4">
+        <div className="rounded-xl border border-slate-800 bg-slate-950/80 p-4">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Preview
+          </p>
+          <p className="text-sm leading-6 text-slate-300">
+            {preview}
+          </p>
+        </div>
+
         <input
           className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="URL"

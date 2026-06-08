@@ -3,6 +3,7 @@ import type {
   IngestionCandidateStatus,
 } from "../types/ingestionCandidate";
 import type { Source } from "../types/source";
+import { getIngestionCandidatePreview } from "../lib/ingestionCandidatePreview";
 import { IngestionCandidateStatusBadge } from "./IngestionCandidateStatusBadge";
 import { Card } from "./ui/Card";
 
@@ -77,6 +78,8 @@ export function IngestionCandidateList({
         <div className="space-y-3 lg:min-h-0 lg:overflow-y-auto lg:pr-2">
           {candidates.map((candidate) => {
             const selected = candidate.id === selectedCandidateId;
+            const preview =
+              getIngestionCandidatePreview(candidate) ?? "No preview available";
 
             return (
               <button
@@ -98,6 +101,10 @@ export function IngestionCandidateList({
 
                 <p className="break-all text-sm text-blue-300">
                   {candidate.canonical_url ?? candidate.final_url ?? candidate.url}
+                </p>
+
+                <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-300">
+                  {preview}
                 </p>
 
                 <div className="mt-3 grid gap-2 text-xs text-slate-400 sm:grid-cols-2">
