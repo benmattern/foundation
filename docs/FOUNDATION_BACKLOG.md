@@ -379,7 +379,6 @@ Complete for v1.1.
 - [x] Accept/Reject/Duplicate workflow tested successfully
 
 ## Still Open
-- [ ] RSS ingestion
 - [ ] Browser extension capture
 - [ ] Custom connectors
 - [ ] Batch import
@@ -439,8 +438,6 @@ Complete for v1. Manual RSS ingestion now feeds Review Queue candidates rather t
 - [x] Add Pending workflow behavior that advances the queue after review
 
 ## Still Open
-- [ ] Queue search/filter
-- [ ] Source filters
 - [ ] Bulk actions
 - [ ] Keyboard shortcuts
 - [ ] AI relevance scoring
@@ -465,8 +462,6 @@ Complete for v1.1. Pending work is separated from accepted, rejected, and duplic
 - [x] Improve review layout efficiency
 
 ## Still Open
-- [ ] Queue search/filter
-- [ ] Source filters
 - [ ] Bulk actions
 - [ ] Keyboard shortcuts
 - [ ] AI relevance scoring
@@ -480,18 +475,116 @@ Complete for v1.2. The review surface now reduces scrolling during candidate rev
 
 ---
 
+# Review Queue Preview Enhancement v1
+
+## Completed Tasks
+- [x] Add candidate preview text to queue cards
+- [x] Add Review panel Preview section
+- [x] Add shared preview helper
+- [x] Use `candidate.description` as first preview source
+- [x] Use `raw_metadata.description` as second preview source
+- [x] Use `raw_metadata.summary` as third preview source
+- [x] Show fallback when no preview is available
+
+## Still Open
+- [ ] First paragraph extraction
+- [ ] AI summaries
+- [ ] Relevance scoring
+- [ ] Priority queues
+
+## Current Status
+
+Complete for v1. Preview uses existing candidate fields and metadata only.
+
+---
+
+# Review Queue UX v1.3
+
+## Completed Tasks
+- [x] Add queue search
+- [x] Search candidate title
+- [x] Search candidate URL fields
+- [x] Search candidate description and preview text
+- [x] Add source filter
+- [x] Add import-source filter
+- [x] Add clear filters
+- [x] Add filtered empty state
+- [x] Keep status tab counts status-wide rather than filtered
+- [x] Keep filtering client-side for v1.3
+
+## Still Open
+- [ ] Bulk actions
+- [ ] Keyboard shortcuts
+- [ ] Server-side queue filtering/search
+- [ ] URL state
+- [ ] Saved queue filters
+- [ ] Relevance scoring
+- [ ] Priority queues
+
+## Current Status
+
+Complete for v1.3. Search and filters narrow candidates within the selected status tab.
+
+---
+
+# Review Queue UX v1.4
+
+## Completed Tasks
+- [x] Add analyst-centered review layout
+- [x] Move primary actions to the top
+- [x] Move title higher and make it prominent
+- [x] Move Preview higher
+- [x] Add compact metadata section
+- [x] Move tags above technical details
+- [x] Group URLs under Technical Details
+- [x] Move Description/Summary below tags
+- [x] Add top/bottom action rows
+
+## Still Open
+- [ ] Collapsible technical details
+- [ ] More explicit metadata edit labels
+- [ ] Bulk actions
+- [ ] Keyboard shortcuts
+
+## Current Status
+
+Complete for v1.4. Review panel order now follows analyst triage decisions rather than schema order.
+
+---
+
+# Review Queue Article Links
+
+## Completed Tasks
+- [x] Make candidate title open article in a new tab
+- [x] Add Open Article link in review panel
+- [x] Add Open links for URL, Canonical URL, and Final URL
+- [x] Preserve queue card selection behavior
+- [x] Use safe new-tab link attributes
+
+## Still Open
+- [ ] Article detail pages
+- [ ] Browser extension capture
+- [ ] Custom connectors
+
+## Current Status
+
+Complete. Analysts can open source articles directly from queue and review surfaces.
+
+---
+
 # Immediate Backlog
 
 # Next Milestone
 
 ## Next Milestone Decision Point
-- [ ] Decide whether the next milestone is Review Queue UX v1.3
+- [ ] Decide whether the next milestone is Bulk actions
+- [ ] Decide whether the next milestone is Keyboard shortcuts
 - [ ] Decide whether the next milestone is RSS Automation Planning
 - [ ] Decide whether the next milestone is Article Detail Pages
-- [ ] Decide whether the next milestone is Source Management cleanup
+- [ ] Decide whether the next milestone is Source Management Cleanup
 - [ ] Decide whether the next milestone is Auth/RLS Planning
 
-Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, and Review Queue UX v1.1/v1.2 are complete. The next milestone has not started.
+Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, Review Queue UX v1.1-v1.4, Review Queue Preview Enhancement v1, and Review Queue Article Links are complete. The next milestone has not started.
 
 ---
 
@@ -577,6 +670,15 @@ Improve how intelligence enters FOUNDATION after manual workflows and schema fou
 - [x] Pending workflow behavior
 - [x] Sticky review panel
 - [x] Review layout improvements
+- [x] Candidate preview text
+- [x] Review panel preview section
+- [x] Queue search
+- [x] Source filter
+- [x] Import-source filter
+- [x] Clear filters
+- [x] Analyst-centered review layout
+- [x] Top/bottom action rows
+- [x] Clickable article links
 
 ## Planned Ingestion Layers
 - [ ] RSS scheduling
@@ -589,7 +691,7 @@ Improve how intelligence enters FOUNDATION after manual workflows and schema fou
 - [ ] Event linking during candidate acceptance
 - [ ] Transactional candidate conversion
 
-Current status: URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, and Review Queue UX v1.1/v1.2 are implemented as analyst-reviewed ingestion workflows. RSS scheduling, feed discovery, OPML import/export, browser extension capture, and custom connectors remain planned and should feed Review Queue candidates rather than approved articles directly.
+Current status: URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, Review Queue UX v1.1-v1.4, Review Queue Preview Enhancement v1, and Review Queue Article Links are implemented as analyst-reviewed ingestion workflows. RSS scheduling, feed discovery, OPML import/export, browser extension capture, and custom connectors remain planned and should feed Review Queue candidates rather than approved articles directly.
 
 ---
 

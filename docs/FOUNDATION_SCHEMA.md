@@ -36,7 +36,9 @@ Sources
        -> URL Metadata Fetch v1.1
        -> Review Queue v1
        -> RSS Ingestion v1
-       -> Review Queue UX v1.1/v1.2
+       -> Review Queue UX v1.1-v1.4
+       -> Review Queue Preview Enhancement v1
+       -> Review Queue Article Links
 ```
 
 The schema is intentionally evolving in layers:
@@ -544,6 +546,14 @@ Current implementation:
 
 Review Queue uses the existing articles schema on acceptance. It does not create a separate approved intelligence record type.
 
+Review Queue Preview Enhancement v1, Review Queue UX v1.3, Review Queue UX v1.4, and Review Queue Article Links required no schema changes. These improvements use existing candidate fields and UI state:
+- preview text uses `ingestion_candidates.description`, `raw_metadata.description`, and `raw_metadata.summary`
+- queue search/filtering is client-side over loaded candidates
+- source filtering uses existing `source_id`
+- import-source filtering uses existing `import_source`
+- article-opening links use existing URL fields
+- analyst-centered review layout reorders existing editable fields
+
 Current ingestion flow:
 
 ```txt
@@ -747,19 +757,25 @@ Accepted candidates may reference the approved article they created through `con
 
 ## Current App Status
 
-Review Queue v1 and Review Queue UX v1.1/v1.2 are operational:
+Review Queue v1, Review Queue UX v1.1-v1.4, Review Queue Preview Enhancement v1, and Review Queue Article Links are operational:
 - URL Import can save candidates to Review Queue.
 - RSS Fetch Feed Now can save candidates to Review Queue.
 - The Ingestion page lists candidates.
 - The Ingestion page separates Pending, Accepted, Rejected, and Duplicate candidates into status tabs.
 - Pending is the default view.
 - Counts by status are displayed.
+- Candidate cards show preview text from existing candidate fields/metadata.
+- The Review panel has a Preview section.
+- Queue search, source filter, import-source filter, clear filters, and filtered empty state are client-side.
+- Status tab counts remain status-wide, not filtered counts.
 - Analysts can review and edit candidate fields.
 - Analysts can accept candidates as articles.
 - Analysts can reject candidates.
 - Analysts can mark candidates duplicate.
 - Reviewed candidates move out of Pending after action.
 - Larger screens use a sticky review panel and independently scrolling queue list.
+- The Review panel is organized around analyst decision flow rather than schema order.
+- Candidate title and review-panel URL links can open source articles in a new tab.
 - Direct ArticleForm creation remains available.
 
 ---
@@ -1015,11 +1031,13 @@ Sources
        -> URL Metadata Fetch v1.1
        -> Review Queue v1
        -> RSS Ingestion v1
-       -> Review Queue UX v1.1/v1.2
+       -> Review Queue UX v1.1-v1.4
+       -> Review Queue Preview Enhancement v1
+       -> Review Queue Article Links
 ```
 
 Next milestone:
-- Decision point between Review Queue UX v1.3, RSS Automation Planning, Article Detail Pages, Source Management cleanup, and Auth/RLS Planning
+- Decision point between Bulk actions, Keyboard shortcuts, RSS Automation Planning, Article Detail Pages, Source Management Cleanup, and Auth/RLS Planning
 
 Entities, timelines, and advanced event refinements intentionally come later unless explicitly reprioritized.
 
@@ -1137,10 +1155,11 @@ until:
 The next likely schema-impacting direction has not started.
 
 Current candidate directions:
-1. Review Queue UX v1.3
-2. RSS Automation Planning
-3. Article detail page / advanced article workflows
-4. Source search/filtering or source delete planning
-5. Auth/RLS Planning
+1. Bulk actions
+2. Keyboard shortcuts
+3. RSS Automation Planning
+4. Article detail page / advanced article workflows
+5. Source search/filtering or source delete planning
+6. Auth/RLS Planning
 
-Filtering & Search v1, Article Management v1, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, and Review Queue UX v1.1/v1.2 are complete. Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, and Review Queue UX v1.1/v1.2 required no schema changes. Event v1 is implemented with `events` and `article_events`; Review Queue v1 is implemented with `ingestion_candidates`; RSS Ingestion v1 is implemented with `rss_feeds` and RSS-created `ingestion_candidates`.
+Filtering & Search v1, Article Management v1, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, Review Queue UX v1.1-v1.4, Review Queue Preview Enhancement v1, and Review Queue Article Links are complete. Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue UX v1.1-v1.4, Review Queue Preview Enhancement v1, and Review Queue Article Links required no schema changes. Event v1 is implemented with `events` and `article_events`; Review Queue v1 is implemented with `ingestion_candidates`; RSS Ingestion v1 is implemented with `rss_feeds` and RSS-created `ingestion_candidates`.

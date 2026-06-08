@@ -1,3 +1,4 @@
+import type { KeyboardEvent } from "react";
 import type {
   IngestionCandidate,
   IngestionImportSource,
@@ -68,6 +69,16 @@ export function IngestionCandidateList({
     if (!sourceId) return "No source match";
 
     return sources.find((source) => source.id === sourceId)?.name ?? "Unknown source";
+  }
+
+  function selectCandidateFromKeyboard(
+    event: KeyboardEvent<HTMLDivElement>,
+    candidate: IngestionCandidate
+  ) {
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    event.preventDefault();
+    onSelectCandidate(candidate);
   }
 
   return (
@@ -164,10 +175,14 @@ export function IngestionCandidateList({
               getIngestionCandidatePreview(candidate) ?? "No preview available";
 
             return (
-              <button
+              <div
                 key={candidate.id}
-                type="button"
+                role="button"
+                tabIndex={0}
                 onClick={() => onSelectCandidate(candidate)}
+                onKeyDown={(event) =>
+                  selectCandidateFromKeyboard(event, candidate)
+                }
                 className={`w-full rounded-xl border p-4 text-left transition ${
                   selected
                     ? "border-blue-500 bg-blue-500/10"
@@ -175,9 +190,15 @@ export function IngestionCandidateList({
                 }`}
               >
                 <div className="mb-3 flex items-start justify-between gap-3">
-                  <p className="line-clamp-2 font-medium text-white">
+                  <a
+                    href={candidate.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(event) => event.stopPropagation()}
+                    className="line-clamp-2 font-medium text-white transition hover:text-blue-200"
+                  >
                     {candidate.title || candidate.url}
-                  </p>
+                  </a>
                   <IngestionCandidateStatusBadge status={candidate.status} />
                 </div>
 
@@ -202,7 +223,7 @@ export function IngestionCandidateList({
                       : "Unknown"}
                   </p>
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>

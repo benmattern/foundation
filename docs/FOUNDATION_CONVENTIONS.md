@@ -140,10 +140,13 @@ Examples:
 - supabaseClient.ts
 - eventMetrics.ts
 - dashboardMetrics.ts
+- ingestionCandidatePreview.ts
 
 Reusable derived metric helpers that span pages/components may live in `src/lib/`.
 
 Derived dashboard metrics may live in `src/lib/` when they are reused, complex enough to make a page harder to read, or useful for keeping route pages focused on orchestration.
+
+Shared display/selection helpers may live in `src/lib/` when they are reused across components and do not belong to data services, such as metadata-based candidate preview selection.
 
 ---
 
@@ -380,7 +383,9 @@ Sources
        -> URL Metadata Fetch v1.1
        -> Review Queue v1
        -> RSS Ingestion v1
-       -> Review Queue UX v1.1/v1.2
+       -> Review Queue UX v1.1-v1.4
+       -> Review Queue Preview Enhancement v1
+       -> Review Queue Article Links
 ```
 
 Long-term direction:
@@ -526,15 +531,15 @@ Use this procedure when starting or resuming work with ChatGPT, Codex, or anothe
 
 ## Current Priority Alignment
 
-Standalone Tags CRUD, Article <-> Tag relationships, Filtering & Search v1, Article Management v1, Event v1, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, and Review Queue UX v1.1/v1.2 are complete for the current stage.
+Standalone Tags CRUD, Article <-> Tag relationships, Filtering & Search v1, Article Management v1, Event v1, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, Review Queue UX v1.1-v1.4, Review Queue Preview Enhancement v1, and Review Queue Article Links are complete for the current stage.
 
 The next milestone is:
 
 ```txt
-Decision point: Review Queue UX v1.3, RSS Automation Planning, Article Detail Pages, Source Management cleanup, or Auth/RLS Planning
+Decision point: Bulk actions, Keyboard shortcuts, RSS Automation Planning, Article Detail Pages, Source Management Cleanup, or Auth/RLS Planning
 ```
 
-Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, and Review Queue UX v1.1/v1.2 are complete. Ingestion is elevated as a roadmap layer. RSS scheduling, browser extension capture, and custom connectors should feed Review Queue candidates rather than approved articles directly. Do not skip ahead to entities, timelines, RSS automation, Financial Signals, or AI workflows unless the user explicitly reprioritizes.
+Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, Review Queue UX v1.1-v1.4, Review Queue Preview Enhancement v1, and Review Queue Article Links are complete. Ingestion is elevated as a roadmap layer. RSS scheduling, browser extension capture, and custom connectors should feed Review Queue candidates rather than approved articles directly. Do not skip ahead to entities, timelines, RSS automation, Financial Signals, or AI workflows unless the user explicitly reprioritizes.
 
 ---
 

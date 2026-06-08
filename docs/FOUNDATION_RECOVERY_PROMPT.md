@@ -27,7 +27,9 @@ Sources
        -> URL Metadata Fetch v1.1
        -> Review Queue v1
        -> RSS Ingestion v1
-       -> Review Queue UX v1.1/v1.2
+       -> Review Queue UX v1.1-v1.4
+       -> Review Queue Preview Enhancement v1
+       -> Review Queue Article Links
 ```
 
 The long-term direction is:
@@ -161,6 +163,16 @@ Not yet implemented:
 - Review Queue review panel is sticky on larger screens
 - Review Queue candidate list scrolls independently on larger screens
 - Review Queue preserves mobile single-column usability
+- Candidate cards show preview text from existing candidate description/metadata
+- Review panel has a dedicated Preview section
+- Shared preview helper exists for candidate previews
+- Review Queue has client-side search
+- Review Queue has source and import-source filters
+- Review Queue has a clear filters button and filtered empty state
+- Status tab counts remain status-wide rather than filtered
+- Review panel uses an analyst-centered layout with top actions, prominent title/preview, compact metadata, higher tags, technical URL grouping, and repeated bottom actions
+- Candidate title opens the source article in a new tab when a URL exists
+- Review panel includes Open Article and technical URL Open links
 - Candidates can be accepted as articles
 - Candidates can be rejected
 - Candidates can be marked duplicate
@@ -268,9 +280,9 @@ Not yet implemented:
 
 ## Next Milestone
 
-The next priority is a decision point between Review Queue UX v1.3, RSS Automation Planning, Article Detail Pages, Source Management cleanup, and Auth/RLS Planning.
+The next priority is a decision point between Bulk actions, Keyboard shortcuts, RSS Automation Planning, Article Detail Pages, Source Management Cleanup, and Auth/RLS Planning.
 
-Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, and Review Queue UX v1.1/v1.2 are complete. Ingestion is elevated as a roadmap layer. RSS scheduling, browser extension capture, and custom connectors should feed Review Queue candidates rather than creating articles directly. Do not skip ahead to entities, timelines, RSS automation, Financial Signals, or AI workflows unless the user explicitly changes priority.
+Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, Review Queue UX v1.1-v1.4, Review Queue Preview Enhancement v1, and Review Queue Article Links are complete. Ingestion is elevated as a roadmap layer. RSS scheduling, browser extension capture, and custom connectors should feed Review Queue candidates rather than creating articles directly. Do not skip ahead to entities, timelines, RSS automation, Financial Signals, or AI workflows unless the user explicitly changes priority.
 
 ---
 
@@ -290,7 +302,7 @@ RSS Ingestion v1 is implemented for manual feed fetching into Review Queue candi
 
 ## Ingestion
 
-Manual entry, Seed Data Script v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, and Review Queue UX v1.1/v1.2 are implemented acquisition/review capabilities.
+Manual entry, Seed Data Script v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, Review Queue UX v1.1-v1.4, Review Queue Preview Enhancement v1, and Review Queue Article Links are implemented acquisition/review capabilities.
 
 Current ingestion flow:
 
@@ -313,6 +325,16 @@ Accepted
 ```
 
 Review Queue candidates are pre-article records separate from approved `articles`, with pending, accepted, rejected, and duplicate statuses. Accepted candidates convert to articles after analyst review. Rejected and duplicate candidates stay out of `articles`.
+
+Review Queue triage currently supports:
+- status tabs with status-wide counts
+- pending-first inbox behavior
+- preview text based on existing `description` and `raw_metadata`
+- client-side search and source/import-source filters
+- clear filters and filtered empty state
+- sticky wider review panel with independently scrolling queue list on larger screens
+- analyst-centered review layout
+- one-click source article links from queue and review panel
 
 RSS feeds create candidates, not articles. The Review Queue is the central analyst gate for URL and RSS intake.
 
@@ -383,7 +405,7 @@ When starting a new ChatGPT or Codex session:
 2. Read FOUNDATION_STATUS.md and FOUNDATION_BACKLOG.md.
 3. Inspect the relevant source files before making changes.
 4. Do not infer that planned features are implemented.
-5. Treat the next milestone as a decision point between Review Queue UX v1.3, RSS Automation Planning, Article Detail Pages, Source Management cleanup, and Auth/RLS Planning unless the user explicitly chooses a different direction.
+5. Treat the next milestone as a decision point between Bulk actions, Keyboard shortcuts, RSS Automation Planning, Article Detail Pages, Source Management Cleanup, and Auth/RLS Planning unless the user explicitly chooses a different direction.
 
 ---
 

@@ -4,7 +4,7 @@
 
 FOUNDATION is currently in early Phase 1 development.
 
-The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, Article Management v1, Event v1 with Article <-> Event relationships, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, and Review Queue UX v1.1/v1.2.
+The application has moved from initial prototype setup into a functioning modular web application with working foundational CRUD-style flows, Supabase persistence, route-based pages, a service-layer architecture, operational Article <-> Tag relationships, client-side Filtering & Search v1, Article Management v1, Event v1 with Article <-> Event relationships, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, Review Queue UX v1.1-v1.4, Review Queue Preview Enhancement v1, and Review Queue Article Links.
 
 The current focus is:
 - establishing core intelligence data structures,
@@ -158,6 +158,10 @@ Operational for create, list, detail, and edit workflows.
 - RSS and Atom feed items stage as ingestion candidates
 - Review Queue UX v1.1 status tabs and Pending workflow behavior
 - Review Queue UX v1.2 sticky review panel and scrollable queue list
+- Review Queue Preview Enhancement v1 candidate previews and shared preview helper
+- Review Queue UX v1.3 client-side queue search and filters
+- Review Queue UX v1.4 analyst-centered review layout
+- Review Queue Article Links for opening source articles from queue/review surfaces
 
 ## Not Yet Implemented
 - Article detail page
@@ -182,6 +186,10 @@ Sources
        -> URL Import v1
        -> URL Metadata Fetch v1.1
        -> Review Queue v1
+       -> RSS Ingestion v1
+       -> Review Queue UX v1.1-v1.4
+       -> Review Queue Preview Enhancement v1
+       -> Review Queue Article Links
     <-> Events v1
        -> Event Refinement v1
        -> Events v1.1 Intelligence Summary
@@ -435,7 +443,7 @@ Complete for v1.1. The Edge Function has been deployed and validated with live a
 
 ## Current Status
 
-Complete for v1. Review Queue now acts as the staging layer between URL intake and approved article records.
+Complete for v1. Review Queue now acts as the staging layer between URL/RSS intake and approved article records. With subsequent UX passes, it also functions as the analyst triage workspace for previewing, filtering, opening, accepting, rejecting, and marking candidates duplicate.
 
 ---
 
@@ -500,6 +508,72 @@ Complete for v1.1. Review Queue now separates pending work from reviewed history
 ## Current Status
 
 Complete for v1.2. Review Queue now reduces scrolling and keeps the active review form in view for analyst efficiency.
+
+---
+
+# Review Queue Preview Enhancement v1
+
+## Implemented
+- Candidate cards show compact preview text
+- Review panel has a dedicated Preview section
+- Shared preview helper added for candidate preview selection
+- Preview priority uses `candidate.description`, `raw_metadata.description`, then `raw_metadata.summary`
+- Fallback shown when no preview is available
+- No AI summaries, first paragraph extraction, article fetch, or article-body storage
+
+## Current Status
+
+Complete for v1. Review Queue now surfaces existing candidate summaries during triage without adding new ingestion behavior.
+
+---
+
+# Review Queue UX v1.3
+
+## Implemented
+- Client-side queue search
+- Search matches candidate title, URL fields, description, and preview text
+- Source filter
+- Import-source filter
+- Clear filters button
+- Filtered empty state
+- Filters apply within the selected status tab
+- Status tab counts remain status-wide, not filtered counts
+
+## Current Status
+
+Complete for v1.3. Review Queue now supports faster candidate discovery and narrowing at prototype scale.
+
+---
+
+# Review Queue UX v1.4
+
+## Implemented
+- Analyst-centered candidate review layout
+- Actions moved to the top of the review panel
+- Title and Preview moved higher as primary review surfaces
+- Compact metadata section for source, published date, and import source
+- Tags moved above technical URL details
+- Description/Summary moved below tags
+- URL, Canonical URL, and Final URL grouped under Technical Details
+- Actions repeated at the bottom
+
+## Current Status
+
+Complete for v1.4. Candidate review is now organized around analyst decisions rather than database field order.
+
+---
+
+# Review Queue Article Links
+
+## Implemented
+- Candidate title opens the source article in a new tab
+- Review panel includes an Open Article link when a URL exists
+- Technical URL fields include Open links
+- Queue card selection behavior preserved
+
+## Current Status
+
+Complete. Analysts can open source articles quickly from both queue and review surfaces.
 
 ---
 
@@ -644,16 +718,19 @@ Sources
        -> URL Metadata Fetch v1.1
        -> Review Queue v1
        -> RSS Ingestion v1
-       -> Review Queue UX v1.1/v1.2
+       -> Review Queue UX v1.1-v1.4
+       -> Review Queue Preview Enhancement v1
+       -> Review Queue Article Links
 ```
 
 ## Next Milestone
 
 The next milestone is a decision point between:
-- Review Queue UX v1.3
+- Bulk actions
+- Keyboard shortcuts
 - RSS Automation Planning
 - Article Detail Pages
-- Source Management cleanup
+- Source Management Cleanup
 - Auth/RLS Planning
 
 ## Expanded Long-Term Direction
@@ -673,7 +750,7 @@ Sources
 # Immediate Priorities
 
 Next priority:
-1. Decide next milestone: Review Queue UX v1.3, RSS Automation Planning, Article Detail Pages, Source Management cleanup, or Auth/RLS Planning
+1. Decide next milestone: Bulk actions, Keyboard shortcuts, RSS Automation Planning, Article Detail Pages, Source Management Cleanup, or Auth/RLS Planning
 2. Article detail page / advanced article workflows
 3. Source search/filtering or source delete planning
 
@@ -684,7 +761,7 @@ Ingestion roadmap status:
 - URL Metadata Fetch v1.1 is implemented through a deployed Supabase Edge Function.
 - Review Queue v1 is implemented as the staging layer for ingestion candidates.
 - RSS Ingestion v1 is implemented with manual Fetch Feed Now into Review Queue candidates.
-- Review Queue UX v1.1/v1.2 is implemented with status tabs, status counts, Pending workflow behavior, sticky review panel, and scrollable queue list.
+- Review Queue UX v1.1-v1.4 is implemented with status tabs, status counts, Pending workflow behavior, sticky review panel, scrollable queue list, candidate previews, client-side queue search/filter controls, analyst-centered review layout, and article-opening links.
 - Current ingestion flow: Manual URL -> Metadata Fetch -> Save to Review Queue; RSS Feed -> Fetch Feed Now -> ingestion_candidates; Review Queue -> accept/reject/duplicate; Accepted -> Article.
 - RSS scheduling, browser extension capture, and custom connectors remain planned and should feed Review Queue candidates rather than articles directly.
 

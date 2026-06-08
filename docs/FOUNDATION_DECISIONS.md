@@ -1228,6 +1228,116 @@ Keeping the review panel visible:
 
 ---
 
+# Human Review UX Before AI Relevance Scoring
+
+## Decision
+Improve the human Review Queue triage experience before adding AI relevance scoring, priority queues, or auto-tagging.
+
+Current implemented improvements:
+- preview text
+- status tabs
+- client-side search
+- source and import-source filters
+- clear filters and filtered empty state
+- analyst-centered review layout
+- one-click source article links
+
+## Reasoning
+The Review Queue is the analyst gate between intake and approved articles.
+
+Improving human review first:
+- validates the manual decision workflow,
+- reduces triage friction without adding model uncertainty,
+- keeps acceptance/rejection decisions transparent,
+- and preserves a stronger baseline for later AI assistance.
+
+AI relevance scoring, priority queues, and auto-tagging remain future work.
+
+---
+
+# Existing Metadata Before AI Summaries
+
+## Decision
+Use existing candidate descriptions and metadata for Review Queue previews before adding AI summaries or first paragraph extraction.
+
+Current preview priority:
+- `candidate.description`
+- `raw_metadata.description`
+- `raw_metadata.summary`
+- fallback text when no preview exists
+
+## Reasoning
+Candidates already store lightweight metadata from URL and RSS intake.
+
+Using existing metadata:
+- improves triage speed immediately,
+- avoids full article fetching or body storage,
+- avoids AI-generated text before review workflows mature,
+- and keeps previews explainable as intake metadata rather than generated analysis.
+
+AI summaries and first paragraph extraction remain future work.
+
+---
+
+# Metadata-Based Previews For Now
+
+## Decision
+Keep Review Queue previews metadata-based for now.
+
+## Reasoning
+Metadata-based previews are enough to help analysts scan candidates while preserving the current ingestion boundary.
+
+This avoids:
+- article body scraping,
+- paywall or extraction complexity,
+- new storage requirements,
+- and conflating metadata previews with analyst-approved summaries.
+
+---
+
+# One-Click Source Article Access
+
+## Decision
+Make source article access one-click from Review Queue candidate cards, the Review panel, and technical URL fields.
+
+## Reasoning
+Analysts often need to inspect the original source before accepting, rejecting, or marking a candidate duplicate.
+
+One-click article access:
+- reduces triage friction,
+- supports quick source verification,
+- preserves queue card selection behavior,
+- and keeps source review adjacent to the decision workflow.
+
+---
+
+# Analyst-Centered Review Panel Order
+
+## Decision
+Organize the Review panel around analyst decisions rather than schema/database field order.
+
+Current ordering emphasizes:
+- action buttons near the top,
+- prominent title,
+- preview,
+- compact metadata,
+- tags,
+- description/summary,
+- technical URL details,
+- warnings/rejection reason,
+- repeated bottom actions.
+
+## Reasoning
+Candidate review is driven by the question: "What is this article and what should I do with it?"
+
+Analyst-centered ordering:
+- surfaces decision-critical information earlier,
+- keeps tags near the review decision,
+- moves technical URL fields lower,
+- and reduces scrolling back to action buttons.
+
+---
+
 # Intelligence Workflow Philosophy
 
 ## Decision

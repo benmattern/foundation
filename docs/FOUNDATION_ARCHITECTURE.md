@@ -65,7 +65,9 @@ Current frontend architecture uses:
 - URL Metadata Fetch v1.1 through a deployed Supabase Edge Function
 - Review Queue v1 for analyst-reviewed ingestion candidates
 - RSS Ingestion v1 for manual feed-to-candidate ingestion
-- Review Queue UX v1.1/v1.2 for status tabs, Pending workflow behavior, sticky review, and scrollable queue review
+- Review Queue UX v1.1-v1.4 for status tabs, Pending workflow behavior, sticky review, scrollable queue review, search/filtering, and analyst-centered review layout
+- Review Queue Preview Enhancement v1 for metadata-based candidate previews
+- Review Queue Article Links for one-click source article access
 
 ### Current Folder Structure
 
@@ -167,6 +169,7 @@ Current functionality:
 - Accept reviewed candidates as articles
 - Manage RSS feeds
 - Manually fetch RSS/Atom feeds into Review Queue candidates
+- Triage Review Queue candidates with previews, search, source/import filters, and one-click source article links
 
 Not implemented:
 - Article detail page
@@ -263,7 +266,9 @@ Sources
        -> URL Metadata Fetch v1.1
        -> Review Queue v1
        -> RSS Ingestion v1
-       -> Review Queue UX v1.1/v1.2
+       -> Review Queue UX v1.1-v1.4
+       -> Review Queue Preview Enhancement v1
+       -> Review Queue Article Links
 ```
 
 Long-term relational direction:
@@ -301,11 +306,15 @@ Completed:
 16. RSS Ingestion v1
 17. Review Queue UX v1.1
 18. Review Queue UX v1.2
+19. Review Queue Preview Enhancement v1
+20. Review Queue UX v1.3
+21. Review Queue UX v1.4
+22. Review Queue Article Links
 
 Next milestone:
-- Decision point between Review Queue UX v1.3, RSS Automation Planning, Article Detail Pages, Source Management cleanup, and Auth/RLS Planning
+- Decision point between Bulk actions, Keyboard shortcuts, RSS Automation Planning, Article Detail Pages, Source Management Cleanup, and Auth/RLS Planning
 
-Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, and Review Queue UX v1.1/v1.2 are complete. The next milestone has not started.
+Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, Review Queue UX v1.1-v1.4, Review Queue Preview Enhancement v1, and Review Queue Article Links are complete. The next milestone has not started.
 
 ---
 
@@ -394,11 +403,20 @@ RSS Ingestion:
 
 Review Queue:
 - Review Queue v1 through `ingestion_candidates`
+- analyst triage workspace for URL and RSS intake candidates
 - candidate list/review UI
 - Pending, Accepted, Rejected, and Duplicate tabs with counts
 - Pending as the default analyst inbox
+- candidate-card preview text from existing descriptions/metadata
+- client-side queue search
+- source and import-source filters
+- clear filters and filtered empty state
+- status tab counts remain status-wide
 - reviewed candidates move out of Pending after action
 - sticky review panel and independently scrolling queue list on larger screens
+- analyst-centered review panel organized around decisions rather than schema order
+- top and bottom action rows
+- one-click article links from candidate titles, review panel, and technical URL fields
 - accept/reject/duplicate workflow
 - candidate-to-article conversion after analyst review
 

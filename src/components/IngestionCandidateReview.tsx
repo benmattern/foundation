@@ -133,6 +133,17 @@ export function IngestionCandidateReview({
     "Unknown source";
   const actionRow = (
     <div className="flex flex-wrap gap-3">
+      {values.url && (
+        <a
+          href={values.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-lg border border-blue-500/40 bg-blue-500/10 px-4 py-2 font-medium text-blue-200 transition hover:bg-blue-500/20"
+        >
+          Open Article
+        </a>
+      )}
+
       <button
         type="button"
         disabled={!actionable || !values.title || !values.url}
@@ -286,28 +297,79 @@ export function IngestionCandidateReview({
             Technical Details
           </p>
 
-          <input
-            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="URL"
-            value={values.url}
-            onChange={(event) => updateValue("url", event.target.value)}
-          />
+          <div>
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <label className="text-xs font-medium text-slate-400">
+                URL
+              </label>
+              {values.url && (
+                <a
+                  href={values.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-medium text-blue-300 transition hover:text-blue-200"
+                >
+                  Open
+                </a>
+              )}
+            </div>
+            <input
+              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="URL"
+              value={values.url}
+              onChange={(event) => updateValue("url", event.target.value)}
+            />
+          </div>
 
-          <input
-            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Canonical URL"
-            value={values.canonical_url}
-            onChange={(event) =>
-              updateValue("canonical_url", event.target.value)
-            }
-          />
+          <div>
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <label className="text-xs font-medium text-slate-400">
+                Canonical URL
+              </label>
+              {values.canonical_url && (
+                <a
+                  href={values.canonical_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-medium text-blue-300 transition hover:text-blue-200"
+                >
+                  Open
+                </a>
+              )}
+            </div>
+            <input
+              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Canonical URL"
+              value={values.canonical_url}
+              onChange={(event) =>
+                updateValue("canonical_url", event.target.value)
+              }
+            />
+          </div>
 
-          <input
-            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Final URL"
-            value={values.final_url}
-            onChange={(event) => updateValue("final_url", event.target.value)}
-          />
+          <div>
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <label className="text-xs font-medium text-slate-400">
+                Final URL
+              </label>
+              {values.final_url && (
+                <a
+                  href={values.final_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-medium text-blue-300 transition hover:text-blue-200"
+                >
+                  Open
+                </a>
+              )}
+            </div>
+            <input
+              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Final URL"
+              value={values.final_url}
+              onChange={(event) => updateValue("final_url", event.target.value)}
+            />
+          </div>
         </div>
 
         {candidate.warnings.length > 0 && (
