@@ -39,6 +39,23 @@ function formatDateForInput(date: string | null): string {
   return date.slice(0, 10);
 }
 
+function formatDisplayDate(date: string): string {
+  if (!date) return "Published date unknown";
+
+  return new Date(date).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function formatImportSource(importSource: string): string {
+  return importSource
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 export function IngestionCandidateReview({
   candidate,
   sources,
@@ -111,6 +128,39 @@ export function IngestionCandidateReview({
   const actionable = candidate.status === "pending";
   const preview =
     getIngestionCandidatePreview(candidate) ?? "No preview available.";
+  const sourceName =
+    sources.find((source) => source.id === values.source_id)?.name ??
+    "Unknown source";
+  const actionRow = (
+    <div className="flex flex-wrap gap-3">
+      <button
+        type="button"
+        disabled={!actionable || !values.title || !values.url}
+        onClick={() => onAcceptCandidate(candidate, values)}
+        className="rounded-lg bg-slate-200 px-4 py-2 font-medium text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        Accept as Article
+      </button>
+
+      <button
+        type="button"
+        disabled={!actionable}
+        onClick={() => onRejectCandidate(candidate, values.rejection_reason)}
+        className="rounded-lg border border-red-900/50 bg-red-950/30 px-4 py-2 font-medium text-red-300 transition hover:bg-red-900/40 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        Reject
+      </button>
+
+      <button
+        type="button"
+        disabled={!actionable}
+        onClick={() => onMarkDuplicate(candidate)}
+        className="rounded-lg border border-slate-700 px-4 py-2 font-medium text-slate-300 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        Mark Duplicate
+      </button>
+    </div>
+  );
 
   return (
     <Card>
@@ -127,6 +177,20 @@ export function IngestionCandidateReview({
       </div>
 
       <div className="space-y-4">
+        {actionRow}
+
+        <div>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Title
+          </label>
+          <input
+            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-lg font-semibold text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Title"
+            value={values.title}
+            onChange={(event) => updateValue("title", event.target.value)}
+          />
+        </div>
+
         <div className="rounded-xl border border-slate-800 bg-slate-950/80 p-4">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
             Preview
@@ -136,62 +200,40 @@ export function IngestionCandidateReview({
           </p>
         </div>
 
-        <input
-          className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="URL"
-          value={values.url}
-          onChange={(event) => updateValue("url", event.target.value)}
-        />
+        <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Metadata
+          </p>
+          <p className="mb-4 text-sm text-slate-300">
+            {sourceName} / {formatDisplayDate(values.published_at)} /{" "}
+            {formatImportSource(candidate.import_source)}
+          </p>
+          <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_11rem]">
+            <select
+              className={`w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                values.source_id ? "text-white" : "text-slate-500"
+              }`}
+              value={values.source_id}
+              onChange={(event) => updateValue("source_id", event.target.value)}
+            >
+              <option value="">No source selected</option>
+              {sources.map((source) => (
+                <option key={source.id} value={source.id}>
+                  {source.name}
+                </option>
+              ))}
+            </select>
 
-        <input
-          className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Canonical URL"
-          value={values.canonical_url}
-          onChange={(event) => updateValue("canonical_url", event.target.value)}
-        />
-
-        <input
-          className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Final URL"
-          value={values.final_url}
-          onChange={(event) => updateValue("final_url", event.target.value)}
-        />
-
-        <select
-          className={`w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            values.source_id ? "text-white" : "text-slate-500"
-          }`}
-          value={values.source_id}
-          onChange={(event) => updateValue("source_id", event.target.value)}
-        >
-          <option value="">No source selected</option>
-          {sources.map((source) => (
-            <option key={source.id} value={source.id}>
-              {source.name}
-            </option>
-          ))}
-        </select>
-
-        <input
-          className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Title"
-          value={values.title}
-          onChange={(event) => updateValue("title", event.target.value)}
-        />
-
-        <input
-          type="date"
-          className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={values.published_at}
-          onChange={(event) => updateValue("published_at", event.target.value)}
-        />
-
-        <textarea
-          className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Description / summary"
-          value={values.description}
-          onChange={(event) => updateValue("description", event.target.value)}
-        />
+            <input
+              type="date"
+              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={values.published_at}
+              onChange={(event) =>
+                updateValue("published_at", event.target.value)
+              }
+            />
+          </div>
+        </div>
 
         {tags.length > 0 && (
           <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
@@ -225,6 +267,49 @@ export function IngestionCandidateReview({
           </div>
         )}
 
+        <div>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Description / Summary
+          </label>
+          <textarea
+            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Description / summary"
+            value={values.description}
+            onChange={(event) =>
+              updateValue("description", event.target.value)
+            }
+          />
+        </div>
+
+        <div className="space-y-3 rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Technical Details
+          </p>
+
+          <input
+            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="URL"
+            value={values.url}
+            onChange={(event) => updateValue("url", event.target.value)}
+          />
+
+          <input
+            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Canonical URL"
+            value={values.canonical_url}
+            onChange={(event) =>
+              updateValue("canonical_url", event.target.value)
+            }
+          />
+
+          <input
+            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Final URL"
+            value={values.final_url}
+            onChange={(event) => updateValue("final_url", event.target.value)}
+          />
+        </div>
+
         {candidate.warnings.length > 0 && (
           <div className="space-y-1 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
             <p className="font-medium">Warnings</p>
@@ -247,36 +332,7 @@ export function IngestionCandidateReview({
           }
         />
 
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            disabled={!actionable || !values.title || !values.url}
-            onClick={() => onAcceptCandidate(candidate, values)}
-            className="rounded-lg bg-slate-200 px-4 py-2 font-medium text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            Accept as Article
-          </button>
-
-          <button
-            type="button"
-            disabled={!actionable}
-            onClick={() =>
-              onRejectCandidate(candidate, values.rejection_reason)
-            }
-            className="rounded-lg border border-red-900/50 bg-red-950/30 px-4 py-2 font-medium text-red-300 transition hover:bg-red-900/40 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            Reject
-          </button>
-
-          <button
-            type="button"
-            disabled={!actionable}
-            onClick={() => onMarkDuplicate(candidate)}
-            className="rounded-lg border border-slate-700 px-4 py-2 font-medium text-slate-300 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            Mark Duplicate
-          </button>
-        </div>
+        {actionRow}
       </div>
     </Card>
   );
