@@ -1,5 +1,19 @@
 # FOUNDATION Conventions
 
+## Workflow update — 2026-10-16
+
+Read [AGENTS.md](../AGENTS.md) for standing instructions and
+[Milestone 01](milestones/01-ingestion.md) for the proposed current package.
+The user now prefers complete milestones with small internal implementation
+steps. This supersedes any interpretation below requiring a separate handoff
+for every small feature. Routine engineering decisions should proceed within
+the assigned scope; consequential deviations belong in the review report.
+
+Ingestion must remain fully usable without AI. The current assessment is
+documentation-only; schema migrations, authentication and scheduled collection
+in the proposed brief are not implemented or authorized for hosted deployment.
+
+
 # Purpose Of This Document
 
 This document defines coding, architecture, naming, documentation, and assistant-workflow conventions for FOUNDATION.

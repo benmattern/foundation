@@ -1,5 +1,27 @@
 # FOUNDATION Architectural Decisions
 
+## Direction update — 2026-10-16
+
+### Accepted product requirements from the current discussion
+- Ingestion/source management is a complete capability with AI optional.
+- Research projects should support configurable sources, topics and rules.
+- Automatic collection should operate independently of the Mac and browser.
+- Keep manual capture and analyst review, preserve origin and avoid silent loss.
+- Prefer complete functionality milestones with repository-based feedback.
+- AI provider, investing use case and future customer need not be chosen now.
+
+### Proposed technical decisions awaiting review
+Minimal owner authentication; server-side collection within the existing
+Supabase boundary; content reuse with project-local annotations; recoverable
+rule-based routing; curated source catalog. See
+[tradeoffs and recommendations](reviews/01-ingestion.md) and the
+[implementation brief](milestones/01-ingestion.md).
+
+No new runtime, database, access-control or hosting change was implemented.
+Older next-milestone deferrals below reflect the prototype's earlier sequence;
+the present planning direction is the ingestion package described above.
+
+
 # Purpose Of This Document
 
 This document records important architectural, structural, and strategic decisions made during development of FOUNDATION.

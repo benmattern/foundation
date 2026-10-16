@@ -1,5 +1,18 @@
 # FOUNDATION Schema
 
+## Schema assessment boundary — 2026-10-16
+
+No schema changes were made in this assessment. The repository has no executable
+migration baseline; this document describes expected tables, not a freshly
+verified live database. Actual constraints, policies and ownership must be
+obtained and reconciled before migration implementation.
+
+[Milestone 01](milestones/01-ingestion.md) proposes projects, subscriptions,
+collection runs, stable item identities, project annotations and access controls.
+None of those proposed schema additions should be read as current tables.
+See [assessment](reviews/01-ingestion.md) for current write/duplicate risks.
+
+
 # Purpose Of This Document
 
 This document defines the current and planned database schema direction for FOUNDATION.

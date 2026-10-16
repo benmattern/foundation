@@ -1,5 +1,22 @@
 # FOUNDATION Architecture
 
+## Architecture assessment — 2026-10-16
+
+Current-code findings: [ingestion assessment](reviews/01-ingestion.md).
+Proposed extension: [Milestone 01](milestones/01-ingestion.md).
+
+Accepted product direction: ingestion/source management remains useful with AI
+disabled. Sources, collection connectors and project subscriptions have distinct
+responsibilities. Research projects and scheduled collection are the next
+planning direction, not implemented capabilities.
+
+Current RSS orchestration is browser-side after server fetch/parse. The proposal
+moves collection persistence, duplicate enforcement and run history server-side,
+adds project-scoped rules/review state and establishes a verified migration and
+access-control baseline. These technical choices remain proposals for review.
+The older next-milestone menu below is superseded as a planning direction.
+
+
 ## Vision
 
 FOUNDATION is an OSINT-focused intelligence and monitoring platform designed to collect, organize, structure, filter, and analyze open-source information.

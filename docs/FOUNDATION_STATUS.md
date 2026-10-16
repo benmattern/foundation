@@ -1,5 +1,27 @@
 # FOUNDATION Current Status
 
+## Assessment update — 2026-10-16
+
+Reviewed main at 030030562e3bf6298005814ff56f78093631fc51.
+See [assessment and verification evidence](reviews/01-ingestion.md) and the
+[proposed implementation milestone](milestones/01-ingestion.md).
+The prior menu of possible next milestones below is historical; the current
+planning direction is project-aware automated ingestion, with AI optional.
+
+Code inspection confirms source/article/tag/event workflows, URL capture,
+RSS/Atom fetching, candidate staging and single-item review are present.
+RSS persistence and duplicate checks run in the browser; no scheduled collector,
+research projects, project subscriptions, persistent rule engine, or bulk
+review is implemented. Acceptance is sequential, not transactional.
+
+Verification this assessment: source inspection and isolated parser/URL probes.
+A clean install failed under Node 24.19.0/npm 11.9.0 on lockfile inconsistencies;
+build/lint were not run. No live Supabase/Render checks or database mutations.
+Statements of completed/live-tested behavior below are historical project
+reports, not new verification. Docs report disabled prototype RLS; actual hosted
+policies remain unverified. No migration history is tracked.
+
+
 ## Project Status
 
 FOUNDATION is currently in early Phase 1 development.

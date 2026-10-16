@@ -1,5 +1,24 @@
 # FOUNDATION Recovery Prompt
 
+## Latest handoff — 2026-10-16
+
+Read [root AGENTS.md](../AGENTS.md), the [assessment](reviews/01-ingestion.md)
+and [proposed milestone](milestones/01-ingestion.md) alongside these existing docs.
+These dated instructions supersede the older next-milestone menu in this file.
+
+The user wants complete functionality packages, beginning with effective
+ingestion/source management and optional AI later. Extend existing RSS/Atom,
+URL capture and Review Queue; do not rebuild capabilities that already exist.
+Projects, subscriptions, server-scheduled persistence, rules and bulk review
+are proposed. They are not implemented. Assessment-only documentation is the
+current completed assignment; implementation requires an active task.
+
+Reviewed baseline: 030030562e3bf6298005814ff56f78093631fc51.
+No live schema access, migrations or deployments were performed. Clean dependency
+installation failed on lockfile inconsistencies here, so no build/lint pass is
+claimed. Read the review report before assuming historical validation is current.
+
+
 You are assisting with FOUNDATION, an OSINT/intelligence platform currently in active development.
 
 FOUNDATION is designed as:

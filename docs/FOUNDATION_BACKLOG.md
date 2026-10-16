@@ -1,5 +1,25 @@
 # FOUNDATION Backlog
 
+## Current planning priority — 2026-10-16
+
+Assessment complete: [findings and limits](reviews/01-ingestion.md).
+Proposed next milestone: [project-aware automated ingestion](milestones/01-ingestion.md).
+The older next-milestone decision menu below is retained as history, not the
+active assignment. Implementation has not started.
+
+- [x] Inspect existing ingestion implementation and prepare repository handoff.
+- [ ] Review the proposed access, scheduling and data-scope choices.
+- [ ] Establish reproducible dependency/schema baseline.
+- [ ] Implement projects, subscriptions, server collection and run history.
+- [ ] Implement transparent rules, persistent tags and bulk review.
+- [ ] Verify migrations/access/concurrency and complete the demo.
+- [ ] Add optional AI assistance as a separate follow-on milestone.
+
+This packages related capabilities into a complete milestone; implement in
+small internal stages. AI, paid connectors and other data types are outside
+this first package. Historical completion claims below were not live-retested.
+
+
 # Current Development Philosophy
 
 The current development strategy for FOUNDATION is:
