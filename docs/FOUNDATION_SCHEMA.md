@@ -9,7 +9,7 @@ baseline 001 is corrected to the live semantics. Migration 002 removes only the
 two exact verified permissive prototype policies; unknown policies still stop.
 Migration 011 explicitly revokes API table/column grants (including TRUNCATE,
 which bypasses RLS) before redeclaring intended privileges. Hosted-default grants
-are now simulated in the SQL tests. Migrations 002?011 are applied in production; the reconciled baseline and all eleven versions are recorded in the ledger.
+are now simulated in the SQL tests. Migrations 002-011 are applied in production; the reconciled baseline and all eleven versions are recorded in the ledger.
 
 ## Local implementation update — 2026-10-16
 

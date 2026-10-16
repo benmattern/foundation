@@ -45,6 +45,8 @@ function run(name, args) {
   });
   if (result.error) throw result.error;
   if (result.status) {
+    const log = join(directory, "test.log");
+    if (existsSync(log)) process.stderr.write(readFileSync(log, "utf8"));
     throw new Error(
       `${name} exited with status ${result.status}; inspect the disposable cluster log.`,
     );
@@ -93,7 +95,7 @@ try {
     "-l",
     join(directory, "test.log"),
     "-o",
-    `-h 127.0.0.1 -p ${port} -F`,
+    `-h 127.0.0.1 -p ${port} -F${process.platform === "win32" ? "" : ` -k ${directory}`}`,
     "-w",
     "start",
   ]);

@@ -1,12 +1,12 @@
 # FOUNDATION Recovery Prompt
 
-## Production rollout ? 2026-10-16
+## Production rollout - 2026-10-16
 
 Deployment and use of the postgres role are authorized. The supplied owner UUID
 is verified against a confirmed Auth user.
 Schema/data logical backups succeeded and were restored into a disposable local
 PostgreSQL cluster. The captured live schema/data upgraded successfully with all
-legacy IDs and associations preserved. Production migrations 002?011 committed;
+legacy IDs and associations preserved. Production migrations 002-011 committed;
 the reconciled baseline and all eleven versions are recorded in the ledger.
 
 Production checks preserve 19 sources, 50 articles, 12 tags, 54 article-tag
@@ -21,9 +21,12 @@ Failures are recorded with retry/backoff; successful feeds continue independentl
 Local verification passes: 38 tests, six PostgreSQL concurrency scenarios,
 Edge browser workflow, Deno checks for all three functions, lint and production
 build without warnings. Actual-backup restore/upgrade rehearsal also passes.
-Frontend publication and Render verification remain outstanding. Render integration
-has been suggested but is not connected. End-user authenticated browser operation
-and an automatically triggered cron pass are not yet verified. No owner password
+Compatible dependency updates resolve all ten CI audit advisories (zero remaining).
+The Linux PostgreSQL harness now uses its own Unix socket directory, and CI
+actions use Node 24 runtimes. Frontend publication and Render verification remain outstanding. Render integration
+has been suggested but is not connected. An automatic cron invocation returned HTTP 200 without timeout. Hosted SQL role
+checks confirm owner visibility and isolation from another identity. End-user
+authenticated browser operation remains unverified. No owner password
 or user session has been requested or created. Private backup/credential artifacts
 remain ignored under .deployment.local and must never be printed or committed.
 
