@@ -1,5 +1,41 @@
 # FOUNDATION Backlog
 
+## Local implementation handoff — 2026-10-16
+
+Milestone 01 code, migrations and local verification now supersede the historical
+next-feature menu below. Finish hosted reconciliation and rollout validation
+before treating automated ingestion as operational:
+
+- [ ] Obtain policies, grants, functions/triggers and complete live schema inventory.
+- [ ] Verify the auth user UUID that should own legacy data.
+- [ ] Reconcile normalized legacy URL collisions without deleting research.
+- [ ] Repeat upgrade/access/concurrency checks on a disposable full Supabase stack.
+- [ ] Verify scheduler/runtime capacity and costs; authorize deployment separately.
+- [ ] Deploy matching migrations/functions/frontend, then verify browser-closed intake.
+- [ ] Validate DNS/egress behavior in the actual hosted runtime.
+
+No new AI, paid connectors, organization administration or graph work was added.
+
+## Current planning priority — 2026-10-16
+
+Assessment complete: [findings and limits](reviews/01-ingestion.md).
+Proposed next milestone: [project-aware automated ingestion](milestones/01-ingestion.md).
+The older next-milestone decision menu below is retained as history, not the
+active assignment. Implementation has not started.
+
+- [x] Inspect existing ingestion implementation and prepare repository handoff.
+- [ ] Review the proposed access, scheduling and data-scope choices.
+- [ ] Establish reproducible dependency/schema baseline.
+- [ ] Implement projects, subscriptions, server collection and run history.
+- [ ] Implement transparent rules, persistent tags and bulk review.
+- [ ] Verify migrations/access/concurrency and complete the demo.
+- [ ] Add optional AI assistance as a separate follow-on milestone.
+
+This packages related capabilities into a complete milestone; implement in
+small internal stages. AI, paid connectors and other data types are outside
+this first package. Historical completion claims below were not live-retested.
+
+
 # Current Development Philosophy
 
 The current development strategy for FOUNDATION is:

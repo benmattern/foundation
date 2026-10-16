@@ -1,3 +1,4 @@
+import { queryAll } from "./queryAll";
 import { supabase } from "../lib/supabaseClient";
 import type { Tag } from "../types/tag";
 
@@ -6,15 +7,10 @@ export type CreateTagInput = {
   description: string;
 };
 
-export async function getTags(): Promise<Tag[]> {
-  const { data, error } = await supabase
-    .from("tags")
-    .select("*")
-    .order("name", { ascending: true });
-
-  if (error) throw error;
-
-  return data ?? [];
+export function getTags(): Promise<Tag[]> {
+  return queryAll<Tag>((from, to) =>
+    supabase.from("tags").select("*").order("id").range(from, to)
+  );
 }
 
 export async function createTag(tag: CreateTagInput): Promise<Tag> {

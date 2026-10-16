@@ -1,0 +1,14 @@
+project_id = "foundation"
+
+# All three handlers perform their own verified-user authentication. The collector
+# also accepts a separate server-only scheduler secret; a publishable key is insufficient.
+[functions.collect-feeds]
+verify_jwt = false
+[functions.fetch-rss-feed]
+verify_jwt = false
+[functions.fetch-url-metadata]
+verify_jwt = false
+
+# Fictional seed requires an explicitly chosen existing auth user; it is opt-in.
+[db.seed]
+enabled = false

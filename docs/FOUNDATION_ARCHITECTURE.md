@@ -1,5 +1,178 @@
 # FOUNDATION Architecture
 
+## Production rollout - 2026-10-16
+
+Deployment and use of the postgres role are authorized. The supplied owner UUID
+is verified against a confirmed Auth user.
+Schema/data logical backups succeeded and were restored into a disposable local
+PostgreSQL cluster. The captured live schema/data upgraded successfully with all
+legacy IDs and associations preserved. Production migrations 002-011 committed;
+the reconciled baseline and all eleven versions are recorded in the ledger.
+
+Production checks preserve 19 sources, 50 articles, 12 tags, 54 article-tag
+links, six events, 19 article-event links, 213 preexisting candidates and five
+feeds. All public research tables have RLS; no API-role TRUNCATE grant remains.
+All three functions are deployed and anonymous POST requests return 401.
+Vault-backed five-minute pg_cron/pg_net scheduling is active. A server-authenticated
+collection pass returned 200: two feeds succeeded and staged 38 new candidates;
+three legacy feeds failed with upstream 403, timeout and DNS resolution errors.
+Failures are recorded with retry/backoff; successful feeds continue independently.
+
+Local verification passes: 38 tests, six PostgreSQL concurrency scenarios,
+Edge browser workflow, Deno checks for all three functions, lint and production
+build without warnings. Actual-backup restore/upgrade rehearsal also passes.
+Compatible dependency updates resolve all ten CI audit advisories (zero remaining).
+The Linux PostgreSQL harness now uses its own Unix socket directory, and CI
+actions use Node 24 runtimes. Frontend publication and Render verification remain outstanding. Render integration
+has been suggested but is not connected. An automatic cron invocation returned HTTP 200 without timeout. Hosted SQL role
+checks confirm owner visibility and isolation from another identity. End-user
+authenticated browser operation remains unverified. No owner password
+or user session has been requested or created. Private backup/credential artifacts
+remain ignored under .deployment.local and must never be printed or committed.
+
+## Ingestion implementation and operating procedure — 2026-10-16
+
+The current branch contains a local implementation of Milestone 01. Historical
+descriptions below are the pre-project prototype. No hosted migration, function
+deployment, scheduler activation or paid-plan change has been performed.
+
+### Data and execution
+
+`WorkspaceGate` authenticates an explicitly provisioned account and selects a
+private project. Pages use services; article/event/dashboard queries use that
+project. Shared acquisition evidence stays within an owner. Approved article
+records, edits, tag assignments and event associations belong to projects.
+
+The browser requests `collect-feeds`; it never persists RSS items. Manual and
+scheduled requests call the same collector. A verified Auth user must have an
+enabled subscription for manual checks. Scheduled requests use a separate
+server-only secret. `verify_jwt=false` delegates authentication to the handlers;
+it does not make ingestion anonymous. The two metadata fetchers also verify users.
+
+PostgreSQL claims a feed lease, deduplicates acquisitions/origins, checks current
+subscriptions, and stages project candidates atomically. Conditional-fetch
+validators are retained only after success. Pausing/re-enabling or editing a
+subscription invalidates them; intake generations prevent a stale completion
+from overwriting a newer subscription change. Partial/error runs retry with
+backoff, and stale workers cannot finish or publish after lease replacement.
+
+### Fresh local setup
+
+1. Use Node 24.13.0/npm 11.6.2 or a compatible Node 24/npm 11 release.
+2. Run `npm ci`, `npm run lint`, `npm run build`, `npm test`,
+   `npm run check:functions`, `npm run test:e2e`, and `npm run test:postgres`.
+   Browser tests use installed Edge on Windows; on Linux first run
+   `npx playwright install --with-deps chromium`. All browser APIs are mocked at
+   an invalid test hostname; tests never use `.env.local` hosted credentials.
+   `test:postgres` starts a fresh localhost-only cluster using binaries from
+   `PG_BIN` (default PostgreSQL 18 on Windows or 16 on Linux), tests separate
+   concurrent connections, then stops/removes its own unique cluster. It never
+   uses an existing server or database URL.
+3. For the full Supabase stack, install/start Docker, then `npx supabase start`
+   and `npx supabase db reset --local`. Automatic seeding is disabled.
+4. Provision a disposable Auth user. For fictional seeds, open a local PostgreSQL
+   session, set `app.demo_owner_id` to that verified local user UUID, then execute
+   `supabase/seed.sql`. The seed is repeatable and never deletes existing research.
+5. Copy `.env.example` to `.env.local` using the local URL/publishable key;
+   start the frontend and provision the Edge Function settings separately.
+   Run `npx supabase functions serve` for local handlers.
+
+### Existing hosted upgrade (requires authorization)
+
+1. Back up database/data and obtain a schema-only export plus the output of
+   `supabase/ops/schema-inventory.sql`. The provided table-only export is partial:
+   grants, policies, routines, triggers and runtime availability remain unknown.
+2. Compare the live objects to baseline 001, reconcile policy/grant/function
+   differences, inspect exact/normalized URL collisions, and verify the legacy
+   Auth owner UUID. Repeat the upgrade on a disposable database with real-shaped
+   sanitized data; inspect article/tag/event/candidate links before and after.
+3. Never run baseline 001 against existing tables. The prepared `upgrade.psql`
+   runs migrations 002–010 in a single transaction using an explicitly supplied
+   `legacy_owner_id` psql variable. Review it before use. Migration 002 refuses
+   to assign legacy data without a matching `auth.users` row and refuses unknown
+   existing policies. Do not bypass those guards without reconciliation.
+4. After successful validation, reconcile the Supabase migration ledger with
+   `supabase migration repair --status applied <version>` for each installed
+   version, including the verified baseline. Do not replay applied SQL.
+5. Deploy all three Edge Functions from their pinned Deno configurations. Set a
+   strong `INGESTION_SCHEDULER_SECRET` server-side. Never put the service role or
+   scheduler secret into a `VITE_` variable or browser request.
+6. Verify pg_cron, pg_net and Vault availability against the actual plan. Store
+   `foundation_project_url` and `foundation_scheduler_secret` in Vault; the latter
+   matches the Edge secret. Review/apply `supabase/ops/schedule.sql` only after
+   an authorized manual collection succeeds. This follows the
+   [Supabase scheduling guidance](https://supabase.com/docs/guides/functions/schedule-functions).
+7. Deploy the frontend only with the matching database/functions. Test anonymous,
+   owner A/owner B, two projects, manual URL fallback, article/events, source
+   pause, subscription resume, bulk conflicts and scheduler runs without a browser.
+
+### Defaults, limits and monitoring
+
+Dispatcher cadence: every five minutes (288 invocations/day), up to five due
+feeds per invocation; normal polling is hourly. This allows at most 1,440 feed
+attempts/day before runtime limits, failures and manual requests. Each feed is
+capped at 1 MiB/50 items; each feed supports up to 100 enabled project
+subscriptions. HTTP hops use five-second timeouts and at most three redirects;
+DNS uses a five-second deadline, database HTTP calls ten seconds. Work stops
+starting new items after the per-feed/overall budget and records a retryable
+partial outcome. A feed lease expires after four minutes. Backoff starts at five
+minutes and is capped by the exponent at 1,280 minutes. Finite windows can miss
+older publisher items; no complete backfill is promised.
+
+Success means every usable item in the supported 50-item window was persisted or
+deduplicated. A documented item-window warning does not trigger failure backoff;
+malformed/oversized XML, invalid-item skips and staging failures do. This avoids
+progressively delaying healthy publishers whose feeds contain more than 50 items.
+
+Rows/history are retained indefinitely by default; no purge is scheduled. UI
+history shows bounded recent samples. Track storage growth, oldest due feed,
+expired leases, partial/error runs, `last_success_at`, pg_cron job results and
+pg_net HTTP responses. Successful scheduling SQL only proves dispatch, not that
+an Edge Function collected successfully. No live cost estimate or plan capacity
+has been verified. Confirm those before activation.
+
+URL guards reject private/reserved literals, mapped IPv6, unsafe DNS answers and
+unsafe redirects. DNS validation and the runtime's subsequent connection remain
+separate; DNS rebinding/egress enforcement needs verification in the hosted
+runtime before treating these checks as a network isolation guarantee.
+
+### Disable and rollback
+
+Disable the scheduler with `select cron.unschedule('foundation-ingestion');`.
+Pause subscriptions or archive projects to stop publishing new candidates while
+retaining history. Do not roll back to the anonymous frontend against the new
+access-controlled schema. For an application rollback, keep authentication/RLS
+and disable intake. For a database rollback, restore the verified pre-upgrade
+backup into a separate instance and validate before cutover; there is no
+destructive down migration that discards newly collected research.
+
+### Demo without AI
+
+Sign in; create two projects; add a source/feed or enable a catalog entry; enable
+different subscriptions/rules; preview a sample; collect manually; inspect
+Pending/Outside scope and reasons; save tags; bulk review; restore rejected
+material; accept with retry; confirm another project and its event tags are
+unchanged. Pause/re-enable, inspect run history and repeat collection to check
+deduplication. After authorized scheduling, close all browsers and verify a later
+run/candidate from the backend. The final hosted step has not been executed here.
+
+## Architecture assessment — 2026-10-16
+
+Current-code findings: [ingestion assessment](reviews/01-ingestion.md).
+Proposed extension: [Milestone 01](milestones/01-ingestion.md).
+
+Accepted product direction: ingestion/source management remains useful with AI
+disabled. Sources, collection connectors and project subscriptions have distinct
+responsibilities. Research projects and scheduled collection are the next
+planning direction, not implemented capabilities.
+
+Current RSS orchestration is browser-side after server fetch/parse. The proposal
+moves collection persistence, duplicate enforcement and run history server-side,
+adds project-scoped rules/review state and establishes a verified migration and
+access-control baseline. These technical choices remain proposals for review.
+The older next-milestone menu below is superseded as a planning direction.
+
+
 ## Vision
 
 FOUNDATION is an OSINT-focused intelligence and monitoring platform designed to collect, organize, structure, filter, and analyze open-source information.

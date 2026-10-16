@@ -1,5 +1,83 @@
 # FOUNDATION Current Status
 
+## Production rollout - 2026-10-16
+
+Deployment and use of the postgres role are authorized. The supplied owner UUID
+is verified against a confirmed Auth user.
+Schema/data logical backups succeeded and were restored into a disposable local
+PostgreSQL cluster. The captured live schema/data upgraded successfully with all
+legacy IDs and associations preserved. Production migrations 002-011 committed;
+the reconciled baseline and all eleven versions are recorded in the ledger.
+
+Production checks preserve 19 sources, 50 articles, 12 tags, 54 article-tag
+links, six events, 19 article-event links, 213 preexisting candidates and five
+feeds. All public research tables have RLS; no API-role TRUNCATE grant remains.
+All three functions are deployed and anonymous POST requests return 401.
+Vault-backed five-minute pg_cron/pg_net scheduling is active. A server-authenticated
+collection pass returned 200: two feeds succeeded and staged 38 new candidates;
+three legacy feeds failed with upstream 403, timeout and DNS resolution errors.
+Failures are recorded with retry/backoff; successful feeds continue independently.
+
+Local verification passes: 38 tests, six PostgreSQL concurrency scenarios,
+Edge browser workflow, Deno checks for all three functions, lint and production
+build without warnings. Actual-backup restore/upgrade rehearsal also passes.
+Compatible dependency updates resolve all ten CI audit advisories (zero remaining).
+The Linux PostgreSQL harness now uses its own Unix socket directory, and CI
+actions use Node 24 runtimes. Frontend publication and Render verification remain outstanding. Render integration
+has been suggested but is not connected. An automatic cron invocation returned HTTP 200 without timeout. Hosted SQL role
+checks confirm owner visibility and isolation from another identity. End-user
+authenticated browser operation remains unverified. No owner password
+or user session has been requested or created. Private backup/credential artifacts
+remain ignored under .deployment.local and must never be printed or committed.
+
+## Implementation update — 2026-10-16
+
+Milestone 01 is implemented locally on `docs/ingestion-assessment-2026-10-16`
+after the owner approved the review recommendations. The current working-tree
+changes extend reviewed commit `f87efb718ddc8c801d0f399dc7e12027e4284e1c`.
+
+Implemented: authenticated private projects, project-scoped approved articles/
+events/dashboard, shared acquisition evidence within an owner, guarded legacy
+migrations, RLS/composite foreign keys, transactional review/article/event writes,
+durable candidate tags, deterministic versioned rules, explainable routing,
+explicit rule reapplication, page-scoped bulk operations with durable results,
+server search/count/pagination, source catalog/subscriptions and backend collection
+with leases, retries, conditional fetch and run history. Parser and URL guards
+are hardened; existing lint errors/dependency warnings and bundle warning fixed.
+
+Local evidence and exact final commands/results are maintained in
+`reviews/01-ingestion.md`. Unit/component/database tests use embedded PostgreSQL;
+browser tests run Edge against mocked APIs. All three Edge Functions are checked
+with Deno separately from the frontend. No AI is configured or required.
+
+Hosted verification remains outstanding: verified legacy owner UUID,
+Supabase Auth/PostgREST integration, remaining function deployments, scheduler
+capability/cost validation and browser-closed collection. Live inventory and
+collector endpoint staging are complete as recorded above. Historical
+implementation/live-validation statements below refer to the earlier prototype.
+
+## Assessment update — 2026-10-16
+
+Reviewed main at 030030562e3bf6298005814ff56f78093631fc51.
+See [assessment and verification evidence](reviews/01-ingestion.md) and the
+[proposed implementation milestone](milestones/01-ingestion.md).
+The prior menu of possible next milestones below is historical; the current
+planning direction is project-aware automated ingestion, with AI optional.
+
+Code inspection confirms source/article/tag/event workflows, URL capture,
+RSS/Atom fetching, candidate staging and single-item review are present.
+RSS persistence and duplicate checks run in the browser; no scheduled collector,
+research projects, project subscriptions, persistent rule engine, or bulk
+review is implemented. Acceptance is sequential, not transactional.
+
+Verification this assessment: source inspection and isolated parser/URL probes.
+A clean install failed under Node 24.19.0/npm 11.9.0 on lockfile inconsistencies;
+build/lint were not run. No live Supabase/Render checks or database mutations.
+Statements of completed/live-tested behavior below are historical project
+reports, not new verification. Docs report disabled prototype RLS; actual hosted
+policies remain unverified. No migration history is tracked.
+
+
 ## Project Status
 
 FOUNDATION is currently in early Phase 1 development.

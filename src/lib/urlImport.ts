@@ -22,6 +22,13 @@ export function normalizeImportUrl(value: string): string {
     throw new Error("Enter a URL to import.");
   }
 
+  if (
+    /^[a-z][a-z\d+.-]*:/i.test(trimmedValue) &&
+    !/^https?:\/\//i.test(trimmedValue)
+  ) {
+    throw new Error("Only http and https URLs can be imported.");
+  }
+
   const valueWithProtocol = /^https?:\/\//i.test(trimmedValue)
     ? trimmedValue
     : `https://${trimmedValue}`;
@@ -29,6 +36,10 @@ export function normalizeImportUrl(value: string): string {
 
   if (url.protocol !== "http:" && url.protocol !== "https:") {
     throw new Error("Only http and https URLs can be imported.");
+  }
+
+  if (url.username || url.password) {
+    throw new Error("URLs containing credentials cannot be imported.");
   }
 
   trackingParams.forEach((param) => url.searchParams.delete(param));
@@ -53,7 +64,7 @@ export function createUrlImportResult(params: {
 
 function findDuplicateArticle(
   normalizedUrl: string,
-  articles: ArticleWithTags[]
+  articles: ArticleWithTags[],
 ): ArticleWithTags | null {
   return (
     articles.find((article) => {
@@ -68,7 +79,7 @@ function findDuplicateArticle(
 
 function findMatchingSource(
   normalizedUrl: string,
-  sources: Source[]
+  sources: Source[],
 ): Source | null {
   const importedHostname = getComparableHostname(normalizedUrl);
 

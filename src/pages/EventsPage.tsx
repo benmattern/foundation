@@ -13,10 +13,7 @@ import type {
   EventStatus,
   FoundationEventWithArticles,
 } from "../types/event";
-import {
-  getEventDate,
-  getLastActivityDate,
-} from "../lib/eventMetrics";
+import { getEventDate, getLastActivityDate } from "../lib/eventMetrics";
 import {
   createEvent as createEventRecord,
   getEventsWithArticles,
@@ -29,8 +26,9 @@ export default function EventsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<"" | EventStatus>("");
   const [selectedEventType, setSelectedEventType] = useState("");
-  const [selectedSort, setSelectedSort] =
-    useState<EventSortOption>("newest_activity");
+  const [selectedSort, setSelectedSort] = useState<EventSortOption>(
+    "newest_activity",
+  );
 
   const normalizedSearchQuery = searchQuery.trim().toLowerCase();
   const eventListItems = events.map<EventListItem>((event) => ({
@@ -40,16 +38,15 @@ export default function EventsPage() {
   }));
 
   const filteredEvents = eventListItems.filter((event) => {
-    const matchesSearch =
-      normalizedSearchQuery === "" ||
+    const matchesSearch = normalizedSearchQuery === "" ||
       event.title.toLowerCase().includes(normalizedSearchQuery) ||
       (event.description ?? "").toLowerCase().includes(normalizedSearchQuery);
 
-    const matchesStatus =
-      selectedStatus === "" || event.status === selectedStatus;
+    const matchesStatus = selectedStatus === "" ||
+      event.status === selectedStatus;
 
-    const matchesEventType =
-      selectedEventType === "" || event.event_type === selectedEventType;
+    const matchesEventType = selectedEventType === "" ||
+      event.event_type === selectedEventType;
 
     return matchesSearch && matchesStatus && matchesEventType;
   });
@@ -78,7 +75,22 @@ export default function EventsPage() {
   }
 
   useEffect(() => {
-    loadEventsPageData();
+    let active = true;
+    Promise.all([getEventsWithArticles(), getArticles()]).then(
+      ([eventData, articleData]) => {
+        if (active) {
+          setEvents(eventData);
+          setArticles(articleData);
+        }
+      },
+    ).catch((error: unknown) => {
+      if (active) console.error(error);
+    }).finally(() => {
+      if (active) setLoading(false);
+    });
+    return () => {
+      active = false;
+    };
   }, []);
 
   async function createEvent(event: EventFormValues) {
@@ -87,6 +99,7 @@ export default function EventsPage() {
       await loadEventsPageData();
     } catch (error) {
       console.error("Error creating event:", error);
+      throw error;
     }
   }
 
@@ -97,42 +110,42 @@ export default function EventsPage() {
         description="Create and manage analyst-defined developments linked to source articles."
       />
 
-      {loading ? (
-        <p className="text-slate-400">Loading events...</p>
-      ) : (
-        <div className="space-y-6">
-          <EventStatusOverview events={events} />
+      {loading
+        ? <p className="text-slate-400">Loading events...</p>
+        : (
+          <div className="space-y-6">
+            <EventStatusOverview events={events} />
 
-          <EventFilters
-            searchQuery={searchQuery}
-            selectedStatus={selectedStatus}
-            selectedEventType={selectedEventType}
-            selectedSort={selectedSort}
-            resultCount={sortedEvents.length}
-            totalCount={events.length}
-            onSearchQueryChange={setSearchQuery}
-            onSelectedStatusChange={setSelectedStatus}
-            onSelectedEventTypeChange={setSelectedEventType}
-            onSelectedSortChange={setSelectedSort}
-            onClearFilters={clearFilters}
-          />
-
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-            <EventForm articles={articles} onSubmit={createEvent} />
-            <EventList
-              events={sortedEvents}
-              emptyMessage="No events match the current filters."
+            <EventFilters
+              searchQuery={searchQuery}
+              selectedStatus={selectedStatus}
+              selectedEventType={selectedEventType}
+              selectedSort={selectedSort}
+              resultCount={sortedEvents.length}
+              totalCount={events.length}
+              onSearchQueryChange={setSearchQuery}
+              onSelectedStatusChange={setSelectedStatus}
+              onSelectedEventTypeChange={setSelectedEventType}
+              onSelectedSortChange={setSelectedSort}
+              onClearFilters={clearFilters}
             />
+
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+              <EventForm articles={articles} onSubmit={createEvent} />
+              <EventList
+                events={sortedEvents}
+                emptyMessage="No events match the current filters."
+              />
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </>
   );
 }
 
 function sortEvents(
   events: EventListItem[],
-  sortOption: EventSortOption
+  sortOption: EventSortOption,
 ): EventListItem[] {
   return [...events].sort((a, b) => {
     if (sortOption === "most_supporting_articles") {

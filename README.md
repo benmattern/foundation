@@ -1,5 +1,32 @@
 # FOUNDATION
 
+## Ingestion implementation — 2026-10-16
+
+The current branch adds authenticated projects, server-owned ingestion,
+subscriptions/rules, transactional review, bulk actions and migration history.
+Database migrations, all three functions and server scheduling are deployed.
+Frontend rollout and authenticated browser verification remain pending. The older planning
+and prototype descriptions below are historical.
+
+Use Node 24/npm 11, then run `npm ci`, `npm run lint`, `npm run build`,
+`npm test`, `npm run check:functions`, and `npm run test:e2e`.
+The browser test uses Edge on Windows or installed Playwright Chromium on Linux,
+with mocked APIs. Full local Supabase needs Docker; hosted upgrades additionally
+need schema/policy reconciliation and a verified legacy owner UUID.
+See [operating procedures](docs/FOUNDATION_ARCHITECTURE.md),
+[implementation evidence](docs/reviews/01-ingestion.md) and [AGENTS.md](AGENTS.md).
+
+## Current planning update — 2026-10-16
+
+A repository assessment is available in [docs/reviews/01-ingestion.md](docs/reviews/01-ingestion.md).
+The proposed next package is [project-aware automated ingestion](docs/milestones/01-ingestion.md):
+a complete collection/review workflow with optional AI enhancements later.
+Read [AGENTS.md](AGENTS.md) before implementation.
+The feature descriptions below reflect the existing prototype; scheduling and
+research projects have not been implemented. Historical live-validation claims
+below have not been independently repeated in this assessment.
+
+
 FOUNDATION is an early-stage OSINT and geopolitical analysis platform inspired by Asimov's Foundation. It is designed to collect, organize, tag, filter, and analyze open-source information, with an initial focus on the Taiwan region and related Indo-Pacific, semiconductor, maritime, supply-chain, and technology issues.
 
 The project is currently in Phase 1: building a clear, reliable intelligence data foundation before adding advanced automation or AI-assisted workflows.

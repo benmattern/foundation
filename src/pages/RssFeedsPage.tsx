@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { PageHeader } from "../components/PageHeader";
+import { Subscriptions } from "../components/Subscriptions";
 import { RssFeedForm } from "../components/RssFeedForm";
 import { RssFeedList } from "../components/RssFeedList";
 import { RssFetchSummary } from "../components/RssFetchSummary";
@@ -11,15 +12,19 @@ import {
   updateRssFeed,
   type UpsertRssFeedInput,
 } from "../services/rssFeedService";
-import type { RssFeed, RssFetchSummary as RssFetchSummaryType } from "../types/rssFeed";
+import type {
+  RssFeed,
+  RssFetchSummary as RssFetchSummaryType,
+} from "../types/rssFeed";
 import type { Source } from "../types/source";
 
 export default function RssFeedsPage() {
   const [feeds, setFeeds] = useState<RssFeed[]>([]);
   const [sources, setSources] = useState<Source[]>([]);
   const [feedToEdit, setFeedToEdit] = useState<RssFeed | null>(null);
-  const [latestSummary, setLatestSummary] =
-    useState<RssFetchSummaryType | null>(null);
+  const [latestSummary, setLatestSummary] = useState<
+    RssFetchSummaryType | null
+  >(null);
   const [fetchingFeedId, setFetchingFeedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -36,7 +41,7 @@ export default function RssFeedsPage() {
 
       if (feedToEdit) {
         setFeedToEdit(
-          feedData.find((feed) => feed.id === feedToEdit.id) ?? null
+          feedData.find((feed) => feed.id === feedToEdit.id) ?? null,
         );
       }
     } catch (error) {
@@ -48,7 +53,25 @@ export default function RssFeedsPage() {
   }
 
   useEffect(() => {
-    loadPageData();
+    let active = true;
+    Promise.all([getRssFeeds(), getSources()]).then(
+      ([feedData, sourceData]) => {
+        if (active) {
+          setFeeds(feedData);
+          setSources(sourceData);
+        }
+      },
+    ).catch((error: unknown) => {
+      if (active) {
+        console.error(error);
+        setErrorMessage("Unable to load RSS feeds.");
+      }
+    }).finally(() => {
+      if (active) setLoading(false);
+    });
+    return () => {
+      active = false;
+    };
   }, []);
 
   async function saveFeed(feed: UpsertRssFeedInput) {
@@ -66,8 +89,9 @@ export default function RssFeedsPage() {
     } catch (error) {
       console.error("Error saving RSS feed:", error);
       setErrorMessage(
-        error instanceof Error ? error.message : "Unable to save RSS feed."
+        error instanceof Error ? error.message : "Unable to save RSS feed.",
       );
+      throw error;
     }
   }
 
@@ -82,7 +106,7 @@ export default function RssFeedsPage() {
     } catch (error) {
       console.error("Error fetching RSS feed:", error);
       setErrorMessage(
-        error instanceof Error ? error.message : "Unable to fetch RSS feed."
+        error instanceof Error ? error.message : "Unable to fetch RSS feed.",
       );
     } finally {
       setFetchingFeedId(null);
@@ -96,38 +120,39 @@ export default function RssFeedsPage() {
         description="Manage RSS feeds and send new feed items to the Review Queue."
       />
 
-      {loading ? (
-        <p className="text-slate-400">Loading RSS feeds...</p>
-      ) : (
-        <div className="space-y-6">
-          {errorMessage && (
-            <div className="rounded-xl border border-red-900/50 bg-red-950/30 p-4 text-sm text-red-300">
-              {errorMessage}
-            </div>
-          )}
+      {loading
+        ? <p className="text-slate-400">Loading RSS feeds...</p>
+        : (
+          <div className="space-y-6">
+            <Subscriptions feeds={feeds} revision={feeds} />
+            {errorMessage && (
+              <div className="rounded-xl border border-red-900/50 bg-red-950/30 p-4 text-sm text-red-300">
+                {errorMessage}
+              </div>
+            )}
 
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,420px)_1fr]">
-            <RssFeedForm
-              feedToEdit={feedToEdit}
-              sources={sources}
-              onSubmit={saveFeed}
-              onCancelEdit={() => setFeedToEdit(null)}
-            />
-
-            <div className="space-y-6">
-              <RssFeedList
-                feeds={feeds}
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,420px)_1fr]">
+              <RssFeedForm
+                feedToEdit={feedToEdit}
                 sources={sources}
-                fetchingFeedId={fetchingFeedId}
-                onEditFeed={setFeedToEdit}
-                onFetchFeed={fetchFeed}
+                onSubmit={saveFeed}
+                onCancelEdit={() => setFeedToEdit(null)}
               />
 
-              <RssFetchSummary summary={latestSummary} />
+              <div className="space-y-6">
+                <RssFeedList
+                  feeds={feeds}
+                  sources={sources}
+                  fetchingFeedId={fetchingFeedId}
+                  onEditFeed={setFeedToEdit}
+                  onFetchFeed={fetchFeed}
+                />
+
+                <RssFetchSummary summary={latestSummary} />
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
     </>
   );
 }

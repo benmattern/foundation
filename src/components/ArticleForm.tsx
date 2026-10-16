@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { Card } from "./ui/Card";
 import type { ArticleWithTags } from "../types/article";
 import type { Source } from "../types/source";
@@ -31,7 +31,16 @@ function formatDateForInput(date: string | null): string {
   return date.slice(0, 10);
 }
 
-export function ArticleForm({
+export function ArticleForm(props: Props) {
+  return (
+    <ArticleFormFields
+      key={JSON.stringify([props.initialArticle, props.initialDraft])}
+      {...props}
+    />
+  );
+}
+
+function ArticleFormFields({
   sources,
   tags,
   mode = "create",
@@ -40,32 +49,30 @@ export function ArticleForm({
   onSubmit,
   onCancel,
 }: Props) {
-  const [sourceId, setSourceId] = useState("");
-  const [title, setTitle] = useState("");
-  const [url, setUrl] = useState("");
-  const [summary, setSummary] = useState("");
-  const [publishedAt, setPublishedAt] = useState("");
-  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+  const [sourceId, setSourceId] = useState(() =>
+    initialArticle?.source_id ?? initialDraft?.source_id ?? ""
+  );
+  const [title, setTitle] = useState(() =>
+    initialArticle?.title ?? initialDraft?.title ?? ""
+  );
+  const [url, setUrl] = useState(() =>
+    initialArticle?.url ?? initialDraft?.url ?? ""
+  );
+  const [summary, setSummary] = useState(() =>
+    initialArticle?.summary ?? initialDraft?.summary ?? ""
+  );
+  const [publishedAt, setPublishedAt] = useState(() =>
+    initialArticle
+      ? formatDateForInput(initialArticle.published_at)
+      : initialDraft?.published_at ?? ""
+  );
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(() =>
+    initialArticle?.tags.map((tag) => tag.id) ?? initialDraft?.tag_ids ?? []
+  );
+  const submitting = useRef(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
   const isEditing = mode === "edit";
-
-  useEffect(() => {
-    if (!initialArticle) {
-      setSourceId(initialDraft?.source_id ?? "");
-      setTitle(initialDraft?.title ?? "");
-      setUrl(initialDraft?.url ?? "");
-      setSummary(initialDraft?.summary ?? "");
-      setPublishedAt(initialDraft?.published_at ?? "");
-      setSelectedTagIds(initialDraft?.tag_ids ?? []);
-      return;
-    }
-
-    setSourceId(initialArticle.source_id ?? "");
-    setTitle(initialArticle.title);
-    setUrl(initialArticle.url);
-    setSummary(initialArticle.summary ?? "");
-    setPublishedAt(formatDateForInput(initialArticle.published_at));
-    setSelectedTagIds(initialArticle.tags.map((tag) => tag.id));
-  }, [initialArticle, initialDraft]);
 
   function toggleTag(tagId: string) {
     setSelectedTagIds((prev) =>
@@ -78,28 +85,44 @@ export function ArticleForm({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    await onSubmit({
-      source_id: sourceId || null,
-      title,
-      url,
-      summary,
-      published_at: publishedAt,
-      tag_ids: selectedTagIds,
-    });
+    if (submitting.current) return;
+    submitting.current = true;
+    setBusy(true);
+    setError("");
+    try {
+      await onSubmit({
+        source_id: sourceId || null,
+        title,
+        url,
+        summary,
+        published_at: publishedAt,
+        tag_ids: selectedTagIds,
+      });
 
-    if (!isEditing) {
-      setTitle("");
-      setUrl("");
-      setSummary("");
-      setPublishedAt("");
-      setSourceId("");
-      setSelectedTagIds([]);
+      if (!isEditing) {
+        setTitle("");
+        setUrl("");
+        setSummary("");
+        setPublishedAt("");
+        setSourceId("");
+        setSelectedTagIds([]);
+      }
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Save failed. Your edits are preserved.",
+      );
+    } finally {
+      submitting.current = false;
+      setBusy(false);
     }
   }
 
   return (
     <Card className="p-8">
       <form onSubmit={handleSubmit} className="space-y-6">
+        {error && <p role="alert" className="text-red-300">{error}</p>}
         <div>
           <h2 className="text-2xl font-semibold text-white">
             {isEditing ? "Edit Article" : "Add Article"}
@@ -113,7 +136,6 @@ export function ArticleForm({
         </div>
 
         <div className="space-y-4">
-          
           <select
             className={`w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
               sourceId ? "text-white" : "text-slate-500"
@@ -128,8 +150,8 @@ export function ArticleForm({
                 {source.name}
               </option>
             ))}
-          </select>          
-          
+          </select>
+
           <input
             className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Title"
@@ -196,6 +218,8 @@ export function ArticleForm({
 
         <div className="flex flex-wrap gap-3">
           <button
+            type="submit"
+            disabled={busy}
             className="rounded-lg bg-slate-200 px-4 py-2 font-medium text-slate-900 transition hover:bg-white"
           >
             {isEditing ? "Save Changes" : "Add Article"}

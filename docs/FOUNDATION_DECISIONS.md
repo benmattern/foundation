@@ -1,5 +1,65 @@
 # FOUNDATION Architectural Decisions
 
+## Implementation decisions — 2026-10-16
+
+The owner instructed implementation to proceed with the review recommendations.
+These choices supersede the historical prototype descriptions below:
+
+- Authenticated owners have multiple private projects. Accounts are explicitly
+  provisioned; there is no public signup or automatic legacy-data claiming.
+- Acquired evidence is reused within an owner in `collected_items`; approved
+  `articles` remain project-specific editable records. This preserves existing
+  article IDs and event links and avoids shared analyst edits. Removing an
+  article removes its project approval/links, retains acquisition evidence, and
+  leaves its candidate recoverable. It does not delete another project's article.
+- Events and dashboards operate within the active project. Sources/feed
+  definitions and tag vocabulary are owner-wide; assignments, review decisions,
+  event links, rule results and subscriptions are project-specific.
+- Manual capture requires a project and uses the same durable item identity.
+  Explicit manual capture starts pending (or links an existing project approval);
+  it remains available when metadata retrieval fails. Direct analyst-approved
+  article creation remains supported through a transaction.
+- Feed GUID/Atom IDs identify origins; normalized URLs identify reusable
+  acquisitions. Later observations never replace original acquisition fields or
+  analyst edits and never silently reopen a reviewed candidate.
+- Rule phrases use Unicode NFKC, lowercase, collapsed whitespace and literal
+  substrings; no regex/stemming/word-boundary inference. Categories match
+  independently. Empty lists explicitly override defaults; null inherits.
+- Reapplication is explicit, only processes pending candidates, and retains
+  analyst additions/removals, edited fields and routing overrides. Every changed
+  rule result is retained in evaluation history.
+- Default scheduling is a five-minute dispatcher, up to five due feeds, hourly
+  successful feed polling, bounded runtime and exponential failure backoff.
+  Subscription changes invalidate validators and force a current-window check.
+- Original evidence, observations, outside-scope candidates, review history and
+  runs have no automatic deletion policy in v1. Monitor storage; retention changes
+  require an explicit follow-up decision. No paid service was enabled.
+- Hosted mutations remain unperformed. The supplied table-only export supports
+  the reconstructed baseline; it does not establish live grants, policies,
+  functions or operational availability.
+
+## Direction update — 2026-10-16
+
+### Accepted product requirements from the current discussion
+- Ingestion/source management is a complete capability with AI optional.
+- Research projects should support configurable sources, topics and rules.
+- Automatic collection should operate independently of the Mac and browser.
+- Keep manual capture and analyst review, preserve origin and avoid silent loss.
+- Prefer complete functionality milestones with repository-based feedback.
+- AI provider, investing use case and future customer need not be chosen now.
+
+### Proposed technical decisions awaiting review
+Minimal owner authentication; server-side collection within the existing
+Supabase boundary; content reuse with project-local annotations; recoverable
+rule-based routing; curated source catalog. See
+[tradeoffs and recommendations](reviews/01-ingestion.md) and the
+[implementation brief](milestones/01-ingestion.md).
+
+No new runtime, database, access-control or hosting change was implemented.
+Older next-milestone deferrals below reflect the prototype's earlier sequence;
+the present planning direction is the ingestion package described above.
+
+
 # Purpose Of This Document
 
 This document records important architectural, structural, and strategic decisions made during development of FOUNDATION.

@@ -1,5 +1,73 @@
 # FOUNDATION Recovery Prompt
 
+## Production rollout - 2026-10-16
+
+Deployment and use of the postgres role are authorized. The supplied owner UUID
+is verified against a confirmed Auth user.
+Schema/data logical backups succeeded and were restored into a disposable local
+PostgreSQL cluster. The captured live schema/data upgraded successfully with all
+legacy IDs and associations preserved. Production migrations 002-011 committed;
+the reconciled baseline and all eleven versions are recorded in the ledger.
+
+Production checks preserve 19 sources, 50 articles, 12 tags, 54 article-tag
+links, six events, 19 article-event links, 213 preexisting candidates and five
+feeds. All public research tables have RLS; no API-role TRUNCATE grant remains.
+All three functions are deployed and anonymous POST requests return 401.
+Vault-backed five-minute pg_cron/pg_net scheduling is active. A server-authenticated
+collection pass returned 200: two feeds succeeded and staged 38 new candidates;
+three legacy feeds failed with upstream 403, timeout and DNS resolution errors.
+Failures are recorded with retry/backoff; successful feeds continue independently.
+
+Local verification passes: 38 tests, six PostgreSQL concurrency scenarios,
+Edge browser workflow, Deno checks for all three functions, lint and production
+build without warnings. Actual-backup restore/upgrade rehearsal also passes.
+Compatible dependency updates resolve all ten CI audit advisories (zero remaining).
+The Linux PostgreSQL harness now uses its own Unix socket directory, and CI
+actions use Node 24 runtimes. Frontend publication and Render verification remain outstanding. Render integration
+has been suggested but is not connected. An automatic cron invocation returned HTTP 200 without timeout. Hosted SQL role
+checks confirm owner visibility and isolation from another identity. End-user
+authenticated browser operation remains unverified. No owner password
+or user session has been requested or created. Private backup/credential artifacts
+remain ignored under .deployment.local and must never be printed or committed.
+
+## Current implementation handoff — 2026-10-16
+
+The owner approved proceeding with the ingestion review recommendations and
+requested fixing errors/warnings with thorough tests. The branch now contains
+local Milestone 01 implementation beyond the original documentation commit
+`f87efb718ddc8c801d0f399dc7e12027e4284e1c`. Read the latest implementation sections
+of FOUNDATION_STATUS, FOUNDATION_ARCHITECTURE, FOUNDATION_SCHEMA,
+FOUNDATION_DECISIONS, and `reviews/01-ingestion.md`; the older prototype sections
+below are historical.
+
+The owner supplied table-only SQL context. Migrations reconstruct that baseline
+for fresh installs; an existing-data upgrade is explicitly gated on verified
+legacy ownership and reconciliation of live policies/grants/functions. The
+legacy owner UUID has not been supplied. No database was changed or function
+deployed on Supabase. Local tests use PGlite; browser API traffic is mocked to an
+invalid hostname. Six separate-connection contention scenarios passed against a
+disposable PostgreSQL 18 cluster. Hosted scheduling remains unverified. See the
+existing architecture doc for setup, limits and rollout steps.
+
+## Latest handoff — 2026-10-16
+
+Read [root AGENTS.md](../AGENTS.md), the [assessment](reviews/01-ingestion.md)
+and [proposed milestone](milestones/01-ingestion.md) alongside these existing docs.
+These dated instructions supersede the older next-milestone menu in this file.
+
+The user wants complete functionality packages, beginning with effective
+ingestion/source management and optional AI later. Extend existing RSS/Atom,
+URL capture and Review Queue; do not rebuild capabilities that already exist.
+Projects, subscriptions, server-scheduled persistence, rules and bulk review
+are proposed. They are not implemented. Assessment-only documentation is the
+current completed assignment; implementation requires an active task.
+
+Reviewed baseline: 030030562e3bf6298005814ff56f78093631fc51.
+No live schema access, migrations or deployments were performed. Clean dependency
+installation failed on lockfile inconsistencies here, so no build/lint pass is
+claimed. Read the review report before assuming historical validation is current.
+
+
 You are assisting with FOUNDATION, an OSINT/intelligence platform currently in active development.
 
 FOUNDATION is designed as:

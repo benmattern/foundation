@@ -8,6 +8,7 @@ const navItems = [
   { label: "Events", to: "/events" },
   { label: "Ingestion", to: "/ingestion" },
   { label: "RSS", to: "/rss" },
+  { label: "Project settings", to: "/project" },
   { label: "Entities", to: "/entities" },
 ];
 
@@ -26,8 +27,7 @@ export function Sidebar() {
                 isActive
                   ? "bg-slate-800 text-white"
                   : "text-slate-400 hover:bg-slate-900 hover:text-white"
-              }`
-            }
+              }`}
           >
             {item.label}
           </NavLink>
