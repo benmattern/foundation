@@ -1,5 +1,42 @@
 # FOUNDATION Architecture
 
+## Current workflow architecture - 2026-10-16
+
+Milestone 01 ingestion is deployed. Its recorded database/function/scheduler and
+public frontend verification is in [the ingestion review](reviews/01-ingestion.md).
+Milestone 02 is implemented on docs/project-workflow-ux-2026-10-16 and verified
+locally; [the workflow review](reviews/02-project-workflow.md) contains the demo,
+exact checks, visual evidence and remaining hosted checks. This milestone has
+not been merged or deployed. No hosted data, credentials or configuration were
+used for its regression tests.
+
+ProjectChooser owns account/project selection and a native dialog for creation.
+BrowserRouter wraps the authenticated workspace, allowing creation/switching to
+land on overview. The selected-project subtree is keyed to discard stale page
+state and in-flight view results. Scope edits refresh the project selector.
+
+ProjectOverview derives its counts and next action from current-project
+subscriptions, candidate counts, kept articles and relevant feed health. It never
+counts owner-wide source records as project configuration. SourcesWorkspace is
+shared by /sources and /sources/:id. SourceSetupForm retains successfully saved
+IDs across later-stage failures; SourceFeedCard keeps workspace feed management
+and raw run details behind disclosure. Subscriptions reuses existing rule saves.
+
+Inbox preserves server filters, visible-page bulk review, tags, history and
+review transactions. Keep uses converted_article_id from the review response
+and links to the implemented /articles?article=<id> highlight. Library separates
+capture-to-Inbox from explicit direct article creation. Events remain available.
+Shared Button/Input/Textarea/EmptyState controls and native modal focus handling
+use the existing dark theme without an additional component framework.
+
+All persistence remains in existing services/RPCs. No migration, RLS change,
+server collector change or new backend endpoint was needed. Check-now success
+messages deliberately avoid the collector's cross-project staged total. Health
+and advanced run totals are explicitly labeled as shared feed information.
+
+<details>
+<summary>Historical planning, implementation and rollout records (superseded where noted above)</summary>
+
 ## Production rollout - 2026-10-16
 
 Deployment and use of the postgres role are authorized. The supplied owner UUID
@@ -767,3 +804,5 @@ The project direction is heavily inspired by:
 - long-horizon systems analysis
 - Foundation-series concepts
 - strategic warning systems
+
+</details>

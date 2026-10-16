@@ -1,3 +1,5 @@
+import { Input } from "./ui/Input";
+import { Button } from "./ui/Button";
 import { useState } from "react";
 import { createUrlImportResult } from "../lib/urlImport";
 import type { UrlImportResult } from "../lib/urlImport";
@@ -12,11 +14,11 @@ type Props = {
   sources: Source[];
   onImportDraft: (
     result: UrlImportResult,
-    metadata?: UrlMetadataResponse
+    metadata?: UrlMetadataResponse,
   ) => void;
   onSaveToQueue?: (
     result: UrlImportResult,
-    metadata?: UrlMetadataResponse
+    metadata?: UrlMetadataResponse,
   ) => Promise<void>;
 };
 
@@ -50,14 +52,13 @@ export function ArticleUrlImport({
       setMetadataError("");
       setQueueMessage("");
       setLastResult(result);
-      onImportDraft(result);
     } catch (error) {
       setLastResult(null);
       setMetadata(null);
       setMetadataError("");
       setQueueMessage("");
       setErrorMessage(
-        error instanceof Error ? error.message : "Unable to import this URL."
+        error instanceof Error ? error.message : "Unable to import this URL.",
       );
     }
   }
@@ -77,7 +78,7 @@ export function ArticleUrlImport({
       setMetadataError(
         error instanceof Error
           ? error.message
-          : "Metadata fetch failed. Continue with manual entry."
+          : "Metadata fetch failed. Continue with manual entry.",
       );
     } finally {
       setMetadataLoading(false);
@@ -107,12 +108,12 @@ export function ArticleUrlImport({
 
     try {
       await onSaveToQueue(lastResult, metadata ?? undefined);
-      setQueueMessage("Saved to Review Queue.");
+      setQueueMessage("Saved to Inbox.");
     } catch (error) {
       setQueueMessage(
         error instanceof Error
           ? error.message
-          : "Unable to save this URL to the Review Queue."
+          : "Unable to save this URL to the Inbox.",
       );
     } finally {
       setQueueLoading(false);
@@ -123,17 +124,16 @@ export function ArticleUrlImport({
     <Card className="p-8">
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <h2 className="text-2xl font-semibold text-white">
-            Import from URL
-          </h2>
+          <h2 className="text-2xl font-semibold text-white">Capture a link</h2>
           <p className="mt-1 text-sm text-slate-400">
-            Start an article draft from a URL. Review and complete the article
-            before saving.
+            Prepare a link, optionally fetch its metadata, then save it to Inbox
+            for review. You can still save the link if metadata is unavailable.
           </p>
         </div>
 
         <div className="space-y-3">
-          <input
+          <Input
+            label="Article link"
             className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="https://example.com/article"
             value={url}
@@ -147,7 +147,7 @@ export function ArticleUrlImport({
           {lastResult && (
             <div className="space-y-2 rounded-xl border border-slate-700 bg-slate-950 p-4 text-sm">
               <p className="break-all text-slate-300">
-                Draft URL: {lastResult.normalizedUrl}
+                Prepared link: {lastResult.normalizedUrl}
               </p>
               <p className="text-slate-400">
                 Source:{" "}
@@ -232,45 +232,50 @@ export function ArticleUrlImport({
                 </div>
               )}
 
-              <button
+              <Button
                 type="button"
                 onClick={applyMetadata}
                 className="rounded-lg bg-blue-500 px-4 py-2 font-medium text-white transition hover:bg-blue-400"
               >
-                Apply Metadata
-              </button>
+                Use metadata in a Library draft
+              </Button>
             </div>
           )}
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <button
-            type="submit"
-            className="rounded-lg bg-slate-200 px-4 py-2 font-medium text-slate-900 transition hover:bg-white"
-          >
-            Start Draft
-          </button>
+          <Button variant={lastResult ? "secondary" : "primary"} type="submit">
+            Prepare link
+          </Button>
 
           {lastResult && (
-            <button
+            <Button
               type="button"
               onClick={handleFetchMetadata}
               disabled={metadataLoading}
               className="rounded-lg border border-slate-700 px-4 py-2 font-medium text-slate-300 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {metadataLoading ? "Fetching Metadata..." : "Fetch Metadata"}
-            </button>
+            </Button>
           )}
 
+          {lastResult && (
+            <Button
+              onClick={() => onImportDraft(lastResult, metadata ?? undefined)}
+            >
+              Create Library draft instead
+            </Button>
+          )}
           {lastResult && onSaveToQueue && (
-            <button
+            <Button
               type="button"
+              variant="primary"
               onClick={saveToQueue}
               disabled={queueLoading}
               className="rounded-lg border border-blue-500/50 bg-blue-500/10 px-4 py-2 font-medium text-blue-200 transition hover:bg-blue-500/20 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {queueLoading ? "Saving..." : "Save to Review Queue"}
-            </button>
+              {queueLoading ? "Saving..." : "Save to Inbox"}
+            </Button>
           )}
         </div>
       </form>

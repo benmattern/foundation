@@ -1,3 +1,6 @@
+import { Input } from "./ui/Input";
+import { Textarea } from "./ui/Textarea";
+import { Button } from "./ui/Button";
 import { useRef, useState } from "react";
 import { Card } from "./ui/Card";
 import type { ArticleWithTags } from "../types/article";
@@ -49,25 +52,26 @@ function ArticleFormFields({
   onSubmit,
   onCancel,
 }: Props) {
-  const [sourceId, setSourceId] = useState(() =>
-    initialArticle?.source_id ?? initialDraft?.source_id ?? ""
+  const [sourceId, setSourceId] = useState(
+    () => initialArticle?.source_id ?? initialDraft?.source_id ?? "",
   );
-  const [title, setTitle] = useState(() =>
-    initialArticle?.title ?? initialDraft?.title ?? ""
+  const [title, setTitle] = useState(
+    () => initialArticle?.title ?? initialDraft?.title ?? "",
   );
-  const [url, setUrl] = useState(() =>
-    initialArticle?.url ?? initialDraft?.url ?? ""
+  const [url, setUrl] = useState(
+    () => initialArticle?.url ?? initialDraft?.url ?? "",
   );
-  const [summary, setSummary] = useState(() =>
-    initialArticle?.summary ?? initialDraft?.summary ?? ""
+  const [summary, setSummary] = useState(
+    () => initialArticle?.summary ?? initialDraft?.summary ?? "",
   );
   const [publishedAt, setPublishedAt] = useState(() =>
     initialArticle
       ? formatDateForInput(initialArticle.published_at)
-      : initialDraft?.published_at ?? ""
+      : (initialDraft?.published_at ?? ""),
   );
-  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(() =>
-    initialArticle?.tags.map((tag) => tag.id) ?? initialDraft?.tag_ids ?? []
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
+    () =>
+      initialArticle?.tags.map((tag) => tag.id) ?? initialDraft?.tag_ids ?? [],
   );
   const submitting = useRef(false);
   const [busy, setBusy] = useState(false);
@@ -78,7 +82,7 @@ function ArticleFormFields({
     setSelectedTagIds((prev) =>
       prev.includes(tagId)
         ? prev.filter((id) => id !== tagId)
-        : [...prev, tagId]
+        : [...prev, tagId],
     );
   }
 
@@ -122,60 +126,72 @@ function ArticleFormFields({
   return (
     <Card className="p-8">
       <form onSubmit={handleSubmit} className="space-y-6">
-        {error && <p role="alert" className="text-red-300">{error}</p>}
+        {error && (
+          <p role="alert" className="text-red-300">
+            {error}
+          </p>
+        )}
         <div>
           <h2 className="text-2xl font-semibold text-white">
-            {isEditing ? "Edit Article" : "Add Article"}
+            {isEditing ? "Edit article" : "Add article manually"}
           </h2>
 
           <p className="text-slate-400 mt-1 text-sm">
             {isEditing
               ? "Update article metadata and tags."
-              : "Add a collected article or intelligence item."}
+              : "Add an article directly to Library after your own review. Automatic collection uses Inbox instead."}
           </p>
         </div>
 
         <div className="space-y-4">
-          <select
-            className={`w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              sourceId ? "text-white" : "text-slate-500"
-            }`}
-            value={sourceId}
-            onChange={(e) => setSourceId(e.target.value)}
-          >
-            <option value="">No source selected</option>
+          <label className="block space-y-2 text-sm text-slate-300">
+            Source
+            <select
+              className={`w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                sourceId ? "text-white" : "text-slate-500"
+              }`}
+              value={sourceId}
+              onChange={(e) => setSourceId(e.target.value)}
+            >
+              <option value="">No source selected</option>
 
-            {sources.map((source) => (
-              <option key={source.id} value={source.id}>
-                {source.name}
-              </option>
-            ))}
-          </select>
+              {sources.map((source) => (
+                <option key={source.id} value={source.id}>
+                  {source.name}
+                </option>
+              ))}
+            </select>
+          </label>
 
-          <input
+          <Input
             className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            label="Article title"
             placeholder="Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
           />
 
-          <input
+          <Input
             className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            label="Original article URL"
             placeholder="URL"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             required
           />
 
-          <input
+          <Input
+            label="Published date"
             type="date"
             className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={publishedAt}
             onChange={(e) => setPublishedAt(e.target.value)}
           />
 
-          <textarea
+          <Textarea
+            label="Summary / analyst notes"
+            rows={4}
             className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Summary"
             value={summary}
@@ -184,9 +200,7 @@ function ArticleFormFields({
 
           {tags.length > 0 && (
             <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
-              <p className="mb-3 text-sm font-medium text-slate-300">
-                Tags
-              </p>
+              <p className="mb-3 text-sm font-medium text-slate-300">Tags</p>
 
               <div className="flex flex-wrap gap-2">
                 {tags.map((tag) => {
@@ -195,7 +209,7 @@ function ArticleFormFields({
                   return (
                     <label
                       key={tag.id}
-                      className={`cursor-pointer rounded-full border px-3 py-1 text-sm transition ${
+                      className={`inline-flex min-h-11 items-center cursor-pointer rounded-full border px-3 py-1 text-sm transition ${
                         selected
                           ? "border-blue-500 bg-blue-500/20 text-blue-200"
                           : "border-slate-700 bg-slate-900 text-slate-300 hover:border-slate-500"
@@ -205,7 +219,7 @@ function ArticleFormFields({
                         type="checkbox"
                         checked={selected}
                         onChange={() => toggleTag(tag.id)}
-                        className="sr-only"
+                        className="mr-2"
                       />
                       {tag.name}
                     </label>
@@ -217,22 +231,18 @@ function ArticleFormFields({
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <button
-            type="submit"
-            disabled={busy}
-            className="rounded-lg bg-slate-200 px-4 py-2 font-medium text-slate-900 transition hover:bg-white"
-          >
+          <Button variant="primary" type="submit" disabled={busy}>
             {isEditing ? "Save Changes" : "Add Article"}
-          </button>
+          </Button>
 
           {isEditing && onCancel && (
-            <button
+            <Button
               type="button"
               onClick={onCancel}
               className="rounded-lg border border-slate-700 px-4 py-2 font-medium text-slate-300 transition hover:bg-slate-800"
             >
               Cancel
-            </button>
+            </Button>
           )}
         </div>
       </form>

@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+@layer base {
+  :root { color-scheme: dark; }
+  body { @apply m-0 bg-slate-950 text-slate-200; }
+  button, summary, select { @apply cursor-pointer; }
+  button { @apply min-h-11 rounded-lg border border-slate-600 px-3 py-2 font-medium transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50; }
+  input:not([type="checkbox"]):not([type="radio"]), select, textarea { @apply min-h-11 max-w-full min-w-0 rounded-lg border border-slate-600 bg-slate-950 px-3 py-2 text-base text-slate-100; }
+  textarea { @apply min-h-28; }
+  input[type="checkbox"], input[type="radio"] { @apply h-5 w-5 shrink-0 accent-blue-500; }
+  :focus-visible { @apply outline-2 outline-offset-2 outline-blue-300; }
+  summary { @apply min-h-11 py-3 font-medium; }
+  p, h1, h2, h3, a { overflow-wrap: anywhere; }
+  details { @apply min-w-0; }
+}

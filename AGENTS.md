@@ -6,10 +6,16 @@ docs/FOUNDATION_BACKLOG.md, and docs/FOUNDATION_CONVENTIONS.md, then inspect
 the code relevant to the task. Use docs/FOUNDATION_DECISIONS.md and
 docs/FOUNDATION_SCHEMA.md for architectural and data context.
 
-Current assessment: docs/reviews/01-ingestion.md.
-Proposed next milestone: docs/milestones/01-ingestion.md.
-That milestone is a proposal, not authorization to implement it merely because
-this file is loaded. Follow the user's active assignment.
+Milestone 01 ingestion is deployed; see docs/reviews/01-ingestion.md for recorded
+verification and remaining live signed-in checks.
+Milestone 02 workflow implementation is locally complete; see
+docs/milestones/02-project-workflow.md and docs/reviews/02-project-workflow.md
+for the completed checklist, verification, demo and remaining hosted checks.
+The owner approved the project workflow/usability implementation on 2026-10-16.
+When assigned this milestone, implement it end to end and report evidence;
+do not stop at another plan or seek approval for routine UI choices.
+Follow the user's active task; these instructions do not independently authorize
+merges, hosted mutations, deployment or use of account credentials.
 
 ## Product principles
 - FOUNDATION is a research platform. Taiwan, Pacific geopolitics, and

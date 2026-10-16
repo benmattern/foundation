@@ -18,14 +18,14 @@ export function DashboardMetricCards({ metrics }: Props) {
       helper: "Tracked intelligence developments",
     },
     {
-      label: "Articles",
+      label: "Kept articles",
       value: metrics.articleCount,
-      helper: "Collected supporting intelligence items",
+      helper: "Articles retained in this project",
     },
     {
-      label: "Sources",
+      label: "Workspace sources",
       value: metrics.sourceCount,
-      helper: "Managed collection sources",
+      helper: "Available source records across all your projects",
     },
   ];
 
@@ -34,9 +34,7 @@ export function DashboardMetricCards({ metrics }: Props) {
       {cards.map((card) => (
         <Card key={card.label}>
           <p className="text-sm font-medium text-slate-400">{card.label}</p>
-          <p className="mt-2 text-4xl font-semibold text-white">
-            {card.value}
-          </p>
+          <p className="mt-2 text-4xl font-semibold text-white">{card.value}</p>
           <p className="mt-2 text-sm text-slate-500">{card.helper}</p>
         </Card>
       ))}

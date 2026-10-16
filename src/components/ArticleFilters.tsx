@@ -1,3 +1,4 @@
+import { Input } from "./ui/Input";
 import type { Source } from "../types/source";
 import type { Tag } from "../types/tag";
 import { Card } from "./ui/Card";
@@ -30,16 +31,16 @@ export function ArticleFilters({
   onClearFilters,
 }: Props) {
   const hasActiveFilters =
-    searchQuery.trim() !== "" || selectedTagId !== "" || selectedSourceId !== "";
+    searchQuery.trim() !== "" ||
+    selectedTagId !== "" ||
+    selectedSourceId !== "";
 
   return (
     <Card>
       <div className="space-y-4">
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-white">
-              Filter Articles
-            </h2>
+            <h2 className="text-xl font-semibold text-white">Search library</h2>
             <p className="text-sm text-slate-400">
               Showing {resultCount} of {totalCount} articles.
             </p>
@@ -56,42 +57,51 @@ export function ArticleFilters({
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <input
+          <Input
+            label="Search library"
             className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Search title or summary"
             value={searchQuery}
             onChange={(event) => onSearchQueryChange(event.target.value)}
           />
 
-          <select
-            className={`w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              selectedTagId ? "text-white" : "text-slate-500"
-            }`}
-            value={selectedTagId}
-            onChange={(event) => onSelectedTagIdChange(event.target.value)}
-          >
-            <option value="">All tags</option>
-            {tags.map((tag) => (
-              <option key={tag.id} value={tag.id}>
-                {tag.name}
-              </option>
-            ))}
-          </select>
+          <label className="block space-y-2 text-sm text-slate-300">
+            Tag
+            <select
+              aria-label="Library tag filter"
+              className={`w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                selectedTagId ? "text-white" : "text-slate-500"
+              }`}
+              value={selectedTagId}
+              onChange={(event) => onSelectedTagIdChange(event.target.value)}
+            >
+              <option value="">All tags</option>
+              {tags.map((tag) => (
+                <option key={tag.id} value={tag.id}>
+                  {tag.name}
+                </option>
+              ))}
+            </select>
+          </label>
 
-          <select
-            className={`w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              selectedSourceId ? "text-white" : "text-slate-500"
-            }`}
-            value={selectedSourceId}
-            onChange={(event) => onSelectedSourceIdChange(event.target.value)}
-          >
-            <option value="">All sources</option>
-            {sources.map((source) => (
-              <option key={source.id} value={source.id}>
-                {source.name}
-              </option>
-            ))}
-          </select>
+          <label className="block space-y-2 text-sm text-slate-300">
+            Source
+            <select
+              aria-label="Library source filter"
+              className={`w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                selectedSourceId ? "text-white" : "text-slate-500"
+              }`}
+              value={selectedSourceId}
+              onChange={(event) => onSelectedSourceIdChange(event.target.value)}
+            >
+              <option value="">All sources</option>
+              {sources.map((source) => (
+                <option key={source.id} value={source.id}>
+                  {source.name}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       </div>
     </Card>

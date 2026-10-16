@@ -1,5 +1,30 @@
 # FOUNDATION Schema
 
+## Current schema boundary - 2026-10-16
+
+Milestone 01 ingestion is deployed. Its recorded database/function/scheduler and
+public frontend verification is in [the ingestion review](reviews/01-ingestion.md).
+Milestone 02 is implemented on docs/project-workflow-ux-2026-10-16 and verified
+locally; [the workflow review](reviews/02-project-workflow.md) contains the demo,
+exact checks, visual evidence and remaining hosted checks. This milestone has
+not been merged or deployed. No hosted data, credentials or configuration were
+used for its regression tests.
+
+Milestone 02 changes no schema, constraint, privilege, RLS policy, SQL function
+or Edge Function. Production retains tracked versions 20261016000100 through
+20261016001100. Project subscriptions and review transactions remain the source
+of truth. The UI reads the existing failure_count field for health when a feed's
+last run falls outside the bounded recent-run history; no column is added.
+
+Owner-wide sources/feeds/tags remain distinct from project subscriptions,
+candidates, kept articles and events. New-project counts include only enabled,
+available project feeds. Review semantics stay accept/reject/duplicate/restore;
+Keep/Dismiss are presentation labels. Historical schema/export assumptions below
+must not override the verified deployed baseline recorded in the ingestion review.
+
+<details>
+<summary>Historical planning, implementation and rollout records (superseded where noted above)</summary>
+
 ## Live reconciliation — 2026-10-16
 
 Read-only inspection of the linked FOUNDATION project now verifies the existing
@@ -1227,3 +1252,5 @@ Current candidate directions:
 6. Auth/RLS Planning
 
 Filtering & Search v1, Article Management v1, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, Review Queue UX v1.1-v1.4, Review Queue Preview Enhancement v1, and Review Queue Article Links are complete. Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue UX v1.1-v1.4, Review Queue Preview Enhancement v1, and Review Queue Article Links required no schema changes. Event v1 is implemented with `events` and `article_events`; Review Queue v1 is implemented with `ingestion_candidates`; RSS Ingestion v1 is implemented with `rss_feeds` and RSS-created `ingestion_candidates`.
+
+</details>

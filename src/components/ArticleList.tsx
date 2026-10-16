@@ -3,6 +3,7 @@ import { Card } from "./ui/Card";
 
 type Props = {
   articles: ArticleWithTags[];
+  highlightId?: string | null;
   emptyMessage?: string;
   onEditArticle?: (article: ArticleWithTags) => void;
   onDeleteArticle?: (article: ArticleWithTags) => void;
@@ -10,15 +11,14 @@ type Props = {
 
 export function ArticleList({
   articles,
+  highlightId,
   emptyMessage = "No articles added yet.",
   onEditArticle,
   onDeleteArticle,
 }: Props) {
   return (
     <Card>
-      <h2 className="text-2xl font-semibold text-white mb-6">
-        Articles
-      </h2>
+      <h2 className="text-2xl font-semibold text-white mb-6">Kept articles</h2>
 
       {articles.length === 0 ? (
         <p className="text-slate-400">{emptyMessage}</p>
@@ -27,9 +27,10 @@ export function ArticleList({
           {articles.map((article) => (
             <div
               key={article.id}
-              className="border-b border-slate-800 pb-4"
+              id={`article-${article.id}`}
+              className={`min-w-0 rounded-lg border-b border-slate-800 p-3 ${highlightId === article.id ? "outline-2 outline-emerald-500" : ""}`}
             >
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-wrap items-start justify-between gap-4">
                 <p className="font-medium text-white text-lg">
                   {article.title}
                 </p>
@@ -69,7 +70,10 @@ export function ArticleList({
               </a>
 
               {article.summary && (
-                <p className="text-sm text-slate-400 mt-2">
+                <p className="text-sm text-slate-300 mt-2 whitespace-pre-wrap">
+                  <span className="mb-1 block text-xs text-slate-400">
+                    Saved summary / analyst notes
+                  </span>
                   {article.summary}
                 </p>
               )}
@@ -89,8 +93,7 @@ export function ArticleList({
 
               {article.published_at && (
                 <p className="text-xs text-slate-500 mt-2">
-                  Published:{" "}
-                  {new Date(article.published_at).toLocaleString()}
+                  Published: {new Date(article.published_at).toLocaleString()}
                 </p>
               )}
             </div>

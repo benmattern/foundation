@@ -1,5 +1,24 @@
 # FOUNDATION
 
+FOUNDATION is a private research workspace built with React, TypeScript, Vite,
+Tailwind and Supabase. Choose project sources, review incoming material in Inbox,
+and keep relevant articles in Library. Events and tags support further analysis.
+Core collection and review work without AI.
+
+## Current implementation - 2026-10-16
+
+Milestone 01 ingestion is deployed. Milestone 02 project workflow and usability
+is implemented and locally tested on docs/project-workflow-ux-2026-10-16; it has
+not been deployed. Read [current status](docs/FOUNDATION_STATUS.md),
+[the workflow review/demo](docs/reviews/02-project-workflow.md), and [AGENTS.md](AGENTS.md).
+
+Use Node 24/npm 11, then npm ci, npm run lint, npm run build, npm test,
+npm run test:e2e, npm run check:functions and npm run test:postgres. Tests use
+fictional local data. Real signed-in production validation remains separate.
+
+<details>
+<summary>Historical prototype features and planning</summary>
+
 ## Ingestion implementation — 2026-10-16
 
 The current branch adds authenticated projects, server-owned ingestion,
@@ -242,3 +261,5 @@ Long term:
 - AI-assisted summarization, tagging, and entity extraction.
 
 FOUNDATION should remain architecture-first and avoid premature complexity while the core intelligence workflows are still stabilizing.
+
+</details>

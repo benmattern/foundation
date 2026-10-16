@@ -1,3 +1,4 @@
+import { Button } from "./ui/Button";
 import { useRef, useState } from "react";
 import type { IngestionCandidate } from "../types/ingestionCandidate";
 import type { Source } from "../types/source";
@@ -46,7 +47,9 @@ function formatDateForInput(date: string | null): string {
 function formatDisplayDate(date: string): string {
   if (!date) return "Published date unknown";
 
-  return new Date(date).toLocaleDateString(undefined, {
+  return new Date(
+    date.length === 10 ? `${date}T00:00:00` : date,
+  ).toLocaleDateString(undefined, {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -131,74 +134,63 @@ function CandidateReviewFields({
   if (!candidate) {
     return (
       <Card>
-        <h2 className="mb-2 text-2xl font-semibold text-white">
-          Candidate Review
-        </h2>
+        <h2 className="mb-2 text-2xl font-semibold text-white">Review item</h2>
         <p className="text-slate-400">
-          Select an ingestion candidate to review its metadata and convert it
-          into an approved article.
+          Select an incoming item to review. Keeping adds it to Library.
         </p>
       </Card>
     );
   }
 
   const actionable = candidate.status === "pending" && !busy;
-  const preview = getIngestionCandidatePreview(candidate) ??
-    "No preview available.";
+  const preview =
+    getIngestionCandidatePreview(candidate) ?? "No preview available.";
   const sourceName =
     sources.find((source) => source.id === values.source_id)?.name ??
-      "Unknown source";
+    "Unknown source";
   const actionRow = (
     <div className="flex flex-wrap gap-3">
       {onSaveCandidate && (
-        <button
+        <Button
           type="button"
           disabled={!actionable}
           onClick={() => void review(() => onSaveCandidate(candidate, values))}
         >
           Save draft and tags
-        </button>
+        </Button>
       )}
       {values.url && (
         <a
           href={values.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-lg border border-blue-500/40 bg-blue-500/10 px-4 py-2 font-medium text-blue-200 transition hover:bg-blue-500/20"
+          className="inline-flex min-h-11 items-center rounded-lg border border-blue-500/40 bg-blue-500/10 px-4 py-2 font-medium text-blue-200 transition hover:bg-blue-500/20"
         >
-          Open Article
+          Open original article
         </a>
       )}
 
-      <button
+      <Button
         type="button"
         disabled={!actionable || !values.title || !values.url}
+        variant="primary"
         onClick={() => void review(() => onAcceptCandidate(candidate, values))}
-        className="rounded-lg bg-slate-200 px-4 py-2 font-medium text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
       >
-        Accept as Article
-      </button>
+        Keep
+      </Button>
 
-      <button
+      <Button
         type="button"
         disabled={!actionable}
         onClick={() =>
           void review(() =>
-            onRejectCandidate(candidate, values.rejection_reason)
-          )}
+            onRejectCandidate(candidate, values.rejection_reason),
+          )
+        }
         className="rounded-lg border border-red-900/50 bg-red-950/30 px-4 py-2 font-medium text-red-300 transition hover:bg-red-900/40 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        Reject
-      </button>
-
-      <button
-        type="button"
-        disabled={!actionable}
-        onClick={() => void review(() => onMarkDuplicate(candidate))}
-        className="rounded-lg border border-slate-700 px-4 py-2 font-medium text-slate-300 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        Mark Duplicate
-      </button>
+        Dismiss
+      </Button>
     </div>
   );
 
@@ -206,11 +198,10 @@ function CandidateReviewFields({
     <Card>
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-white">
-            Candidate Review
-          </h2>
+          <h2 className="text-2xl font-semibold text-white">Review item</h2>
           <p className="mt-1 text-sm text-slate-400">
-            Edit candidate metadata before accepting it as an article.
+            Keeping adds this item to Library. Edit its details or tags first if
+            needed.
           </p>
         </div>
         <IngestionCandidateStatusBadge status={candidate.status} />
@@ -224,8 +215,7 @@ function CandidateReviewFields({
             </summary>
             <p>
               Classified{" "}
-              {new Date(candidate.rule_result.classifiedAt).toLocaleString()} as
-              {" "}
+              {new Date(candidate.rule_result.classifiedAt).toLocaleString()} as{" "}
               {candidate.rule_result.route.replaceAll("_", " ")}.
             </p>
             <ul>
@@ -234,9 +224,9 @@ function CandidateReviewFields({
                   {match.kind}: “{match.term}” in {match.field}
                   {match.tag
                     ? ` → ${
-                      tags.find((tag) => tag.id === match.tag)?.name ??
+                        tags.find((tag) => tag.id === match.tag)?.name ??
                         "suggested tag"
-                    }`
+                      }`
                     : ""}
                 </li>
               ))}
@@ -249,7 +239,11 @@ function CandidateReviewFields({
             ))}
           </details>
         )}
-        {error && <p role="alert" className="text-red-300">{error}</p>}
+        {error && (
+          <p role="alert" className="text-red-300">
+            {error}
+          </p>
+        )}
         {actionRow}
 
         <div>
@@ -258,6 +252,7 @@ function CandidateReviewFields({
           </label>
           <input
             className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-lg font-semibold text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Item title"
             placeholder="Title"
             value={values.title}
             onChange={(event) => updateValue("title", event.target.value)}
@@ -266,11 +261,9 @@ function CandidateReviewFields({
 
         <div className="rounded-xl border border-slate-800 bg-slate-950/80 p-4">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Preview
+            Publisher excerpt (not full article text)
           </p>
-          <p className="text-sm leading-6 text-slate-300">
-            {preview}
-          </p>
+          <p className="text-sm leading-6 text-slate-300">{preview}</p>
         </div>
 
         <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
@@ -283,6 +276,7 @@ function CandidateReviewFields({
           </p>
           <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_11rem]">
             <select
+              aria-label="Item source"
               className={`w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 values.source_id ? "text-white" : "text-slate-500"
               }`}
@@ -298,11 +292,13 @@ function CandidateReviewFields({
             </select>
 
             <input
+              aria-label="Published date"
               type="date"
               className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={values.published_at}
               onChange={(event) =>
-                updateValue("published_at", event.target.value)}
+                updateValue("published_at", event.target.value)
+              }
             />
           </div>
         </div>
@@ -310,7 +306,7 @@ function CandidateReviewFields({
         {tags.length > 0 && (
           <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
             <p className="mb-3 text-sm font-medium text-slate-300">
-              Tags for accepted article
+              Tags for this item
             </p>
             <div className="flex flex-wrap gap-2">
               {tags.map((tag) => {
@@ -319,7 +315,7 @@ function CandidateReviewFields({
                 return (
                   <label
                     key={tag.id}
-                    className={`cursor-pointer rounded-full border px-3 py-1 text-sm transition ${
+                    className={`inline-flex min-h-11 items-center cursor-pointer rounded-full border px-3 py-1 text-sm transition ${
                       selected
                         ? "border-blue-500 bg-blue-500/20 text-blue-200"
                         : "border-slate-700 bg-slate-900 text-slate-300 hover:border-slate-500"
@@ -329,7 +325,7 @@ function CandidateReviewFields({
                       type="checkbox"
                       checked={selected}
                       onChange={() => toggleTag(tag.id)}
-                      className="sr-only"
+                      className="mr-2"
                     />
                     {tag.name}
                   </label>
@@ -341,26 +337,35 @@ function CandidateReviewFields({
 
         <div>
           <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Description / Summary
+            Saved summary / analyst notes
           </label>
           <textarea
             className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Saved summary / analyst notes"
+            rows={4}
             placeholder="Description / summary"
             value={values.description}
             onChange={(event) => updateValue("description", event.target.value)}
           />
         </div>
 
-        <div className="space-y-3 rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+        <details className="space-y-3 rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+          <summary>Technical details and duplicate action</summary>
+          <Button
+            type="button"
+            disabled={!actionable}
+            onClick={() => void review(() => onMarkDuplicate(candidate))}
+            className="rounded-lg border border-slate-700 px-4 py-2 font-medium text-slate-300 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Mark Duplicate
+          </Button>
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
             Technical Details
           </p>
 
           <div>
             <div className="mb-2 flex items-center justify-between gap-3">
-              <label className="text-xs font-medium text-slate-400">
-                URL
-              </label>
+              <label className="text-xs font-medium text-slate-400">URL</label>
               {values.url && (
                 <a
                   href={values.url}
@@ -374,6 +379,7 @@ function CandidateReviewFields({
             </div>
             <input
               className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label="Original URL"
               placeholder="URL"
               value={values.url}
               onChange={(event) => updateValue("url", event.target.value)}
@@ -398,10 +404,12 @@ function CandidateReviewFields({
             </div>
             <input
               className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label="Canonical URL"
               placeholder="Canonical URL"
               value={values.canonical_url}
               onChange={(event) =>
-                updateValue("canonical_url", event.target.value)}
+                updateValue("canonical_url", event.target.value)
+              }
             />
           </div>
 
@@ -423,12 +431,13 @@ function CandidateReviewFields({
             </div>
             <input
               className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label="Final URL"
               placeholder="Final URL"
               value={values.final_url}
               onChange={(event) => updateValue("final_url", event.target.value)}
             />
           </div>
-        </div>
+        </details>
 
         {candidate.warnings.length > 0 && (
           <div className="space-y-1 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
@@ -445,10 +454,12 @@ function CandidateReviewFields({
 
         <textarea
           className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Optional rejection reason"
+          aria-label="Optional dismissal reason"
+          placeholder="Optional dismissal reason"
           value={values.rejection_reason}
           onChange={(event) =>
-            updateValue("rejection_reason", event.target.value)}
+            updateValue("rejection_reason", event.target.value)
+          }
         />
 
         {actionRow}

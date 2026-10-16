@@ -16,7 +16,14 @@ export function IngestionCandidateStatusBadge({ status }: Props) {
     <span
       className={`rounded-full border px-2.5 py-1 text-xs font-medium capitalize ${statusStyles[status]}`}
     >
-      {status}
+      {
+        {
+          pending: "Awaiting review",
+          accepted: "Kept",
+          rejected: "Dismissed",
+          duplicate: "Duplicate",
+        }[status]
+      }
     </span>
   );
 }
