@@ -4,17 +4,21 @@
 
 Milestone 01 ingestion is deployed. Its recorded database/function/scheduler and
 public frontend verification is in [the ingestion review](reviews/01-ingestion.md).
-Milestone 02 is implemented on docs/project-workflow-ux-2026-10-16 and verified
-locally; [the workflow review](reviews/02-project-workflow.md) contains the demo,
-exact checks, visual evidence and remaining hosted checks. This milestone has
-not been merged or deployed. No hosted data, credentials or configuration were
-used for its regression tests.
+Milestone 02 is deployed from implementation commit 520223c via PR #2 (merge
+c9ff67f). All GitHub CI checks passed. The live Render assets exactly match the
+tested build; nine routes pass direct visit/refresh and anonymous sign-in gates,
+with no browser errors or failed requests. Desktop/mobile public checks pass.
+[The workflow review](reviews/02-project-workflow.md) contains the demo and exact
+evidence. The real-account signed-in journey remains unverified. No hosted data,
+credentials or configuration were used for regression tests, and this frontend
+release required no database or Edge Function change.
 
 - [x] Implement the complete project-to-library journey and shared control pass.
 - [x] Verify new/existing projects, manual capture, partial-save and check failures.
 - [x] Verify switching, deep links, keyboard dialogs, desktop/mobile layouts.
 - [x] Consolidate current documentation and write the Milestone 02 review/demo.
-- [ ] Publish the Milestone 02 frontend and verify the real signed-in journey.
+- [x] Publish Milestone 02 and verify its assets, public routes and sign-in gates.
+- [ ] Verify the real-account signed-in workflow on the hosted release.
 - [ ] Continue operational monitoring of upstream feed failures and retention.
 - [ ] Verify the previously documented DNS/egress rebinding boundary separately.
 

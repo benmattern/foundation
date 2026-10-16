@@ -1,11 +1,12 @@
 # Project workflow usability review
 
 Date: 2026-10-16.
-Status: implemented and locally verified; no Milestone 02 merge or deployment.
+Status: deployed; local and GitHub CI checks plus public hosted smoke checks pass.
 Branch: docs/project-workflow-ux-2026-10-16.
 Reviewed implementation baseline: 0556a3f71c7f8ed8dd55baa36edda2a51d173157.
 Earlier production baseline: a42454ea9c7930e56db0bfbfb0779a4729f1a70f.
-Implementation and this report are working-tree changes beyond the branch baseline.
+Implementation commit: 520223c212346b87db27d414b4ce9348fee3f5b4.
+Merged via PR #2 at c9ff67f27cf519de0e4d1c673f02e80df5b7cfbd.
 Brief: [Milestone 02](../milestones/02-project-workflow.md).
 
 ## Delivered workflow
@@ -162,15 +163,37 @@ Long project names remain accessible through their select option; URLs wrap.
 8. Open Project settings: edit optional descriptive scope, Save/Cancel, then
    expand advanced rules. Scope edits alone have not activated keyword filtering.
 
+## Deployment verification - 2026-10-16
+
+The owner authorized deployment. [PR #2](https://github.com/benmattern/foundation/pull/2)
+is merged and the matching frontend is live at https://foundation-ljfo.onrender.com.
+[GitHub CI run 38954321845](https://github.com/benmattern/foundation/actions/runs/38954321845)
+passed every step, including all five Chromium journeys, 42 tests, six PostgreSQL
+concurrency scenarios, frozen Deno checks, lint, build and a clean installation.
+
+All five live entry assets exactly match the tested local production manifest,
+including index-ChwnqH1-.js and index-2-hrl8tj.css. Every asset returns HTTP 200;
+the application bundle contains the new overview, Available sources and Keep
+selected workflow markers. Render publication was verified from the live site,
+not inferred from the merge alone.
+
+Headless Edge verifies HTTP 200, refresh and the anonymous sign-in gate on /,
+/sources, /articles, /ingestion, /events, /tags, /project, /rss and a source-detail
+bookmark path. Both 1440px desktop and 390px mobile sign-in views have visible
+labels, required-field validation and no horizontal overflow. No console/page
+errors or failed requests occurred. Public deployment screenshots are under
+ignored .deployment.local/workflow-login-desktop.png and workflow-login-mobile.png.
+The existing Render rewrite remains effective. No migration, function deployment,
+hosted research mutation or scheduler change was made for this frontend release.
+
 ## Remaining external checks
 
-Implementation is complete locally. This branch has not been pushed/merged or
-deployed by this task. Publish the matching frontend within the active owner's
-authorization, then validate the signed-in real-account journey, feed health and
-project switching on the hosted release. The prior Render SPA rewrite is already
-recorded as applied; this milestone does not establish a new hosted refresh pass.
-Existing upstream 403/timeout/DNS failures, retention monitoring and the earlier
-DNS-rebinding verification gap remain operational limits, not new UI successes.
+The release is deployed. Validate the real-account signed-in project journey,
+collection and switching separately; these were covered with fictional local/CI
+fixtures, not a real hosted user session. No password or account session was
+requested or generated. Existing upstream 403/timeout/DNS failures, retention
+monitoring and the earlier DNS-rebinding verification gap remain operational
+limits, not new UI successes.
 
 No unresolved consequential product question remains for this implementation.
 

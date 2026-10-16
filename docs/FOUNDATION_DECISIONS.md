@@ -54,7 +54,8 @@ These choices supersede the historical prototype descriptions below:
   runs have no automatic deletion policy in v1. Monitor storage; retention changes
   require an explicit follow-up decision. No paid service was enabled.
 - Milestone 01 production deployment is recorded in reviews/01-ingestion.md.
-  Milestone 02 reuses that deployed backend and has only local UI verification.
+  Milestone 02 reuses that backend and is deployed with CI and public frontend
+  smoke verification. Real-account signed-in validation remains outstanding.
 
 ## Historical direction update — 2026-10-16
 

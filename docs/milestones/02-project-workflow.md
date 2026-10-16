@@ -1,12 +1,13 @@
 # Milestone 02: Clear project setup and research workflow
 
-Status: implemented and locally verified on 2026-10-16; not merged or deployed.
+Status: deployed on 2026-10-16 via PR #2; CI and public frontend smoke checks pass.
+Real-account signed-in validation remains separate.
 Owner implementation authorization: 2026-10-16. See the workflow review for evidence.
 Reviewed baseline: a42454ea9c7930e56db0bfbfb0779a4729f1a70f.
 Implementation entry point: read AGENTS.md, then this file and
 ../reviews/02-project-workflow.md. Implement the complete milestone; do not stop
 at another proposal or ask the owner to approve routine layout/component choices.
-The behavior below is implemented locally; hosted verification remains separate.
+The behavior below is implemented and deployed; real-account signed-in verification remains separate.
 
 ## Problem and outcome
 

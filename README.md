@@ -8,8 +8,8 @@ Core collection and review work without AI.
 ## Current implementation - 2026-10-16
 
 Milestone 01 ingestion is deployed. Milestone 02 project workflow and usability
-is implemented and locally tested on docs/project-workflow-ux-2026-10-16; it has
-not been deployed. Read [current status](docs/FOUNDATION_STATUS.md),
+is deployed via PR #2. Live assets, anonymous route refresh and desktop/mobile
+sign-in checks pass; the real-account signed-in journey remains unverified. Read [current status](docs/FOUNDATION_STATUS.md),
 [the workflow review/demo](docs/reviews/02-project-workflow.md), and [AGENTS.md](AGENTS.md).
 
 Use Node 24/npm 11, then npm ci, npm run lint, npm run build, npm test,
