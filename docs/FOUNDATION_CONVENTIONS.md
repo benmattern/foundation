@@ -1,6 +1,6 @@
 # FOUNDATION Conventions
 
-## Local 03/04 conventions - 2026-10-16
+## Deployed 03/04 conventions - 2026-10-16
 
 Questions and findings are analyst reasoning, not article summaries. Keep original
 acquisition, separately attributed page metadata, legacy mixed summaries, article

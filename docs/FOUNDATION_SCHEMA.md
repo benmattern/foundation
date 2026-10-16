@@ -1,6 +1,9 @@
 # FOUNDATION Schema
 
-## Local migrations 012-014 - 2026-10-16 (not deployed)
+## Deployed migrations 012-014 - 2026-10-16
+
+Production ledger 001-014 verified. Fresh backup restore and production row/value
+preservation checks passed; see the milestone reviews for evidence.
 
 | Tables/columns | Scope and purpose |
 |---|---|

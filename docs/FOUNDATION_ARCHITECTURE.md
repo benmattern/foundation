@@ -1,8 +1,8 @@
 # FOUNDATION Architecture
 
-## Selective intake and connected research - local, 2026-10-16
+## Selective intake and connected research - deployed, 2026-10-16
 
-Migrations 012-014 extend the deployed 01/02 baseline. See the milestone reviews
+Production migrations 012-014 extend the deployed 01/02 baseline. See the milestone reviews
 for exact verification boundaries. Database access remains in services; new
 Research/Entities/article-connection pages use project-scoped service reads.
 

@@ -6,15 +6,15 @@ docs/FOUNDATION_BACKLOG.md, and docs/FOUNDATION_CONVENTIONS.md, then inspect
 the code relevant to the task. Use docs/FOUNDATION_DECISIONS.md and
 docs/FOUNDATION_SCHEMA.md for architectural and data context.
 
-Milestones 01 and 02 are deployed; their reviews document verification and
+Milestones 01 through 04 are deployed; their reviews document verification and
 remaining real-account hosted checks.
 The owner approved the next two implementations on 2026-10-16:
 1. docs/milestones/03-selective-intake.md with docs/reviews/03-selective-intake.md.
 2. docs/milestones/04-connected-research.md with docs/reviews/04-connected-research.md.
 When assigned this sequence, implement 03 end to end, verify it, then continue
-to 04 without another routine planning-approval round. Both are now implemented
-and locally verified in the working tree; read their updated reviews for results,
-schema changes and remaining hosted checks. Inspect actual code before changes.
+to 04 without another routine planning-approval round. Both are now deployed via
+PR #3 (merge 849a09d); read their updated reviews for results, schema changes and
+remaining real-account signed-in browser acceptance. Inspect code before changes.
 Follow the user's active task. This handoff does not independently authorize
 merges, hosted mutations, deployment or use of account credentials.
 
