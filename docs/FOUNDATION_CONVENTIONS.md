@@ -1,5 +1,18 @@
 # FOUNDATION Conventions
 
+## Active workflow direction — 2026-10-16
+
+The approved next implementation is [Milestone 02](milestones/02-project-workflow.md).
+Its project-to-library workflow and minimum visual/accessibility requirements
+apply to the touched screens. Favor visible controls, useful field sizes,
+progressive disclosure and contextual next actions over stacked technical forms.
+
+Milestone 01 is deployed per current STATUS rollout evidence. Older statements
+below describing it as only proposed or documentation-only are historical. During
+Milestone 02 reconcile those contradictory current descriptions and maintain one
+clear active task; do not infer that untested hosted user workflows passed.
+
+
 ## Verification update — 2026-10-16
 
 Use the Node 24/npm 11 baseline in `.nvmrc`/package engines. Required local checks:

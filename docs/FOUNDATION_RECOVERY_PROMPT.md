@@ -1,5 +1,20 @@
 # FOUNDATION Recovery Prompt
 
+## Active handoff — project workflow, 2026-10-16
+
+Read [AGENTS.md](../AGENTS.md), [Milestone 02](milestones/02-project-workflow.md)
+and the [workflow review](reviews/02-project-workflow.md). The owner approved
+implementation after trying the deployed project and finding the setup/source/
+inbox/library journey unclear and controls cramped or visually ambiguous.
+
+Implement the brief end to end: guide project setup, combine sources and feeds,
+make Inbox/Library actions understandable, and improve basic control usability.
+Reuse the deployed backend and preserve data/security. This handoff is prepared;
+no Milestone 02 UI changes are implemented in this documentation commit.
+Milestone 01 production notes below supersede older statements that deployment
+has not happened. Preserve the remaining live signed-in verification boundary.
+
+
 ## Production rollout - 2026-10-16
 
 Deployment and use of the postgres role are authorized. The supplied owner UUID

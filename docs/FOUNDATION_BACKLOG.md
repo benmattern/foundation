@@ -1,5 +1,22 @@
 # FOUNDATION Backlog
 
+## Active priority — project workflow, 2026-10-16
+
+Implement [Milestone 02](milestones/02-project-workflow.md) as a complete package:
+project overview/setup, unified Sources with collection details, Inbox, Library,
+and readable accessible controls. [Review and evidence](reviews/02-project-workflow.md).
+Milestone 01 is deployed per the newer production rollout notes in STATUS; older
+rollout checklists below must be reconciled against that evidence, not replayed.
+
+- [x] Record the owner's first-use feedback and inspect relevant UI code.
+- [x] Prepare the approved implementation brief and repository handoff.
+- [ ] Implement the complete project-to-library journey and minimum visual pass.
+- [ ] Verify new/existing project workflows, failure states and responsive layouts.
+- [ ] Consolidate current documentation and report remaining live checks.
+
+Do this before optional AI, broad catalog expansion or new connector families.
+
+
 ## Local implementation handoff — 2026-10-16
 
 Milestone 01 code, migrations and local verification now supersede the historical

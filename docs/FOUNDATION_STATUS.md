@@ -1,5 +1,16 @@
 # FOUNDATION Current Status
 
+## Active milestone — project workflow, 2026-10-16
+
+Milestone 01 is deployed according to the production rollout evidence below.
+The owner has now approved [Milestone 02: project workflow and usability](milestones/02-project-workflow.md).
+The [workflow review](reviews/02-project-workflow.md) records the reported problems
+and source evidence. This commit prepares the implementation handoff only; the
+new navigation, guided setup and shared-control improvements are not implemented.
+Older local-only/planning statements below are historical where superseded by the
+production rollout. Live signed-in workflow validation remains an explicit gap.
+
+
 ## Production rollout - 2026-10-16
 
 Deployment and use of the postgres role are authorized. The supplied owner UUID
