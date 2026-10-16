@@ -1,7 +1,8 @@
 # Milestone 04: Connected research without AI
 
-Status: implemented and locally verified, 2026-10-16; not deployed.
-Reviewed working tree over 28b326a13e1542affeb0053d32f70e332937e988.
+Status: deployed 2026-10-16; CI, hosted SQL roles and public frontend checks pass.
+Real-account signed-in browser acceptance remains unverified.
+Release head b50d26d; production merge 849a09d5fffd53c9f4bc6ca812573f0a05dbabfc.
 See ../reviews/04-connected-research.md for evidence, design choices and rollout limits.
 Milestone 03 local acceptance preceded Milestone 04 implementation.
 

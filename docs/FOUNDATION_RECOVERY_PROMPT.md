@@ -1,24 +1,25 @@
 # FOUNDATION Recovery Prompt
 
-## Current local handoff - 2026-10-16
+## Current deployed handoff - 2026-10-16
 
-Read AGENTS.md and the updated [03 review](reviews/03-selective-intake.md) and
-[04 review](reviews/04-connected-research.md). Both milestones were implemented
-in sequence on `docs/selective-intake-connected-research` over `28b326a`.
-The working tree contains migrations 012-014, UI/services/shared matcher and tests.
-Do not restart their implementation or mistake them for a deployed release.
+Read AGENTS.md, current STATUS and updated [03](reviews/03-selective-intake.md)/
+[04](reviews/04-connected-research.md) reviews. Both milestones are deployed via
+PR #3, merge `849a09d`, release head `b50d26d`. Do not restart implementation,
+replay migrations 001-014, reset data or reassign the established legacy owner.
 
-Next work is separately authorized rollout and hosted signed-in acceptance.
-Preserve the deployed 01/02 baseline, research IDs, RLS and collector locks.
-Apply migrations 012-014, deploy and verify the format-2-aware collector first,
-then release the frontend. Update fetch-rss-feed for the longer-excerpt parser.
-014 supplies Research, article connections and entity storage. Take/verify a backup
-before hosted migration. Do not infer production authorization from this handoff.
+Fresh backup restored and upgraded with all 1,950 original rows/values preserved;
+production migrations 012-014 committed atomically and their ledger is verified.
+Collector v3 and RSS v5 were released before the frontend. CI and hosted SQL role
+checks passed; the automatic five-minute collector returned 200 at 22:10 UTC.
+Render serves the exact tested release and all 12 route/refresh/auth gates work.
 
-Known-name suggestions remain unconfirmed until review. Legacy summaries stay
-separate from original acquisition and analyst notes; preview is metadata, not
-full text. Coverage is not independent corroboration. No AI or graph engine was
-introduced.
+Next: real-account signed-in acceptance of intake and the research demo, plus
+routine publisher/preview availability monitoring. Public browser checks and SQL
+role tests do not establish end-user Auth/browser behavior. Do not invent or
+request account passwords unnecessarily. Backups, short-lived CLI connection
+plans and private evidence are ignored under .deployment.local/release03-04;
+never print or commit them. Keep original evidence, analyst text and reviewed
+mentions distinct; coverage never establishes independent corroboration.
 
 ## Deployed Milestones 01/02 handoff - 2026-10-16
 

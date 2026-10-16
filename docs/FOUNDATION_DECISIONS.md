@@ -16,8 +16,8 @@
 
 See [03](milestones/03-selective-intake.md) and [04](milestones/04-connected-research.md)
 for implementation contracts. These are approved product/design directions;
-schema/code are now implemented locally in migrations 012-014. Hosted changes
-remain pending separately authorized rollout.
+schema/code are deployed with migrations 012-014 and PR #3. Hosted SQL and public
+frontend checks pass; real-account signed-in browser acceptance remains separate.
 
 
 ## Implementation choices for 03/04 - 2026-10-16

@@ -1,5 +1,59 @@
 # Selective intake implementation review
 
+## Production release - 2026-10-16
+
+Status: deployed. [PR #3](https://github.com/benmattern/foundation/pull/3) merged
+at `849a09d5fffd53c9f4bc6ca812573f0a05dbabfc`. Implementation: `182b2e6`;
+release head including browser synchronization fixes: `b50d26d`.
+[GitHub CI run 38973287830](https://github.com/benmattern/foundation/actions/runs/38973287830)
+passed every check: clean install, lint, build, 59 tests, 11 PostgreSQL check groups,
+all three function checks and eight Linux Chromium browser journeys. Linux CI
+exposed missing waits for form/project navigation; the tests now wait for visible
+new-question/new-project headings. No arbitrary sleeps were added.
+
+The owner authorized deployment. A fresh consistent public schema/data plus
+migration-ledger backup was saved privately and restored into a disposable local
+PostgreSQL 18 cluster. All 1,950 original rows across 17 tables restored exactly
+and survived migrations 012-014 unchanged (excluding newly added columns).
+Production then applied those migrations in one transaction with ledger entries;
+the same complete row/value comparison and RLS/TRUNCATE checks passed before commit.
+At cutover, preserved data included 59 articles, six events, 19 event links,
+21 sources, 12 tags, 54 tag links, 422 candidates, seven feeds, 11 subscriptions
+and three projects. No legacy ownership reassignment or reset was performed.
+
+The format-2-aware collect-feeds v3 and longer-excerpt fetch-rss-feed v5 were
+released before the frontend; fetch-url-metadata v4 was unchanged. All three
+functions are ACTIVE and reject anonymous POST with 401. The existing five-minute
+foundation-ingestion cron remains active; its 22:10 UTC post-deployment invocation
+succeeded and received HTTP 200 without timeout. This proves orchestration, not
+unrestricted access to every publisher or full article text.
+
+Hosted SQL-role verification passed pinned vocabulary/CAS, source state versus
+shared availability, Later/restore/preview/acceptance, independent question notes,
+validated citation passages, entity types and mention review/rescan idempotency,
+retained prose after deletion, cross-project/owner denial and anonymous denial.
+Every fictional verification write was rolled back; no test records remain.
+These checks exercise hosted SQL authorization, not end-user Auth/browser login.
+
+[The live application](https://foundation-ljfo.onrender.com) serves the exact
+locally tested JavaScript/CSS bytes and new feature markers. All 12 routes passed
+direct visits, refreshes and anonymous sign-in gates, including /research,
+/entities and /articles/:id. Desktop 1440/mobile 390 sign-in screens were rendered
+and visually inspected: required fields work, no horizontal overflow, console
+errors, page errors or failed requests. Public frontend verification completed
+at 2026-10-16T22:09:41.433Z. Entry asset: `index-BkKXpD8R.js`.
+
+Remaining acceptance: a real-account signed-in browser journey through collection,
+rule editing, preview retrieval and the complete research demo. No owner password,
+auth session or login link was requested or created. Existing publisher availability
+failures remain operational checks; HTTP 200 from the scheduler is not a claim
+that every feed succeeded. Backups, credentials and detailed private evidence stay
+ignored under .deployment.local/release03-04 and must never be printed or committed.
+
+<details>
+<summary>Local implementation review before authorized deployment</summary>
+
+
 Date: 2026-10-16. Branch: docs/selective-intake-connected-research.
 Reviewed baseline: 28b326a13e1542affeb0053d32f70e332937e988.
 Status: implemented and locally accepted in the working tree; not deployed.
@@ -95,3 +149,5 @@ request with edited content reports a conflict instead of silently ignoring the
 new draft. Version-1 stored scores are used unchanged across JavaScript/SQL
 Unicode case-folding differences; older scoreless results receive a server
 fallback score, returned to the pane so its explanation agrees with ordering.
+
+</details>

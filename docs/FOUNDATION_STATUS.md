@@ -1,25 +1,31 @@
 # FOUNDATION Current Status
 
-## Current local implementation - 2026-10-16
+## Deployed Milestones 03/04 - 2026-10-16
 
-Milestones 03 and 04 are implemented in sequence on
-`docs/selective-intake-connected-research`, working tree over documentation
-baseline `28b326a13e1542affeb0053d32f70e332937e988`.
+Milestones 03 and 04 are deployed through [PR #3](https://github.com/benmattern/foundation/pull/3),
+merge `849a09d` (release head `b50d26d`).
 [Selective intake review](reviews/03-selective-intake.md) and
-[connected research review](reviews/04-connected-research.md) record results.
+[connected research review](reviews/04-connected-research.md) contain exact evidence.
 
-Delivered locally: Follow/Pause/Unfollow, explicit grouped intake rules, pinned
-vocabulary versions, explained relevance, original/preview provenance and Later;
-then project questions, many-to-many evidence notes, sourced findings, separate
-article notes, entity identities/aliases, manual and known-name mention review,
-related articles and factual coverage signals. All function without AI.
+Delivered: durable Follow/Pause/Unfollow; grouped intake, pinned vocabulary,
+explained relevance, attributed preview and Later; then research questions,
+independent evidence notes, sourced findings, separate article notes, entity
+identities/aliases, reviewed mentions, related articles and factual coverage.
 
-Migrations 012-014 are additive and locally tested. Browser tests use fictional
-mock APIs; SQL and concurrency tests use disposable databases. No hosted data,
-credentials, deployment or merge was used for this task. GitHub CI was not run;
-its commands are exercised locally. Milestones 01/02 remain the deployed release.
-Separately authorized backup, migrations, collector/frontend release and live
-signed-in acceptance are next. See the reviews for rollout order and limits.
+Fresh consistent backup and actual-data restore/upgrade rehearsal passed. All
+1,950 pre-migration rows across 17 tables were preserved. Production ledger now
+contains 001-014; all public tables retain RLS and no API TRUNCATE grants.
+Hosted owner/foreign-owner/anonymous SQL checks passed with every test write rolled
+back. Collector v3 and RSS v5 were deployed before the frontend; all functions
+reject anonymous requests, and the 22:10 UTC automatic collector returned 200.
+
+[GitHub CI](https://github.com/benmattern/foundation/actions/runs/38973287830)
+passed 59 tests, eight browser journeys, 11 PostgreSQL check groups and all other
+checks. Live Render assets exactly match the tested build; 12 direct/refresh
+routes and desktop/mobile anonymous browser checks pass without errors.
+Real-account signed-in browser acceptance remains unverified. No owner login
+credentials/session were created or requested. Private backups/evidence remain
+ignored; do not print or commit them.
 
 ## Deployed Milestones 01/02 baseline - 2026-10-16
 
