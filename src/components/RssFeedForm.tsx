@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Card } from "./ui/Card";
 import type { UpsertRssFeedInput } from "../services/rssFeedService";
 import type { RssFeed } from "../types/rssFeed";
@@ -11,36 +11,33 @@ type Props = {
   onCancelEdit: () => void;
 };
 
-export function RssFeedForm({
+export function RssFeedForm(props: Props) {
+  return (
+    <RssFeedFormFields
+      key={JSON.stringify(props.feedToEdit)}
+      {...props}
+    />
+  );
+}
+
+function RssFeedFormFields({
   feedToEdit,
   sources,
   onSubmit,
   onCancelEdit,
 }: Props) {
-  const [feedUrl, setFeedUrl] = useState("");
-  const [sourceId, setSourceId] = useState("");
-  const [title, setTitle] = useState("");
-  const [isActive, setIsActive] = useState(true);
+  const [feedUrl, setFeedUrl] = useState(() => feedToEdit?.feed_url ?? "");
+  const [sourceId, setSourceId] = useState(() => feedToEdit?.source_id ?? "");
+  const [title, setTitle] = useState(() => feedToEdit?.title ?? "");
+  const [isActive, setIsActive] = useState(() => feedToEdit?.is_active ?? true);
   const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (!feedToEdit) {
-      setFeedUrl("");
-      setSourceId("");
-      setTitle("");
-      setIsActive(true);
-      return;
-    }
-
-    setFeedUrl(feedToEdit.feed_url);
-    setSourceId(feedToEdit.source_id ?? "");
-    setTitle(feedToEdit.title ?? "");
-    setIsActive(feedToEdit.is_active);
-  }, [feedToEdit]);
+  const [error, setError] = useState("");
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submitting) return;
     setSubmitting(true);
+    setError("");
 
     try {
       await onSubmit({
@@ -56,6 +53,12 @@ export function RssFeedForm({
         setTitle("");
         setIsActive(true);
       }
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Unable to save feed. Your edits are preserved.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -73,6 +76,7 @@ export function RssFeedForm({
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {error && <p role="alert" className="text-red-300">{error}</p>}
         <div>
           <label className="mb-2 block text-sm font-medium text-slate-300">
             Feed URL
@@ -123,7 +127,7 @@ export function RssFeedForm({
             onChange={(event) => setIsActive(event.target.checked)}
             className="h-4 w-4 rounded border-slate-700 bg-slate-950 text-blue-500 focus:ring-blue-500"
           />
-          Active
+          Collector available across your projects
         </label>
 
         <div className="flex flex-wrap gap-3">
@@ -132,7 +136,11 @@ export function RssFeedForm({
             disabled={submitting}
             className="rounded-xl bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {submitting ? "Saving..." : feedToEdit ? "Save Changes" : "Add Feed"}
+            {submitting
+              ? "Saving..."
+              : feedToEdit
+              ? "Save Changes"
+              : "Add Feed"}
           </button>
 
           {feedToEdit && (

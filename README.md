@@ -1,5 +1,21 @@
 # FOUNDATION
 
+## Ingestion implementation — 2026-10-16
+
+The current branch adds authenticated projects, server-owned ingestion,
+subscriptions/rules, transactional review, bulk actions and migration history.
+Database migrations, all three functions and server scheduling are deployed.
+Frontend rollout and authenticated browser verification remain pending. The older planning
+and prototype descriptions below are historical.
+
+Use Node 24/npm 11, then run `npm ci`, `npm run lint`, `npm run build`,
+`npm test`, `npm run check:functions`, and `npm run test:e2e`.
+The browser test uses Edge on Windows or installed Playwright Chromium on Linux,
+with mocked APIs. Full local Supabase needs Docker; hosted upgrades additionally
+need schema/policy reconciliation and a verified legacy owner UUID.
+See [operating procedures](docs/FOUNDATION_ARCHITECTURE.md),
+[implementation evidence](docs/reviews/01-ingestion.md) and [AGENTS.md](AGENTS.md).
+
 ## Current planning update — 2026-10-16
 
 A repository assessment is available in [docs/reviews/01-ingestion.md](docs/reviews/01-ingestion.md).

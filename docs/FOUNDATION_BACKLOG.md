@@ -1,5 +1,21 @@
 # FOUNDATION Backlog
 
+## Local implementation handoff — 2026-10-16
+
+Milestone 01 code, migrations and local verification now supersede the historical
+next-feature menu below. Finish hosted reconciliation and rollout validation
+before treating automated ingestion as operational:
+
+- [ ] Obtain policies, grants, functions/triggers and complete live schema inventory.
+- [ ] Verify the auth user UUID that should own legacy data.
+- [ ] Reconcile normalized legacy URL collisions without deleting research.
+- [ ] Repeat upgrade/access/concurrency checks on a disposable full Supabase stack.
+- [ ] Verify scheduler/runtime capacity and costs; authorize deployment separately.
+- [ ] Deploy matching migrations/functions/frontend, then verify browser-closed intake.
+- [ ] Validate DNS/egress behavior in the actual hosted runtime.
+
+No new AI, paid connectors, organization administration or graph work was added.
+
 ## Current planning priority — 2026-10-16
 
 Assessment complete: [findings and limits](reviews/01-ingestion.md).

@@ -28,4 +28,12 @@ export type IngestionCandidate = {
   created_at: string;
   updated_at: string;
   reviewed_at: string | null;
+  project_id?: string;
+  item_id?: string | null;
+  tag_ids?: string[];
+  route?: "pending" | "outside_scope";
+  rule_result?:
+    | import("../../supabase/functions/_shared/rules").RuleResult
+    | null;
+  original_acquisition?: Record<string, unknown> | null;
 };

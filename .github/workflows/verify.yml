@@ -1,0 +1,21 @@
+name: Verify
+on: [push, pull_request]
+jobs:
+  local-verification:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm test
+      - run: sudo apt-get update
+      - run: sudo apt-get install -y postgresql
+      - run: PG_BIN="$(pg_config --bindir)" npm run test:postgres
+      - run: npm run check:functions
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e

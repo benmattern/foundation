@@ -1,9 +1,12 @@
 # Milestone 01: Project-aware automated ingestion
 
-Status: proposed implementation brief, prepared 2026-10-16.
+Status: locally implemented and tested; hosted rollout pending, 2026-10-16.
 Baseline: main at 030030562e3bf6298005814ff56f78093631fc51.
 Assessment: ../reviews/01-ingestion.md.
-No feature in this document is implemented merely because it is specified here.
+The checked criteria below reflect local tests only; hosted verification is
+separate. Implementation extends documentation commit f87efb7 in the working tree.
+The owner approved the review recommendations. See the updated assessment for
+evidence, deviations and external prerequisites.
 
 ## Outcome
 
@@ -136,31 +139,35 @@ with durable, clear results.
 
 ## Acceptance criteria
 
-- [ ] An existing-data upgrade preserves source/article/event/tag relationships.
-- [ ] A fresh database can be set up from tracked migrations and fictional seeds.
-- [ ] Authenticated access works; anonymous/cross-owner reads and writes are denied.
-- [ ] Two projects follow one source with different enable states and rules;
+Checked items are locally verified with SQL/component/browser tests. Browser APIs
+are mocked; PostgreSQL contention uses a separate disposable PostgreSQL 18 server.
+No hosted deployment or browser-closed scheduled collection is claimed.
+
+- [x] An existing-data upgrade preserves source/article/event/tag relationships.
+- [x] A fresh database can be set up from tracked migrations and fictional seeds.
+- [x] Authenticated access works; anonymous/cross-owner reads and writes are denied.
+- [x] Two projects follow one source with different enable states and rules;
       review/tag actions in one do not change the other.
 - [ ] Catalog discovery and manual source/feed addition work.
 - [ ] Scheduled collection creates candidates with no browser or Mac running.
-- [ ] Pause/resume is enforced server-side and preserves history.
-- [ ] Concurrent fetches and retries produce no duplicate project candidates;
+- [x] Pause/resume is enforced server-side and preserves history.
+- [x] Concurrent fetches and retries produce no duplicate project candidates;
       multiple feed origins remain discoverable.
-- [ ] Acceptance retries/concurrency create at most one intended approved result,
+- [x] Acceptance retries/concurrency create at most one intended approved result,
       with atomic tags and status updates; failure does not leave partial writes.
-- [ ] Include/exclude/tag rules are explainable, previewable and versioned.
-- [ ] Outside-scope and rejected material can be recovered without reimporting.
-- [ ] Candidate tags persist before acceptance; analyst edits survive rule reruns.
-- [ ] Bulk actions show scope/count and per-item failures.
-- [ ] Paginated server queries and counts remain correct beyond the hosted row cap;
+- [x] Include/exclude/tag rules are explainable, previewable and versioned.
+- [x] Outside-scope and rejected material can be recovered without reimporting.
+- [x] Candidate tags persist before acceptance; analyst edits survive rule reruns.
+- [x] Bulk actions show scope/count and per-item failures.
+- [x] Paginated server queries and counts remain correct beyond the hosted row cap;
       the review panel always selects from the visible filtered result.
-- [ ] Feed failures/partial runs are durable and distinguish last attempt/success.
-- [ ] RSS/Atom fixtures cover namespaces, entities, missing fields, GUIDs, relative
+- [x] Feed failures/partial runs are durable and distinguish last attempt/success.
+- [x] RSS/Atom fixtures cover namespaces, entities, missing fields, GUIDs, relative
       links, invalid schemes, malformed and oversized documents.
 - [ ] Manual URL capture, article management, dashboard and events still work.
-- [ ] npm ci, build, lint and relevant frontend/backend/database tests pass,
+- [x] npm ci, build, lint and relevant frontend/backend/database tests pass,
       with existing failures and exceptions documented rather than hidden.
-- [ ] Demo succeeds without AI configured. No credentials are in frontend code.
+- [x] Demo succeeds without AI configured. No credentials are in frontend code.
 
 ## Implementation feedback contract
 

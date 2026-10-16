@@ -34,7 +34,7 @@ export default function EventDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [event, setEvent] = useState<FoundationEventWithArticleTags | null>(
-    null
+    null,
   );
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,7 +59,22 @@ export default function EventDetailPage() {
   }
 
   useEffect(() => {
-    loadEventDetail();
+    let active = true;
+    Promise.all([getEventWithArticleTagsById(id!), getArticles()]).then(
+      ([eventData, articleData]) => {
+        if (active) {
+          setEvent(eventData);
+          setArticles(articleData);
+        }
+      },
+    ).catch((error: unknown) => {
+      if (active) console.error(error);
+    }).finally(() => {
+      if (active) setLoading(false);
+    });
+    return () => {
+      active = false;
+    };
   }, [id]);
 
   async function updateEvent(values: EventFormValues) {
@@ -71,6 +86,7 @@ export default function EventDetailPage() {
       await loadEventDetail();
     } catch (error) {
       console.error("Error updating event:", error);
+      throw error;
     }
   }
 
@@ -78,7 +94,7 @@ export default function EventDetailPage() {
     if (!event) return;
 
     const confirmed = window.confirm(
-      `Delete "${event.title}"? This cannot be undone.`
+      `Delete "${event.title}"? This cannot be undone.`,
     );
 
     if (!confirmed) return;
@@ -125,100 +141,102 @@ export default function EventDetailPage() {
 
       <PageHeader title={event.title} description="Event detail record" />
 
-      {editing ? (
-        <EventForm
-          articles={articles}
-          mode="edit"
-          initialEvent={event}
-          onSubmit={updateEvent}
-          onCancel={() => setEditing(false)}
-        />
-      ) : (
-        <div className="space-y-6">
-          <Card>
-            <div className="space-y-6">
-              <div className="flex flex-wrap justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setEditing(true)}
-                  className="rounded-xl bg-blue-600 px-5 py-2 font-medium text-white transition hover:bg-blue-500"
-                >
-                  Edit Event
-                </button>
-
-                <button
-                  type="button"
-                  onClick={deleteEvent}
-                  className="rounded-xl border border-red-900/50 bg-red-950/30 px-5 py-2 font-medium text-red-300 transition hover:bg-red-900/40"
-                >
-                  Delete Event
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <p className="text-sm text-slate-400">Status</p>
-                  <p className="text-white">{event.status}</p>
-                </div>
-
-                <div>
-                  <p className="text-sm text-slate-400">Type</p>
-                  <p className="text-white">
-                    {event.event_type || "Unclassified"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-sm text-slate-400">Occurred</p>
-                  <p className="text-white">
-                    {event.occurred_at
-                      ? new Date(event.occurred_at).toLocaleDateString()
-                      : "Unknown"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-sm text-slate-400">Location</p>
-                  <p className="text-white">
-                    {event.location || "No location added."}
-                  </p>
-                </div>
-              </div>
-
-              <div>
-                <p className="text-sm text-slate-400">Description</p>
-                <p className="whitespace-pre-wrap text-white">
-                  {event.description || "No description added."}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-sm text-slate-400">Created</p>
-                <p className="text-white">
-                  {new Date(event.created_at).toLocaleString()}
-                </p>
-              </div>
-            </div>
-          </Card>
-
-          <EventIntelligenceSummary
-            supportingArticleCount={event.articles.length}
-            newestArticle={newestArticle}
-            oldestArticle={oldestArticle}
-            eventAge={getRelativeDateLabel(event.occurred_at)}
-            lastActivity={formatDate(
-              getLastActivityDate(event, event.articles)
-            )}
-            relatedTags={relatedTags}
-            formatArticleDate={formatArticleDate}
+      {editing
+        ? (
+          <EventForm
+            articles={articles}
+            mode="edit"
+            initialEvent={event}
+            onSubmit={updateEvent}
+            onCancel={() => setEditing(false)}
           />
+        )
+        : (
+          <div className="space-y-6">
+            <Card>
+              <div className="space-y-6">
+                <div className="flex flex-wrap justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditing(true)}
+                    className="rounded-xl bg-blue-600 px-5 py-2 font-medium text-white transition hover:bg-blue-500"
+                  >
+                    Edit Event
+                  </button>
 
-          <EventArticleTimeline
-            articles={timelineArticles}
-            formatArticleDate={formatArticleDate}
-          />
-        </div>
-      )}
+                  <button
+                    type="button"
+                    onClick={deleteEvent}
+                    className="rounded-xl border border-red-900/50 bg-red-950/30 px-5 py-2 font-medium text-red-300 transition hover:bg-red-900/40"
+                  >
+                    Delete Event
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <p className="text-sm text-slate-400">Status</p>
+                    <p className="text-white">{event.status}</p>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-slate-400">Type</p>
+                    <p className="text-white">
+                      {event.event_type || "Unclassified"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-slate-400">Occurred</p>
+                    <p className="text-white">
+                      {event.occurred_at
+                        ? new Date(event.occurred_at).toLocaleDateString()
+                        : "Unknown"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-slate-400">Location</p>
+                    <p className="text-white">
+                      {event.location || "No location added."}
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm text-slate-400">Description</p>
+                  <p className="whitespace-pre-wrap text-white">
+                    {event.description || "No description added."}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-slate-400">Created</p>
+                  <p className="text-white">
+                    {new Date(event.created_at).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            <EventIntelligenceSummary
+              supportingArticleCount={event.articles.length}
+              newestArticle={newestArticle}
+              oldestArticle={oldestArticle}
+              eventAge={getRelativeDateLabel(event.occurred_at)}
+              lastActivity={formatDate(
+                getLastActivityDate(event, event.articles),
+              )}
+              relatedTags={relatedTags}
+              formatArticleDate={formatArticleDate}
+            />
+
+            <EventArticleTimeline
+              articles={timelineArticles}
+              formatArticleDate={formatArticleDate}
+            />
+          </div>
+        )}
     </>
   );
 }
@@ -244,6 +262,6 @@ function getRelatedTags(articles: ArticleWithTags[]): RelatedTagSummary[] {
   });
 
   return [...tagsById.values()].sort(
-    (a, b) => b.count - a.count || a.name.localeCompare(b.name)
+    (a, b) => b.count - a.count || a.name.localeCompare(b.name),
   );
 }

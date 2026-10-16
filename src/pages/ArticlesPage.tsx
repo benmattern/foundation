@@ -9,10 +9,10 @@ import type { UrlImportResult } from "../lib/urlImport";
 import type { UrlMetadataResponse } from "../types/urlMetadata";
 import type { ArticleWithTags } from "../types/article";
 import {
-  getArticlesWithTags,
   createArticle as createArticleRecord,
-  updateArticle as updateArticleRecord,
   deleteArticle as deleteArticleRecord,
+  getArticlesWithTags,
+  updateArticle as updateArticleRecord,
 } from "../services/articleService";
 import { createIngestionCandidate } from "../services/ingestionCandidateService";
 import type { ArticleFormValues } from "../components/ArticleForm";
@@ -29,24 +29,24 @@ export default function ArticlesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTagId, setSelectedTagId] = useState("");
   const [selectedSourceId, setSelectedSourceId] = useState("");
-  const [editingArticle, setEditingArticle] =
-    useState<ArticleWithTags | null>(null);
-  const [articleDraft, setArticleDraft] =
-    useState<ArticleFormDraftValues | null>(null);
+  const [editingArticle, setEditingArticle] = useState<ArticleWithTags | null>(
+    null,
+  );
+  const [articleDraft, setArticleDraft] = useState<
+    ArticleFormDraftValues | null
+  >(null);
 
   const normalizedSearchQuery = searchQuery.trim().toLowerCase();
   const filteredArticles = articles.filter((article) => {
-    const matchesSearch =
-      normalizedSearchQuery === "" ||
+    const matchesSearch = normalizedSearchQuery === "" ||
       article.title.toLowerCase().includes(normalizedSearchQuery) ||
       (article.summary ?? "").toLowerCase().includes(normalizedSearchQuery);
 
-    const matchesTag =
-      selectedTagId === "" ||
+    const matchesTag = selectedTagId === "" ||
       article.tags.some((tag) => tag.id === selectedTagId);
 
-    const matchesSource =
-      selectedSourceId === "" || article.source_id === selectedSourceId;
+    const matchesSource = selectedSourceId === "" ||
+      article.source_id === selectedSourceId;
 
     return matchesSearch && matchesTag && matchesSource;
   });
@@ -76,7 +76,23 @@ export default function ArticlesPage() {
   }
 
   useEffect(() => {
-    loadArticles();
+    let active = true;
+    Promise.all([getArticlesWithTags(), getSources(), getTags()]).then(
+      ([articleData, sourceData, tagData]) => {
+        if (active) {
+          setArticles(articleData);
+          setSources(sourceData);
+          setTags(tagData);
+        }
+      },
+    ).catch((error: unknown) => {
+      if (active) console.error(error);
+    }).finally(() => {
+      if (active) setLoading(false);
+    });
+    return () => {
+      active = false;
+    };
   }, []);
 
   async function createArticle(article: ArticleFormValues) {
@@ -86,6 +102,7 @@ export default function ArticlesPage() {
       await loadArticles();
     } catch (error) {
       console.error("Error adding article:", error);
+      throw error;
     }
   }
 
@@ -98,12 +115,13 @@ export default function ArticlesPage() {
       await loadArticles();
     } catch (error) {
       console.error("Error updating article:", error);
+      throw error;
     }
   }
 
   async function deleteArticle(article: ArticleWithTags) {
     const confirmed = window.confirm(
-      `Delete "${article.title}"? This cannot be undone.`
+      `Delete "${article.title}"? This cannot be undone.`,
     );
 
     if (!confirmed) return;
@@ -123,10 +141,10 @@ export default function ArticlesPage() {
 
   function importArticleDraft(
     result: UrlImportResult,
-    metadata?: UrlMetadataResponse
+    metadata?: UrlMetadataResponse,
   ) {
-    const metadataUrl =
-      metadata?.canonicalUrl ?? metadata?.finalUrl ?? result.normalizedUrl;
+    const metadataUrl = metadata?.canonicalUrl ?? metadata?.finalUrl ??
+      result.normalizedUrl;
 
     setEditingArticle(null);
     setArticleDraft({
@@ -147,7 +165,7 @@ export default function ArticlesPage() {
 
   async function saveImportToQueue(
     result: UrlImportResult,
-    metadata?: UrlMetadataResponse
+    metadata?: UrlMetadataResponse,
   ) {
     const warnings = [
       ...(metadata?.warnings ?? []),
@@ -177,56 +195,56 @@ export default function ArticlesPage() {
         description="Collect, review, and organize articles gathered from OSINT sources."
       />
 
-      {loading ? (
-        <p className="text-slate-400">Loading articles...</p>
-      ) : (
-        <div className="space-y-6">
-          <ArticleFilters
-            searchQuery={searchQuery}
-            selectedTagId={selectedTagId}
-            selectedSourceId={selectedSourceId}
-            sources={sources}
-            tags={tags}
-            resultCount={filteredArticles.length}
-            totalCount={articles.length}
-            onSearchQueryChange={setSearchQuery}
-            onSelectedTagIdChange={setSelectedTagId}
-            onSelectedSourceIdChange={setSelectedSourceId}
-            onClearFilters={clearFilters}
-          />
+      {loading
+        ? <p className="text-slate-400">Loading articles...</p>
+        : (
+          <div className="space-y-6">
+            <ArticleFilters
+              searchQuery={searchQuery}
+              selectedTagId={selectedTagId}
+              selectedSourceId={selectedSourceId}
+              sources={sources}
+              tags={tags}
+              resultCount={filteredArticles.length}
+              totalCount={articles.length}
+              onSearchQueryChange={setSearchQuery}
+              onSelectedTagIdChange={setSelectedTagId}
+              onSelectedSourceIdChange={setSelectedSourceId}
+              onClearFilters={clearFilters}
+            />
 
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            <div className="space-y-6">
-              {!editingArticle && (
-                <ArticleUrlImport
-                  articles={articles}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              <div className="space-y-6">
+                {!editingArticle && (
+                  <ArticleUrlImport
+                    articles={articles}
+                    sources={sources}
+                    onImportDraft={importArticleDraft}
+                    onSaveToQueue={saveImportToQueue}
+                  />
+                )}
+
+                <ArticleForm
                   sources={sources}
-                  onImportDraft={importArticleDraft}
-                  onSaveToQueue={saveImportToQueue}
+                  tags={tags}
+                  mode={editingArticle ? "edit" : "create"}
+                  initialArticle={editingArticle}
+                  initialDraft={articleDraft}
+                  onSubmit={editingArticle ? updateArticle : createArticle}
+                  onCancel={editingArticle
+                    ? () => setEditingArticle(null)
+                    : undefined}
                 />
-              )}
-
-              <ArticleForm
-                sources={sources}
-                tags={tags}
-                mode={editingArticle ? "edit" : "create"}
-                initialArticle={editingArticle}
-                initialDraft={articleDraft}
-                onSubmit={editingArticle ? updateArticle : createArticle}
-                onCancel={
-                  editingArticle ? () => setEditingArticle(null) : undefined
-                }
+              </div>
+              <ArticleList
+                articles={filteredArticles}
+                emptyMessage="No articles match the current filters."
+                onEditArticle={editArticle}
+                onDeleteArticle={deleteArticle}
               />
             </div>
-            <ArticleList
-              articles={filteredArticles}
-              emptyMessage="No articles match the current filters."
-              onEditArticle={editArticle}
-              onDeleteArticle={deleteArticle}
-            />
           </div>
-        </div>
-      )}
+        )}
     </>
   );
 }

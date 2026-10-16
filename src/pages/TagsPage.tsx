@@ -7,9 +7,9 @@ import { TagList } from "../components/TagList";
 import type { Tag } from "../types/tag";
 
 import {
-  getTags,
   createTag as createTagRecord,
   deleteTag as deleteTagRecord,
+  getTags,
 } from "../services/tagService";
 
 import { Card } from "../components/ui/Card";
@@ -18,19 +18,18 @@ export default function TagsPage() {
   const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
 
-  async function loadTags() {
-    try {
-      const data = await getTags();
-      setTags(data);
-    } catch (error) {
-      console.error("Error loading tags:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   useEffect(() => {
-    loadTags();
+    let active = true;
+    getTags().then((data) => {
+      if (active) setTags(data);
+    }).catch((error: unknown) => {
+      if (active) console.error(error);
+    }).finally(() => {
+      if (active) setLoading(false);
+    });
+    return () => {
+      active = false;
+    };
   }, []);
 
   async function createTag(tag: {
@@ -41,9 +40,7 @@ export default function TagsPage() {
       const data = await createTagRecord(tag);
 
       setTags((prev) =>
-        [...prev, data].sort((a, b) =>
-          a.name.localeCompare(b.name)
-        )
+        [...prev, data].sort((a, b) => a.name.localeCompare(b.name))
       );
     } catch (error) {
       console.error("Error creating tag:", error);
@@ -54,9 +51,7 @@ export default function TagsPage() {
     try {
       await deleteTagRecord(id);
 
-      setTags((prev) =>
-        prev.filter((tag) => tag.id !== id)
-      );
+      setTags((prev) => prev.filter((tag) => tag.id !== id));
     } catch (error) {
       console.error("Error deleting tag:", error);
     }
@@ -69,22 +64,22 @@ export default function TagsPage() {
         description="Manage topics used to classify intelligence records."
       />
 
-      {loading ? (
-        <p className="text-slate-400">Loading tags...</p>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <Card>
-            <TagForm onCreateTag={createTag} />
-          </Card>
+      {loading
+        ? <p className="text-slate-400">Loading tags...</p>
+        : (
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+            <Card>
+              <TagForm onCreateTag={createTag} />
+            </Card>
 
-          <Card>
-            <TagList
-              tags={tags}
-              onDeleteTag={deleteTag}
-            />
-          </Card>
-        </div>
-      )}
+            <Card>
+              <TagList
+                tags={tags}
+                onDeleteTag={deleteTag}
+              />
+            </Card>
+          </div>
+        )}
     </div>
   );
 }

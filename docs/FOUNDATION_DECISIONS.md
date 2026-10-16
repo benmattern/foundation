@@ -1,5 +1,43 @@
 # FOUNDATION Architectural Decisions
 
+## Implementation decisions — 2026-10-16
+
+The owner instructed implementation to proceed with the review recommendations.
+These choices supersede the historical prototype descriptions below:
+
+- Authenticated owners have multiple private projects. Accounts are explicitly
+  provisioned; there is no public signup or automatic legacy-data claiming.
+- Acquired evidence is reused within an owner in `collected_items`; approved
+  `articles` remain project-specific editable records. This preserves existing
+  article IDs and event links and avoids shared analyst edits. Removing an
+  article removes its project approval/links, retains acquisition evidence, and
+  leaves its candidate recoverable. It does not delete another project's article.
+- Events and dashboards operate within the active project. Sources/feed
+  definitions and tag vocabulary are owner-wide; assignments, review decisions,
+  event links, rule results and subscriptions are project-specific.
+- Manual capture requires a project and uses the same durable item identity.
+  Explicit manual capture starts pending (or links an existing project approval);
+  it remains available when metadata retrieval fails. Direct analyst-approved
+  article creation remains supported through a transaction.
+- Feed GUID/Atom IDs identify origins; normalized URLs identify reusable
+  acquisitions. Later observations never replace original acquisition fields or
+  analyst edits and never silently reopen a reviewed candidate.
+- Rule phrases use Unicode NFKC, lowercase, collapsed whitespace and literal
+  substrings; no regex/stemming/word-boundary inference. Categories match
+  independently. Empty lists explicitly override defaults; null inherits.
+- Reapplication is explicit, only processes pending candidates, and retains
+  analyst additions/removals, edited fields and routing overrides. Every changed
+  rule result is retained in evaluation history.
+- Default scheduling is a five-minute dispatcher, up to five due feeds, hourly
+  successful feed polling, bounded runtime and exponential failure backoff.
+  Subscription changes invalidate validators and force a current-window check.
+- Original evidence, observations, outside-scope candidates, review history and
+  runs have no automatic deletion policy in v1. Monitor storage; retention changes
+  require an explicit follow-up decision. No paid service was enabled.
+- Hosted mutations remain unperformed. The supplied table-only export supports
+  the reconstructed baseline; it does not establish live grants, policies,
+  functions or operational availability.
+
 ## Direction update — 2026-10-16
 
 ### Accepted product requirements from the current discussion

@@ -1,5 +1,155 @@
 # Ingestion assessment and architecture review
 
+## Production rollout ? 2026-10-16
+
+Deployment and use of the postgres role are authorized. The supplied owner UUID
+is verified against a confirmed Auth user.
+Schema/data logical backups succeeded and were restored into a disposable local
+PostgreSQL cluster. The captured live schema/data upgraded successfully with all
+legacy IDs and associations preserved. Production migrations 002?011 committed;
+the reconciled baseline and all eleven versions are recorded in the ledger.
+
+Production checks preserve 19 sources, 50 articles, 12 tags, 54 article-tag
+links, six events, 19 article-event links, 213 preexisting candidates and five
+feeds. All public research tables have RLS; no API-role TRUNCATE grant remains.
+All three functions are deployed and anonymous POST requests return 401.
+Vault-backed five-minute pg_cron/pg_net scheduling is active. A server-authenticated
+collection pass returned 200: two feeds succeeded and staged 38 new candidates;
+three legacy feeds failed with upstream 403, timeout and DNS resolution errors.
+Failures are recorded with retry/backoff; successful feeds continue independently.
+
+Local verification passes: 38 tests, six PostgreSQL concurrency scenarios,
+Edge browser workflow, Deno checks for all three functions, lint and production
+build without warnings. Actual-backup restore/upgrade rehearsal also passes.
+Frontend publication and Render verification remain outstanding. Render integration
+has been suggested but is not connected. End-user authenticated browser operation
+and an automatically triggered cron pass are not yet verified. No owner password
+or user session has been requested or created. Private backup/credential artifacts
+remain ignored under .deployment.local and must never be printed or committed.
+
+## Implementation handoff — 2026-10-16
+
+The owner approved the review recommendations and requested implementation,
+error/warning fixes and thorough testing. Local implementation extends
+`f87efb718ddc8c801d0f399dc7e12027e4284e1c` on
+`docs/ingestion-assessment-2026-10-16`; changes are in the working tree, not a
+newly committed/deployed release. The original assessment below is historical.
+
+### Implemented scope
+
+- Verified-user sign-in, private owner projects, project selection/settings and
+  archive behavior; no automatic legacy claiming or public signup.
+- Project-scoped articles, events, event links, dashboards and tag assignments.
+  Acquisition evidence is reused only within an owner; analyst edits remain
+  independent between projects.
+- Eleven tracked migrations, a baseline reconciled against the live schema,
+  guarded ownership backfill, composite ownership/project
+  foreign keys, RLS and privilege restrictions on all affected tables/joins/RPCs.
+- Transactional article/event writes and candidate acceptance, retry-safe
+  acceptance, conflicting-review outcomes, persistent candidate tags, explicit
+  route overrides, and immutable acquisition/observation/review/rule history.
+- One server collector for manual and scheduled requests, unique feed leases,
+  bounded work, current-subscription checks, stale-worker rejection, durable
+  partial/error outcomes, backoff and last-attempt/last-success separation.
+- Conditional RSS/Atom fetching, subscription intake generations/validator
+  invalidation, durable item identity and multiple origins, validating XML parser,
+  dates/authors/categories, explicit skips/limits and hardened IP/DNS/redirect checks.
+- Project/default and subscription/override rules, sample previews, versioned
+  explanations, explicit reapplication preserving analyst edits/tags/routing.
+- Server-side literal search, tag/date/source/import filters, stable pagination
+  and counts, filter persistence, visible-only selection and durable per-item
+  bulk success/failure history.
+- Small publisher-verified source catalog, source/feed subscription switches,
+  manual source/feed management, run history, environment example, deployment/
+  scheduler/disable/rollback instructions and a non-deploying CI workflow.
+- Existing React effect-state/dependency lint failures fixed with initialized,
+  keyed forms and cancellable asynchronous initial loading. Review controls
+  guard in-flight actions and preserve failed drafts. Vendor splitting removes
+  the previous >500 kB bundle warning. URL normalization rejects explicit invalid
+  schemes and embedded credentials.
+
+### Verification evidence
+
+Runtime: Windows, Node 24.13.0/npm 11.6.2. Local PostgreSQL: 18.1. No Docker
+runtime was available. PGlite supplies the broader isolated SQL/upgrade suite;
+the PostgreSQL executable supplies genuine separate-connection contention tests.
+
+| Command / check | Result |
+|---|---|
+| `npm.cmd ci --no-audit --no-fund --fetch-retries=0 --fetch-timeout=15000` | Passed, 273 packages; normal install scripts enabled; no dependency warnings |
+| `npm.cmd run lint` | Passed with zero errors/warnings |
+| `npm.cmd run build` | Passed; largest output chunk about 230 kB, no bundle warning |
+| `npm.cmd test` | 37 tests across 7 files: parser, rules, URL/network guards, forms/review, paging, collector auth, SQL/migrations/RLS/bulk/history |
+| `npm.cmd run test:postgres` | Six actual concurrent-connection scenarios passed against a new localhost-only cluster; cluster stopped and removed |
+| `npm.cmd run check:functions` | All three Edge Functions passed Deno checks using pinned lockfiles |
+| `npm.cmd run test:e2e` | Edge browser workflow passed: sign-in, project isolation, literal server search, visible-page bulk scope, partial conflict display, restore; APIs mocked to an invalid hostname |
+| `npm.cmd run check:catalog` | Federal Reserve RSS and UK Ministry of Defence Atom each returned HTTP 200, 20 usable items, zero parser warnings |
+| Hosted Supabase / Render / scheduler / costs | Not changed or independently verified |
+| Remote GitHub CI | Workflow prepared; not run remotely in this session |
+
+SQL coverage includes fresh setup, required/verified ownership on upgrade,
+preserved IDs and source/article/event/tag links, anonymous/cross-owner denial,
+project-specific decisions, acceptance retry/rollback, literal search/counts
+beyond 1,000 rows, lease expiry/replacement, durable partial outcomes, source
+pause/resume, stale subscription-edit conflicts, multiple origins/observations,
+repeatable fictional seeds, rule reapplication and bulk per-item failure history.
+Real PostgreSQL tests establish simultaneous claim/staging/acceptance behavior,
+pause serialization, accept/reject conflict handling and stale-validator defense.
+
+The original Node 24.19/npm 11.9 lockfile failure was not reproduced initially on
+this chosen runtime. Installing test/parser dependencies and reconciling the
+lockfile resolved optional metadata warnings; a final normal clean install passed.
+Initial sandbox-only attempts to fetch dependencies/start PostgreSQL were denied
+by filesystem/network/token boundaries. Authorized retries succeeded. A Windows
+startup harness pipe-inheritance issue was fixed; its stopped disposable cluster
+was removed explicitly. A post-install Deno cache refill required permitted
+network access, then function checks passed. These were environmental/test-harness
+issues, not hosted application failures.
+
+### Decisions and deviations
+
+- The reviewed recommendation is implemented as owner-shared `collected_items`
+  plus project-specific existing `articles`, rather than a new project/article
+  overlay table. `article_tags` therefore scopes through its approved article's
+  project. This preserves legacy article IDs/links while isolating all editable
+  fields and tags. Original legacy assignments are retained as legacy-project data.
+- Existing duplicate legacy rows/IDs are preserved; one exact-URL representative
+  is associated with acquisition identity. Normalized URL collisions and ambiguous
+  legacy duplicates are a pre-rollout reconciliation item, not silently merged.
+- Manual capture is explicit analyst intake and starts pending instead of being
+  automatically routed outside scope. Saved rules can be reapplied explicitly;
+  direct analyst-approved creation remains available.
+- Source and tag vocabularies are owner-wide; project article/candidate assignments
+  and event links are isolated. The catalog is deliberately small. JPL's feed
+  returned HTTP 403 during verification and was replaced by the working official
+  UK defence feed. No access restrictions were bypassed.
+- Fictional seeds are now opt-in, ownership-checked and non-deleting, rather than
+  cleaning/recreating the older anonymous demo dataset. Existing demo IDs/data
+  are preserved by the upgrade.
+- Retention defaults to preserving research/history indefinitely; no paid plan,
+  storage purge or model dependency was introduced. Polling/capacity/cost limits
+  are documented in FOUNDATION_ARCHITECTURE.
+
+### External prerequisites and remaining acceptance work
+
+1. Supply the verified `auth.users.id` for legacy ownership. The table-only export
+   did not include this, policies, grants, routines, triggers or a hosted audit.
+2. Run/reconcile the read-only inventory and schema export before any existing-data
+   rollout. Unknown existing policies deliberately stop migration 002. Review
+   aliases/duplicate research without deleting or reassigning IDs implicitly.
+3. Repeat the upgrade, user authentication, PostgREST and function integration on
+   a disposable full Supabase environment; local PostgreSQL does not emulate the
+   Auth server, HTTP authorization gateway, extensions or managed runtime.
+4. Verify the actual scheduler, runtime/plan capacity, DNS/egress behavior and costs.
+   DNS validation and the connection remain separate in the runtime; no DNS
+   rebinding isolation guarantee is claimed.
+5. Authorize/deploy the matching database/functions/frontend separately, enable
+   the prepared Vault-backed schedule, and demonstrate collection with browsers
+   closed. The complete hosted acceptance criterion remains unchecked.
+
+No hosted database changes, deployments, messages to others, merge or push were
+performed. The implementation and operating procedure are reviewable locally.
+
 Assessment date: 2026-10-16.
 Reviewed repository: benmattern/foundation, main at
 030030562e3bf6298005814ff56f78093631fc51.

@@ -1,0 +1,16 @@
+-- Run only after baseline reconciliation, backup, disposable upgrade tests and approval.
+-- psql --set=ON_ERROR_STOP=1 --set=legacy_owner_id=<verified-auth-user-uuid> --file=supabase/ops/upgrade.psql
+\set ON_ERROR_STOP on
+begin;
+select set_config('app.legacy_owner_id', :'legacy_owner_id', true);
+\ir ../migrations/20261016000200_projects.sql
+\ir ../migrations/20261016000300_review_operations.sql
+\ir ../migrations/20261016000400_search.sql
+\ir ../migrations/20261016000500_collection.sql
+\ir ../migrations/20261016000600_rules.sql
+\ir ../migrations/20261016000700_catalog.sql
+\ir ../migrations/20261016000800_integrity.sql
+\ir ../migrations/20261016000900_subscriptions.sql
+\ir ../migrations/20261016001000_bulk_review.sql
+\ir ../migrations/20261016001100_explicit_privileges.sql
+commit;

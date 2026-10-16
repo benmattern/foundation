@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import type { IngestionCandidate } from "../types/ingestionCandidate";
 import type { Source } from "../types/source";
 import type { Tag } from "../types/tag";
@@ -24,13 +24,17 @@ type Props = {
   tags: Tag[];
   onAcceptCandidate: (
     candidate: IngestionCandidate,
-    values: IngestionCandidateReviewValues
+    values: IngestionCandidateReviewValues,
   ) => Promise<void>;
   onRejectCandidate: (
     candidate: IngestionCandidate,
-    rejectionReason: string
+    rejectionReason: string,
   ) => Promise<void>;
   onMarkDuplicate: (candidate: IngestionCandidate) => Promise<void>;
+  onSaveCandidate?: (
+    candidate: IngestionCandidate,
+    values: IngestionCandidateReviewValues,
+  ) => Promise<void>;
 };
 
 function formatDateForInput(date: string | null): string {
@@ -56,45 +60,58 @@ function formatImportSource(importSource: string): string {
     .join(" ");
 }
 
-export function IngestionCandidateReview({
+export function IngestionCandidateReview(props: Props) {
+  return (
+    <CandidateReviewFields key={props.candidate?.id ?? "empty"} {...props} />
+  );
+}
+
+function CandidateReviewFields({
   candidate,
   sources,
   tags,
   onAcceptCandidate,
   onRejectCandidate,
   onMarkDuplicate,
+  onSaveCandidate,
 }: Props) {
-  const [values, setValues] = useState<IngestionCandidateReviewValues>({
-    url: "",
-    canonical_url: "",
-    final_url: "",
-    source_id: "",
-    title: "",
-    description: "",
-    published_at: "",
-    tag_ids: [],
+  const [values, setValues] = useState<IngestionCandidateReviewValues>(() => ({
+    url: candidate?.url ?? "",
+    canonical_url: candidate?.canonical_url ?? "",
+    final_url: candidate?.final_url ?? "",
+    source_id: candidate?.source_id ?? "",
+    title: candidate?.title ?? "",
+    description: candidate?.description ?? "",
+    published_at: formatDateForInput(candidate?.published_at ?? null),
+    tag_ids: candidate?.tag_ids ?? [],
     rejection_reason: "",
-  });
+  }));
+  const busyRef = useRef(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (!candidate) return;
-
-    setValues({
-      url: candidate.url,
-      canonical_url: candidate.canonical_url ?? "",
-      final_url: candidate.final_url ?? "",
-      source_id: candidate.source_id ?? "",
-      title: candidate.title ?? "",
-      description: candidate.description ?? "",
-      published_at: formatDateForInput(candidate.published_at),
-      tag_ids: [],
-      rejection_reason: "",
-    });
-  }, [candidate]);
+  async function review(action: () => Promise<void>) {
+    if (busyRef.current) return;
+    busyRef.current = true;
+    setBusy(true);
+    setError("");
+    try {
+      await action();
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Review failed. Your edits are preserved.",
+      );
+    } finally {
+      busyRef.current = false;
+      setBusy(false);
+    }
+  }
 
   function updateValue<K extends keyof IngestionCandidateReviewValues>(
     key: K,
-    value: IngestionCandidateReviewValues[K]
+    value: IngestionCandidateReviewValues[K],
   ) {
     setValues((current) => ({
       ...current,
@@ -125,14 +142,23 @@ export function IngestionCandidateReview({
     );
   }
 
-  const actionable = candidate.status === "pending";
-  const preview =
-    getIngestionCandidatePreview(candidate) ?? "No preview available.";
+  const actionable = candidate.status === "pending" && !busy;
+  const preview = getIngestionCandidatePreview(candidate) ??
+    "No preview available.";
   const sourceName =
     sources.find((source) => source.id === values.source_id)?.name ??
-    "Unknown source";
+      "Unknown source";
   const actionRow = (
     <div className="flex flex-wrap gap-3">
+      {onSaveCandidate && (
+        <button
+          type="button"
+          disabled={!actionable}
+          onClick={() => void review(() => onSaveCandidate(candidate, values))}
+        >
+          Save draft and tags
+        </button>
+      )}
       {values.url && (
         <a
           href={values.url}
@@ -147,7 +173,7 @@ export function IngestionCandidateReview({
       <button
         type="button"
         disabled={!actionable || !values.title || !values.url}
-        onClick={() => onAcceptCandidate(candidate, values)}
+        onClick={() => void review(() => onAcceptCandidate(candidate, values))}
         className="rounded-lg bg-slate-200 px-4 py-2 font-medium text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
       >
         Accept as Article
@@ -156,7 +182,10 @@ export function IngestionCandidateReview({
       <button
         type="button"
         disabled={!actionable}
-        onClick={() => onRejectCandidate(candidate, values.rejection_reason)}
+        onClick={() =>
+          void review(() =>
+            onRejectCandidate(candidate, values.rejection_reason)
+          )}
         className="rounded-lg border border-red-900/50 bg-red-950/30 px-4 py-2 font-medium text-red-300 transition hover:bg-red-900/40 disabled:cursor-not-allowed disabled:opacity-60"
       >
         Reject
@@ -165,7 +194,7 @@ export function IngestionCandidateReview({
       <button
         type="button"
         disabled={!actionable}
-        onClick={() => onMarkDuplicate(candidate)}
+        onClick={() => void review(() => onMarkDuplicate(candidate))}
         className="rounded-lg border border-slate-700 px-4 py-2 font-medium text-slate-300 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
       >
         Mark Duplicate
@@ -188,6 +217,39 @@ export function IngestionCandidateReview({
       </div>
 
       <div className="space-y-4">
+        {candidate.rule_result && (
+          <details className="text-slate-300">
+            <summary>
+              Why this item was routed · rules v{candidate.rule_result.version}
+            </summary>
+            <p>
+              Classified{" "}
+              {new Date(candidate.rule_result.classifiedAt).toLocaleString()} as
+              {" "}
+              {candidate.rule_result.route.replaceAll("_", " ")}.
+            </p>
+            <ul>
+              {candidate.rule_result.matches.map((match, index) => (
+                <li key={index}>
+                  {match.kind}: “{match.term}” in {match.field}
+                  {match.tag
+                    ? ` → ${
+                      tags.find((tag) => tag.id === match.tag)?.name ??
+                        "suggested tag"
+                    }`
+                    : ""}
+                </li>
+              ))}
+            </ul>
+            {candidate.rule_result.matches.length === 0 && (
+              <p>No terms matched; inclusion defaults determined the route.</p>
+            )}
+            {candidate.rule_result.warnings.map((warning) => (
+              <p key={warning}>{warning}</p>
+            ))}
+          </details>
+        )}
+        {error && <p role="alert" className="text-red-300">{error}</p>}
         {actionRow}
 
         <div>
@@ -240,8 +302,7 @@ export function IngestionCandidateReview({
               className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={values.published_at}
               onChange={(event) =>
-                updateValue("published_at", event.target.value)
-              }
+                updateValue("published_at", event.target.value)}
             />
           </div>
         </div>
@@ -286,9 +347,7 @@ export function IngestionCandidateReview({
             className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Description / summary"
             value={values.description}
-            onChange={(event) =>
-              updateValue("description", event.target.value)
-            }
+            onChange={(event) => updateValue("description", event.target.value)}
           />
         </div>
 
@@ -342,8 +401,7 @@ export function IngestionCandidateReview({
               placeholder="Canonical URL"
               value={values.canonical_url}
               onChange={(event) =>
-                updateValue("canonical_url", event.target.value)
-              }
+                updateValue("canonical_url", event.target.value)}
             />
           </div>
 
@@ -390,8 +448,7 @@ export function IngestionCandidateReview({
           placeholder="Optional rejection reason"
           value={values.rejection_reason}
           onChange={(event) =>
-            updateValue("rejection_reason", event.target.value)
-          }
+            updateValue("rejection_reason", event.target.value)}
         />
 
         {actionRow}

@@ -1,3 +1,6 @@
+import { isUnsafeIp, resolveHostAddresses } from "../_shared/network.ts";
+import { requireCaller } from "../_shared/auth.ts";
+
 type UrlMetadataResponse = {
   requestedUrl: string;
   finalUrl: string | null;
@@ -15,7 +18,8 @@ type UrlMetadataResponse = {
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
@@ -34,11 +38,20 @@ Deno.serve(async (request) => {
   }
 
   try {
+    try {
+      await requireCaller(request);
+    } catch {
+      return jsonResponse({ error: "Authentication required." }, 401);
+    }
     const body = await request.json();
     const requestedUrl = validateUrl(body?.url);
     const warnings: string[] = [];
     const fetchResult = await fetchHtmlWithRedirects(requestedUrl, warnings);
-    const metadata = extractMetadata(fetchResult.html, fetchResult.finalUrl, warnings);
+    const metadata = extractMetadata(
+      fetchResult.html,
+      fetchResult.finalUrl,
+      warnings,
+    );
 
     const response: UrlMetadataResponse = {
       requestedUrl: requestedUrl.toString(),
@@ -56,7 +69,9 @@ Deno.serve(async (request) => {
     };
 
     if (!response.title && !response.description && !response.publishedAt) {
-      response.warnings.push("Metadata unavailable or incomplete for this URL.");
+      response.warnings.push(
+        "Metadata unavailable or incomplete for this URL.",
+      );
     }
 
     if (
@@ -74,13 +89,16 @@ Deno.serve(async (request) => {
     }
 
     if (!response.publishedAt) {
-      response.warnings.push("Published date was not found or could not be parsed.");
+      response.warnings.push(
+        "Published date was not found or could not be parsed.",
+      );
     }
 
     return jsonResponse(response, 200);
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unable to fetch URL metadata.";
+    const message = error instanceof Error
+      ? error.message
+      : "Unable to fetch URL metadata.";
 
     return jsonResponse({ error: message }, 400);
   }
@@ -112,11 +130,15 @@ function validateUrl(value: unknown): URL {
 
 async function fetchHtmlWithRedirects(
   initialUrl: URL,
-  warnings: string[]
+  warnings: string[],
 ): Promise<{ finalUrl: URL; html: string }> {
   let currentUrl = initialUrl;
 
-  for (let redirectCount = 0; redirectCount <= maxRedirects; redirectCount += 1) {
+  for (
+    let redirectCount = 0;
+    redirectCount <= maxRedirects;
+    redirectCount += 1
+  ) {
     await assertSafeUrl(currentUrl);
 
     const controller = new AbortController();
@@ -148,7 +170,9 @@ async function fetchHtmlWithRedirects(
       }
 
       if (!response.ok) {
-        throw new Error(`Metadata fetch failed with status ${response.status}.`);
+        throw new Error(
+          `Metadata fetch failed with status ${response.status}.`,
+        );
       }
 
       const contentType = response.headers.get("content-type") ?? "";
@@ -184,7 +208,7 @@ function isHtmlContentType(contentType: string): boolean {
 
 async function readLimitedText(
   response: Response,
-  warnings: string[]
+  warnings: string[],
 ): Promise<string> {
   const reader = response.body?.getReader();
 
@@ -201,7 +225,9 @@ async function readLimitedText(
     receivedBytes += value.length;
 
     if (receivedBytes > maxResponseBytes) {
-      warnings.push("Metadata fetch stopped after reaching the response size limit.");
+      warnings.push(
+        "Metadata fetch stopped after reaching the response size limit.",
+      );
       const remainingBytes = maxResponseBytes - (receivedBytes - value.length);
 
       if (remainingBytes > 0) {
@@ -231,6 +257,13 @@ function concatChunks(chunks: Uint8Array[]): Uint8Array {
 }
 
 async function assertSafeUrl(url: URL): Promise<void> {
+  if (
+    !["http:", "https:"].includes(url.protocol) || url.username || url.password
+  ) {
+    throw new Error(
+      "Only public HTTP(S) URLs without credentials are allowed.",
+    );
+  }
   const hostname = url.hostname.replace(/^\[|\]$/g, "").toLowerCase();
 
   if (
@@ -242,7 +275,9 @@ async function assertSafeUrl(url: URL): Promise<void> {
   }
 
   if (isUnsafeIp(hostname)) {
-    throw new Error("Private, loopback, or link-local IP URLs cannot be fetched.");
+    throw new Error(
+      "Private, loopback, or link-local IP URLs cannot be fetched.",
+    );
   }
 
   if (!isIpAddress(hostname)) {
@@ -262,77 +297,12 @@ async function assertSafeDns(hostname: string): Promise<void> {
   }
 }
 
-async function resolveHostAddresses(hostname: string): Promise<string[]> {
-  const addresses: string[] = [];
-
-  try {
-    addresses.push(...(await Deno.resolveDns(hostname, "A")));
-  } catch {
-    // Some hosts do not have IPv4 records.
-  }
-
-  try {
-    addresses.push(...(await Deno.resolveDns(hostname, "AAAA")));
-  } catch {
-    // Some hosts do not have IPv6 records.
-  }
-
-  return addresses;
-}
-
 function isIpAddress(value: string): boolean {
   return isIpv4(value) || value.includes(":");
 }
 
 function isIpv4(value: string): boolean {
   return /^\d{1,3}(\.\d{1,3}){3}$/.test(value);
-}
-
-function isUnsafeIp(value: string): boolean {
-  if (isIpv4(value)) {
-    return isUnsafeIpv4(value);
-  }
-
-  if (value.includes(":")) {
-    return isUnsafeIpv6(value);
-  }
-
-  return false;
-}
-
-function isUnsafeIpv4(value: string): boolean {
-  const parts = value.split(".").map(Number);
-
-  if (parts.some((part) => Number.isNaN(part) || part < 0 || part > 255)) {
-    return true;
-  }
-
-  const [first, second] = parts;
-
-  return (
-    first === 0 ||
-    first === 10 ||
-    first === 127 ||
-    (first === 169 && second === 254) ||
-    (first === 172 && second >= 16 && second <= 31) ||
-    (first === 192 && second === 168) ||
-    (first === 100 && second >= 64 && second <= 127)
-  );
-}
-
-function isUnsafeIpv6(value: string): boolean {
-  const normalized = value.toLowerCase();
-
-  return (
-    normalized === "::1" ||
-    normalized.startsWith("fc") ||
-    normalized.startsWith("fd") ||
-    normalized.startsWith("fe80") ||
-    normalized.startsWith("::ffff:127.") ||
-    normalized.startsWith("::ffff:10.") ||
-    normalized.startsWith("::ffff:192.168.") ||
-    normalized.startsWith("::ffff:169.254.")
-  );
 }
 
 type ExtractedMetadata = {
@@ -346,41 +316,40 @@ type ExtractedMetadata = {
 function extractMetadata(
   html: string,
   finalUrl: URL,
-  warnings: string[]
+  warnings: string[],
 ): ExtractedMetadata {
   const jsonLd = extractJsonLdMetadata(html);
   const canonicalHref = getLinkHref(html, "canonical");
   const ogUrl = getMetaContent(html, "property", "og:url");
-  const title =
-    getMetaContent(html, "property", "og:title") ??
+  const title = getMetaContent(html, "property", "og:title") ??
     getMetaContent(html, "name", "twitter:title") ??
     jsonLd.title ??
     getTitleTag(html);
-  const description =
-    getMetaContent(html, "property", "og:description") ??
+  const description = getMetaContent(html, "property", "og:description") ??
     getMetaContent(html, "name", "twitter:description") ??
     getMetaContent(html, "name", "description") ??
     jsonLd.description;
-  const siteName =
-    getMetaContent(html, "property", "og:site_name") ??
+  const siteName = getMetaContent(html, "property", "og:site_name") ??
     jsonLd.siteName ??
     finalUrl.hostname;
   const rawPublishedAt =
     getMetaContent(html, "property", "article:published_time") ??
-    jsonLd.publishedAt ??
-    getFirstMetaContent(html, [
-      ["name", "date"],
-      ["name", "pubdate"],
-      ["name", "publishdate"],
-      ["name", "publish_date"],
-      ["name", "datePublished"],
-      ["property", "datePublished"],
-    ]);
+      jsonLd.publishedAt ??
+      getFirstMetaContent(html, [
+        ["name", "date"],
+        ["name", "pubdate"],
+        ["name", "publishdate"],
+        ["name", "publish_date"],
+        ["name", "datePublished"],
+        ["property", "datePublished"],
+      ]);
 
   const publishedAt = normalizeDate(rawPublishedAt);
 
   if (rawPublishedAt && !publishedAt) {
-    warnings.push("Published date metadata was present but could not be parsed.");
+    warnings.push(
+      "Published date metadata was present but could not be parsed.",
+    );
   }
 
   return {
@@ -395,27 +364,33 @@ function extractMetadata(
 function getMetaContent(
   html: string,
   attributeName: string,
-  attributeValue: string
+  attributeValue: string,
 ): string | null {
   const pattern = new RegExp(
-    `<meta\\b(?=[^>]*\\b${attributeName}\\s*=\\s*["']${escapeRegExp(
-      attributeValue
-    )}["'])(?=[^>]*\\bcontent\\s*=\\s*["']([^"']*)["'])[^>]*>`,
-    "i"
+    `<meta\\b(?=[^>]*\\b${attributeName}\\s*=\\s*["']${
+      escapeRegExp(
+        attributeValue,
+      )
+    }["'])(?=[^>]*\\bcontent\\s*=\\s*["']([^"']*)["'])[^>]*>`,
+    "i",
   );
   const reversePattern = new RegExp(
-    `<meta\\b(?=[^>]*\\bcontent\\s*=\\s*["']([^"']*)["'])(?=[^>]*\\b${attributeName}\\s*=\\s*["']${escapeRegExp(
-      attributeValue
-    )}["'])[^>]*>`,
-    "i"
+    `<meta\\b(?=[^>]*\\bcontent\\s*=\\s*["']([^"']*)["'])(?=[^>]*\\b${attributeName}\\s*=\\s*["']${
+      escapeRegExp(
+        attributeValue,
+      )
+    }["'])[^>]*>`,
+    "i",
   );
 
-  return decodeHtml(pattern.exec(html)?.[1] ?? reversePattern.exec(html)?.[1] ?? null);
+  return decodeHtml(
+    pattern.exec(html)?.[1] ?? reversePattern.exec(html)?.[1] ?? null,
+  );
 }
 
 function getFirstMetaContent(
   html: string,
-  candidates: Array<[string, string]>
+  candidates: Array<[string, string]>,
 ): string | null {
   for (const [attributeName, attributeValue] of candidates) {
     const value = getMetaContent(html, attributeName, attributeValue);
@@ -428,19 +403,25 @@ function getFirstMetaContent(
 
 function getLinkHref(html: string, relValue: string): string | null {
   const pattern = new RegExp(
-    `<link\\b(?=[^>]*\\brel\\s*=\\s*["'][^"']*\\b${escapeRegExp(
-      relValue
-    )}\\b[^"']*["'])(?=[^>]*\\bhref\\s*=\\s*["']([^"']*)["'])[^>]*>`,
-    "i"
+    `<link\\b(?=[^>]*\\brel\\s*=\\s*["'][^"']*\\b${
+      escapeRegExp(
+        relValue,
+      )
+    }\\b[^"']*["'])(?=[^>]*\\bhref\\s*=\\s*["']([^"']*)["'])[^>]*>`,
+    "i",
   );
   const reversePattern = new RegExp(
-    `<link\\b(?=[^>]*\\bhref\\s*=\\s*["']([^"']*)["'])(?=[^>]*\\brel\\s*=\\s*["'][^"']*\\b${escapeRegExp(
-      relValue
-    )}\\b[^"']*["'])[^>]*>`,
-    "i"
+    `<link\\b(?=[^>]*\\bhref\\s*=\\s*["']([^"']*)["'])(?=[^>]*\\brel\\s*=\\s*["'][^"']*\\b${
+      escapeRegExp(
+        relValue,
+      )
+    }\\b[^"']*["'])[^>]*>`,
+    "i",
   );
 
-  return decodeHtml(pattern.exec(html)?.[1] ?? reversePattern.exec(html)?.[1] ?? null);
+  return decodeHtml(
+    pattern.exec(html)?.[1] ?? reversePattern.exec(html)?.[1] ?? null,
+  );
 }
 
 function getTitleTag(html: string): string | null {
@@ -478,7 +459,8 @@ function extractJsonLdMetadata(html: string): JsonLdMetadata {
           continue;
         }
 
-        result.title ??= getString(candidate.headline) ?? getString(candidate.name);
+        result.title ??= getString(candidate.headline) ??
+          getString(candidate.name);
         result.description ??= getString(candidate.description);
         result.publishedAt ??= getString(candidate.datePublished);
         result.siteName ??= getPublisherName(candidate.publisher);
@@ -570,7 +552,7 @@ function decodeHtml(value: string | null): string | null {
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, "\"")
+    .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&apos;/g, "'");
 }

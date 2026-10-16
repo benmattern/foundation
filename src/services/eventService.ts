@@ -1,12 +1,14 @@
+import { activeProjectId } from "./projectService";
+import { queryAll } from "./queryAll";
 import { supabase } from "../lib/supabaseClient";
-import { getArticlesWithTags } from "./articleService";
+import { getArticles, getArticlesWithTags } from "./articleService";
 import type { Article, ArticleWithTags } from "../types/article";
 import type {
   ArticleEvent,
   EventStatus,
   FoundationEvent,
-  FoundationEventWithArticleTags,
   FoundationEventWithArticles,
+  FoundationEventWithArticleTags,
 } from "../types/event";
 
 export type CreateEventInput = {
@@ -21,21 +23,17 @@ export type CreateEventInput = {
 
 export type UpdateEventInput = CreateEventInput;
 
-export async function getEvents(): Promise<FoundationEvent[]> {
-  const { data, error } = await supabase
-    .from("events")
-    .select("*")
-    .order("occurred_at", { ascending: false, nullsFirst: false })
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    throw error;
-  }
-
-  return data ?? [];
+export function getEvents(): Promise<FoundationEvent[]> {
+  const project = activeProjectId();
+  return queryAll<FoundationEvent>((from, to) =>
+    supabase.from("events").select("*").eq("project_id", project)
+      .order("occurred_at", { ascending: false, nullsFirst: false }).order("id")
+      .range(from, to)
+  );
 }
-
-export async function getEventsWithArticles(): Promise<FoundationEventWithArticles[]> {
+export async function getEventsWithArticles(): Promise<
+  FoundationEventWithArticles[]
+> {
   const [events, articleEvents, articles] = await Promise.all([
     getEvents(),
     getArticleEvents(),
@@ -46,7 +44,7 @@ export async function getEventsWithArticles(): Promise<FoundationEventWithArticl
 }
 
 export async function getEventWithArticlesById(
-  id: string
+  id: string,
 ): Promise<FoundationEventWithArticles> {
   const [event, articleEvents, articles] = await Promise.all([
     getEventById(id),
@@ -58,7 +56,7 @@ export async function getEventWithArticlesById(
 }
 
 export async function getEventWithArticleTagsById(
-  id: string
+  id: string,
 ): Promise<FoundationEventWithArticleTags> {
   const [event, articleEvents, articles] = await Promise.all([
     getEventById(id),
@@ -69,78 +67,31 @@ export async function getEventWithArticleTagsById(
   return composeEventsWithArticleTags([event], articleEvents, articles)[0];
 }
 
-export async function createEvent(
-  event: CreateEventInput
+async function saveEvent(
+  event: CreateEventInput,
+  id: string | null,
 ): Promise<FoundationEvent> {
-  const { data, error } = await supabase
-    .from("events")
-    .insert({
-      title: event.title,
-      description: event.description || null,
-      event_type: event.event_type || null,
-      status: event.status,
-      occurred_at: event.occurred_at
-        ? new Date(event.occurred_at).toISOString()
-        : null,
-      location: event.location || null,
-    })
-    .select()
-    .single();
-
-  if (error) {
-    throw error;
-  }
-
-  await replaceEventArticles(data.id, event.article_ids ?? []);
-
+  const { data, error } = await supabase.rpc("save_event", {
+    p_project: activeProjectId(),
+    p_values: event,
+    p_id: id,
+  });
+  if (error) throw error;
   return data;
 }
-
-export async function updateEvent(
-  id: string,
-  event: UpdateEventInput
-): Promise<FoundationEvent> {
-  const { data, error } = await supabase
-    .from("events")
-    .update({
-      title: event.title,
-      description: event.description || null,
-      event_type: event.event_type || null,
-      status: event.status,
-      occurred_at: event.occurred_at
-        ? new Date(event.occurred_at).toISOString()
-        : null,
-      location: event.location || null,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", id)
-    .select()
-    .single();
-
-  if (error) {
-    throw error;
-  }
-
-  await replaceEventArticles(id, event.article_ids ?? []);
-
-  return data;
-}
-
+export const createEvent = (event: CreateEventInput) => saveEvent(event, null);
+export const updateEvent = (id: string, event: UpdateEventInput) =>
+  saveEvent(event, id);
 export async function deleteEvent(id: string): Promise<void> {
-  const { error } = await supabase
-    .from("events")
-    .delete()
-    .eq("id", id);
-
-  if (error) {
-    throw error;
-  }
+  const { error } = await supabase.rpc("remove_event", {
+    p_project: activeProjectId(),
+    p_id: id,
+  });
+  if (error) throw error;
 }
-
 async function getEventById(id: string): Promise<FoundationEvent> {
   const { data, error } = await supabase
-    .from("events")
-    .select("*")
+    .from("events").select("*").eq("project_id", activeProjectId())
     .eq("id", id)
     .single();
 
@@ -149,87 +100,32 @@ async function getEventById(id: string): Promise<FoundationEvent> {
   }
 
   return data;
-}
-
-async function replaceEventArticles(
-  eventId: string,
-  articleIds: string[]
-): Promise<void> {
-  const { error: deleteError } = await supabase
-    .from("article_events")
-    .delete()
-    .eq("event_id", eventId);
-
-  if (deleteError) {
-    throw deleteError;
-  }
-
-  const uniqueArticleIds = [...new Set(articleIds)];
-
-  if (uniqueArticleIds.length === 0) {
-    return;
-  }
-
-  const { error: insertError } = await supabase
-    .from("article_events")
-    .insert(
-      uniqueArticleIds.map((articleId) => ({
-        article_id: articleId,
-        event_id: eventId,
-      }))
-    );
-
-  if (insertError) {
-    throw insertError;
-  }
 }
 
 async function getArticleEvents(): Promise<ArticleEvent[]> {
-  const { data, error } = await supabase
-    .from("article_events")
-    .select("*");
-
-  if (error) {
-    throw error;
-  }
-
-  return data ?? [];
+  const project = activeProjectId();
+  return queryAll<ArticleEvent>((from, to) =>
+    supabase.from("article_events").select("*").eq("project_id", project).order(
+      "article_id",
+    ).order("event_id").range(from, to)
+  );
 }
-
 async function getArticleEventsByEventId(
-  eventId: string
+  eventId: string,
 ): Promise<ArticleEvent[]> {
-  const { data, error } = await supabase
-    .from("article_events")
-    .select("*")
-    .eq("event_id", eventId);
-
-  if (error) {
-    throw error;
-  }
-
-  return data ?? [];
+  return (await getArticleEvents()).filter((link) => link.event_id === eventId);
 }
-
 async function getArticlesForEvents(): Promise<Article[]> {
-  const { data, error } = await supabase
-    .from("articles")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    throw error;
-  }
-
-  return data ?? [];
+  return getArticles();
 }
-
 function composeEventsWithArticles(
   events: FoundationEvent[],
   articleEvents: ArticleEvent[],
-  articles: Article[]
+  articles: Article[],
 ): FoundationEventWithArticles[] {
-  const articlesById = new Map(articles.map((article) => [article.id, article]));
+  const articlesById = new Map(
+    articles.map((article) => [article.id, article]),
+  );
   const articleIdsByEventId = articleEvents.reduce<Map<string, string[]>>(
     (map, articleEvent) => {
       const current = map.get(articleEvent.event_id) ?? [];
@@ -238,7 +134,7 @@ function composeEventsWithArticles(
 
       return map;
     },
-    new Map()
+    new Map(),
   );
 
   return events.map((event) => ({
@@ -252,9 +148,11 @@ function composeEventsWithArticles(
 function composeEventsWithArticleTags(
   events: FoundationEvent[],
   articleEvents: ArticleEvent[],
-  articles: ArticleWithTags[]
+  articles: ArticleWithTags[],
 ): FoundationEventWithArticleTags[] {
-  const articlesById = new Map(articles.map((article) => [article.id, article]));
+  const articlesById = new Map(
+    articles.map((article) => [article.id, article]),
+  );
   const articleIdsByEventId = articleEvents.reduce<Map<string, string[]>>(
     (map, articleEvent) => {
       const current = map.get(articleEvent.event_id) ?? [];
@@ -263,7 +161,7 @@ function composeEventsWithArticleTags(
 
       return map;
     },
-    new Map()
+    new Map(),
   );
 
   return events.map((event) => ({

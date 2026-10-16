@@ -5,6 +5,7 @@ export type RssFeed = {
   title: string | null;
   is_active: boolean;
   last_checked_at: string | null;
+  last_success_at?: string | null;
   created_at: string;
   updated_at: string;
 };

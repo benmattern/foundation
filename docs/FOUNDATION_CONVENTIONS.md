@@ -1,5 +1,19 @@
 # FOUNDATION Conventions
 
+## Verification update — 2026-10-16
+
+Use the Node 24/npm 11 baseline in `.nvmrc`/package engines. Required local checks:
+`npm ci`, `npm run lint`, `npm run build`, `npm test`,
+`npm run check:functions`, and `npm run test:e2e`. The browser runner owns a local
+Vite process and uses mocked APIs at an invalid hostname; never point regression
+tests at the user's `.env.local` database. CI performs these checks on Linux.
+
+SQL tests execute the tracked migrations and fictional seeds in PGlite. This is
+real embedded PostgreSQL behavior, but it is not Supabase Auth/PostgREST,
+pg_cron/pg_net. `npm run test:postgres` separately exercises actual lock contention
+with independent connections in a disposable local cluster. Report those limits.
+Keep hosted rollout gates and checklist statuses explicit.
+
 ## Workflow update — 2026-10-16
 
 Read [AGENTS.md](../AGENTS.md) for standing instructions and

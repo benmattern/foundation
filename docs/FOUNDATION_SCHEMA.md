@@ -1,5 +1,56 @@
 # FOUNDATION Schema
 
+## Live reconciliation — 2026-10-16
+
+Read-only inspection of the linked FOUNDATION project now verifies the existing
+table columns/constraints, policies, grants, function and timestamp triggers.
+The context-only export omitted CASCADE/SET NULL actions and timestamp triggers;
+baseline 001 is corrected to the live semantics. Migration 002 removes only the
+two exact verified permissive prototype policies; unknown policies still stop.
+Migration 011 explicitly revokes API table/column grants (including TRUNCATE,
+which bypasses RLS) before redeclaring intended privileges. Hosted-default grants
+are now simulated in the SQL tests. Migrations 002?011 are applied in production; the reconciled baseline and all eleven versions are recorded in the ledger.
+
+## Local implementation update — 2026-10-16
+
+Tracked migrations now reconstruct the owner's supplied eight-table baseline
+(`20261016000100`) and extend it through `20261016001100`. The baseline preserves
+the verified CASCADE/SET NULL foreign keys, correcting the context-only export and historical cascade
+assumption below. This is locally executed PostgreSQL evidence, not a live audit.
+
+New tables: `projects`, `collected_items`, `project_subscriptions`,
+`collection_runs`, `item_origins`, `item_observations`, `rule_evaluations`,
+`review_history`, `bulk_review_runs`.
+
+Legacy primary entities gain `owner_id`; articles/events/candidates gain
+`project_id`. Composite foreign keys enforce owner consistency for source/feed
+and project relationships and project consistency for event/article links and
+candidate conversion. Tags are unique by owner/name. Article tags now belong to
+project-specific approved article records; legacy assignments remain intact.
+
+Acquisition identity is unique by `(owner_id,identity_url)`, candidates and
+approved articles by `(project_id,item_id)`, origins by `(feed_id,origin_key)`,
+subscriptions by `(project_id,feed_id)`. Existing duplicate legacy IDs are retained;
+only one representative per exact legacy URL receives an item association.
+Normalized URL aliases and existing duplicates require inventory/reconciliation
+before rollout; migrations never silently delete research to force uniqueness.
+
+RLS applies to all tracked research tables and joins. Review/article/event writes
+use authorized transactional RPCs. Collector RPC execution is service-role-only.
+Browser roles cannot mutate original acquisitions or operational run records.
+Rule suggestions, analyst tag additions/removals and explicit route overrides
+remain separate; history records changed decisions and classification results.
+
+Search/count pagination uses `search_candidates`, literal substring search and
+stable `(created_at DESC,id)` ordering. Collection uses a unique active-run index,
+four-minute lease, feed locks, subscription/project locks and intake versions.
+Every staged transaction rechecks enabled subscriptions and archive state.
+
+Existing-data migration requires a verified auth user UUID in the same transaction
+as migration 002. Existing policies cause a preflight failure instead of being
+silently retained or removed. See `supabase/ops/schema-inventory.sql`,
+`supabase/ops/upgrade.psql` and the operating procedure in FOUNDATION_ARCHITECTURE.
+
 ## Schema assessment boundary — 2026-10-16
 
 No schema changes were made in this assessment. The repository has no executable

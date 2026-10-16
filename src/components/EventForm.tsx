@@ -1,9 +1,6 @@
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import type { Article } from "../types/article";
-import type {
-  EventStatus,
-  FoundationEventWithArticles,
-} from "../types/event";
+import type { EventStatus, FoundationEventWithArticles } from "../types/event";
 import { eventStatusOptions, eventTypeOptions } from "../types/event";
 import { Card } from "./ui/Card";
 
@@ -31,42 +28,43 @@ function formatDateForInput(date: string | null): string {
   return date.slice(0, 10);
 }
 
-export function EventForm({
+export function EventForm(props: Props) {
+  return (
+    <EventFormFields
+      key={JSON.stringify(props.initialEvent)}
+      {...props}
+    />
+  );
+}
+
+function EventFormFields({
   articles,
   mode = "create",
   initialEvent = null,
   onSubmit,
   onCancel,
 }: Props) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [eventType, setEventType] = useState("");
-  const [status, setStatus] = useState<EventStatus>("draft");
-  const [occurredAt, setOccurredAt] = useState("");
-  const [location, setLocation] = useState("");
-  const [selectedArticleIds, setSelectedArticleIds] = useState<string[]>([]);
+  const [title, setTitle] = useState(() => initialEvent?.title ?? "");
+  const [description, setDescription] = useState(() =>
+    initialEvent?.description ?? ""
+  );
+  const [eventType, setEventType] = useState(() =>
+    initialEvent?.event_type ?? ""
+  );
+  const [status, setStatus] = useState<EventStatus>(() =>
+    initialEvent?.status ?? "draft"
+  );
+  const [occurredAt, setOccurredAt] = useState(() =>
+    formatDateForInput(initialEvent?.occurred_at ?? null)
+  );
+  const [location, setLocation] = useState(() => initialEvent?.location ?? "");
+  const [selectedArticleIds, setSelectedArticleIds] = useState<string[]>(() =>
+    initialEvent?.articles.map((article) => article.id) ?? []
+  );
+  const submitting = useRef(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
   const isEditing = mode === "edit";
-
-  useEffect(() => {
-    if (!initialEvent) {
-      setTitle("");
-      setDescription("");
-      setEventType("");
-      setStatus("draft");
-      setOccurredAt("");
-      setLocation("");
-      setSelectedArticleIds([]);
-      return;
-    }
-
-    setTitle(initialEvent.title);
-    setDescription(initialEvent.description ?? "");
-    setEventType(initialEvent.event_type ?? "");
-    setStatus(initialEvent.status);
-    setOccurredAt(formatDateForInput(initialEvent.occurred_at));
-    setLocation(initialEvent.location ?? "");
-    setSelectedArticleIds(initialEvent.articles.map((article) => article.id));
-  }, [initialEvent]);
 
   function toggleArticle(articleId: string) {
     setSelectedArticleIds((prev) =>
@@ -79,30 +77,46 @@ export function EventForm({
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
-    await onSubmit({
-      title,
-      description,
-      event_type: eventType,
-      status,
-      occurred_at: occurredAt,
-      location,
-      article_ids: selectedArticleIds,
-    });
+    if (submitting.current) return;
+    submitting.current = true;
+    setBusy(true);
+    setError("");
+    try {
+      await onSubmit({
+        title,
+        description,
+        event_type: eventType,
+        status,
+        occurred_at: occurredAt,
+        location,
+        article_ids: selectedArticleIds,
+      });
 
-    if (!isEditing) {
-      setTitle("");
-      setDescription("");
-      setEventType("");
-      setStatus("draft");
-      setOccurredAt("");
-      setLocation("");
-      setSelectedArticleIds([]);
+      if (!isEditing) {
+        setTitle("");
+        setDescription("");
+        setEventType("");
+        setStatus("draft");
+        setOccurredAt("");
+        setLocation("");
+        setSelectedArticleIds([]);
+      }
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Save failed. Your edits are preserved.",
+      );
+    } finally {
+      submitting.current = false;
+      setBusy(false);
     }
   }
 
   return (
     <Card className="p-8">
       <form onSubmit={handleSubmit} className="space-y-6">
+        {error && <p role="alert" className="text-red-300">{error}</p>}
         <div>
           <h2 className="text-2xl font-semibold text-white">
             {isEditing ? "Edit Event" : "Create Event"}
@@ -181,49 +195,55 @@ export function EventForm({
               Linked Articles
             </p>
 
-            {articles.length === 0 ? (
-              <p className="text-sm text-slate-500">
-                No articles available to link.
-              </p>
-            ) : (
-              <div className="max-h-72 space-y-2 overflow-y-auto pr-2">
-                {articles.map((article) => {
-                  const selected = selectedArticleIds.includes(article.id);
+            {articles.length === 0
+              ? (
+                <p className="text-sm text-slate-500">
+                  No articles available to link.
+                </p>
+              )
+              : (
+                <div className="max-h-72 space-y-2 overflow-y-auto pr-2">
+                  {articles.map((article) => {
+                    const selected = selectedArticleIds.includes(article.id);
 
-                  return (
-                    <label
-                      key={article.id}
-                      className={`block cursor-pointer rounded-lg border p-3 transition ${
-                        selected
-                          ? "border-blue-500 bg-blue-500/20"
-                          : "border-slate-800 bg-slate-900 hover:border-slate-600"
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selected}
-                        onChange={() => toggleArticle(article.id)}
-                        className="sr-only"
-                      />
-                      <span className="block text-sm font-medium text-white">
-                        {article.title}
-                      </span>
-                      {article.published_at && (
-                        <span className="mt-1 block text-xs text-slate-500">
-                          Published:{" "}
-                          {new Date(article.published_at).toLocaleDateString()}
+                    return (
+                      <label
+                        key={article.id}
+                        className={`block cursor-pointer rounded-lg border p-3 transition ${
+                          selected
+                            ? "border-blue-500 bg-blue-500/20"
+                            : "border-slate-800 bg-slate-900 hover:border-slate-600"
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          onChange={() => toggleArticle(article.id)}
+                          className="sr-only"
+                        />
+                        <span className="block text-sm font-medium text-white">
+                          {article.title}
                         </span>
-                      )}
-                    </label>
-                  );
-                })}
-              </div>
-            )}
+                        {article.published_at && (
+                          <span className="mt-1 block text-xs text-slate-500">
+                            Published: {new Date(article.published_at)
+                              .toLocaleDateString()}
+                          </span>
+                        )}
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
           </div>
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <button className="rounded-lg bg-slate-200 px-4 py-2 font-medium text-slate-900 transition hover:bg-white">
+          <button
+            type="submit"
+            disabled={busy}
+            className="rounded-lg bg-slate-200 px-4 py-2 font-medium text-slate-900 transition hover:bg-white"
+          >
             {isEditing ? "Save Changes" : "Create Event"}
           </button>
 
