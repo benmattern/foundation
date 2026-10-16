@@ -52,21 +52,19 @@ describe("validating feed parser", () => {
   });
   it("supports empty feeds but rejects unsupported and malformed documents", () => {
     expect(parseFeedXml(rss(""), base).items).toEqual([]);
-    for (
-      const xml of [
-        "",
-        "<html/>",
-        "<rss><channel><item><link>/x</link></item>",
-        "<rss/>",
-        "<rss><channel></rss>",
-      ]
-    ) {
+    for (const xml of [
+      "",
+      "<html/>",
+      "<rss><channel><item><link>/x</link></item>",
+      "<rss/>",
+      "<rss><channel></rss>",
+    ]) {
       expect(() => parseFeedXml(xml, base)).toThrow();
     }
   });
   it("rejects entity declarations, oversized bodies and credential URLs", () => {
     expect(() =>
-      parseFeedXml(`<!DOCTYPE rss [<!ENTITY x "bad">]>${rss("")}`, base)
+      parseFeedXml(`<!DOCTYPE rss [<!ENTITY x "bad">]>${rss("")}`, base),
     ).toThrow(/DTD/);
     expect(() => parseFeedXml("x".repeat(1024 * 1024 + 1), base)).toThrow(
       /limit/,
@@ -85,16 +83,23 @@ describe("validating feed parser", () => {
         Array.from(
           { length: 51 },
           (_, i) =>
-            `<item><link>/a/${i}</link><description>${
-              "x".repeat(700)
-            }</description></item>`,
+            `<item><link>/a/${i}</link><description>${"x".repeat(
+              700,
+            )}</description></item>`,
         ).join(""),
       ),
       base,
       warnings,
     ).items;
     expect(items).toHaveLength(50);
-    expect(items[0].description?.length).toBe(603);
+    expect(items[0].description?.length).toBe(700);
     expect(warnings[0]).toMatch(/50 of 51/);
+    const capped = parseFeedXml(
+      rss(
+        `<item><link>/long</link><description>${"x".repeat(25000)}</description></item>`,
+      ),
+      base,
+    ).items[0];
+    expect(capped.description?.length).toBe(20003);
   });
 });

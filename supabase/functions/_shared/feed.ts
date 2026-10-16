@@ -15,7 +15,7 @@ export type FeedItem = {
 type Node = Record<string, unknown>;
 const object = (value: unknown): Node =>
   value !== null && typeof value === "object" && !Array.isArray(value)
-    ? value as Node
+    ? (value as Node)
     : {};
 const list = (value: unknown): unknown[] =>
   value == null ? [] : Array.isArray(value) ? value : [value];
@@ -26,16 +26,21 @@ function text(value: unknown): string | null {
     : null;
 }
 function plain(value: unknown): string | null {
-  return text(value)?.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim() ||
-    null;
+  return (
+    text(value)
+      ?.replace(/<[^>]*>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim() || null
+  );
 }
 function url(value: unknown, base: URL): string | null {
   const input = text(value);
   if (!input) return null;
   try {
     const result = new URL(input, base);
-    return ["http:", "https:"].includes(result.protocol) && !result.username &&
-        !result.password
+    return ["http:", "https:"].includes(result.protocol) &&
+      !result.username &&
+      !result.password
       ? result.href
       : null;
   } catch {
@@ -104,14 +109,13 @@ export function parseFeedXml(
       continue;
     }
     const links = list(item.link);
-    const alternate = links.find((link) =>
-      !object(link)["@_rel"] || object(link)["@_rel"] === "alternate"
+    const alternate = links.find(
+      (link) => !object(link)["@_rel"] || object(link)["@_rel"] === "alternate",
     );
     const rawLink = isRss ? text(item.link) : text(object(alternate)["@_href"]);
     const guid = text(item[isRss ? "guid" : "id"]);
-    const guidLink = isRss && object(item.guid)["@_isPermaLink"] !== "false"
-      ? guid
-      : null;
+    const guidLink =
+      isRss && object(item.guid)["@_isPermaLink"] !== "false" ? guid : null;
     const link = url(rawLink ?? guidLink, base);
     if (!link) {
       warnings.push(
@@ -120,24 +124,27 @@ export function parseFeedXml(
       continue;
     }
     const date = text(
-      isRss ? item.pubDate ?? item.date : item.published ?? item.updated,
+      isRss ? (item.pubDate ?? item.date) : (item.published ?? item.updated),
     );
     const parsedDate = date ? new Date(date) : null;
-    const publishedAt = parsedDate && !Number.isNaN(parsedDate.getTime())
-      ? parsedDate.toISOString()
-      : null;
+    const publishedAt =
+      parsedDate && !Number.isNaN(parsedDate.getTime())
+        ? parsedDate.toISOString()
+        : null;
     if (date && !publishedAt) {
       itemWarnings.push("Publish date could not be parsed.");
     }
     const description = plain(
-      isRss ? item.description ?? item.encoded : item.summary ?? item.content,
+      isRss
+        ? (item.description ?? item.encoded)
+        : (item.summary ?? item.content),
     );
-    const authors = list(item.author ?? item.creator).map((author) =>
-      plain(object(author).name ?? author)
-    ).filter((author): author is string => !!author);
-    const categories = list(item.category).map((category) =>
-      plain(isRss ? category : object(category)["@_term"])
-    ).filter((category): category is string => !!category);
+    const authors = list(item.author ?? item.creator)
+      .map((author) => plain(object(author).name ?? author))
+      .filter((author): author is string => !!author);
+    const categories = list(item.category)
+      .map((category) => plain(isRss ? category : object(category)["@_term"]))
+      .filter((category): category is string => !!category);
     items.push({
       title: plain(item.title),
       link,
@@ -145,9 +152,10 @@ export function parseFeedXml(
       publishedAt,
       authors,
       categories,
-      description: description && description.length > 600
-        ? `${description.slice(0, 600).trim()}...`
-        : description,
+      description:
+        description && description.length > 20000
+          ? `${description.slice(0, 20000).trim()}...`
+          : description,
       raw: item,
       warnings: itemWarnings,
     });

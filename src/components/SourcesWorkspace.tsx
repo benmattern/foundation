@@ -6,7 +6,9 @@ import {
   activeProjectId,
   getProjects,
   getSubscriptions,
-  setSourceEnabled,
+  setSourceState,
+  getSourceStates,
+  type ProjectSourceState,
 } from "../services/projectService";
 import type { Source } from "../types/source";
 import type { RssFeed } from "../types/rssFeed";
@@ -24,6 +26,7 @@ import { buttonClass } from "./ui/buttonStyles";
 import { EmptyState } from "./ui/EmptyState";
 
 type Data = {
+  states: ProjectSourceState[];
   sources: Source[];
   feeds: RssFeed[];
   subscriptions: Subscription[];
@@ -33,7 +36,10 @@ type Data = {
 export function SourcesWorkspace() {
   const { id } = useParams();
   const [params, setParams] = useSearchParams();
-  const view = params.get("view") ?? "following";
+  const requestedView = params.get("view") ?? "following";
+  const view = ["collection", "available"].includes(requestedView)
+    ? "saved"
+    : requestedView;
   const [data, setData] = useState<Data | null>(null);
   const [error, setError] = useState("");
   const [formBusy, setFormBusy] = useState(false);
@@ -44,15 +50,18 @@ export function SourcesWorkspace() {
   const [revision, setRevision] = useState(0);
   async function read(): Promise<Data> {
     const project = activeProjectId();
-    const [sources, feeds, subscriptions, runs, projects] = await Promise.all([
-      getSources(),
-      getRssFeeds(),
-      getSubscriptions(),
-      getCollectionRuns(),
-      getProjects(),
-    ]);
+    const [sources, feeds, subscriptions, runs, projects, states] =
+      await Promise.all([
+        getSources(),
+        getRssFeeds(),
+        getSubscriptions(),
+        getCollectionRuns(),
+        getProjects(),
+        getSourceStates(),
+      ]);
     return {
       sources,
+      states,
       feeds,
       subscriptions,
       runs,
@@ -81,9 +90,14 @@ export function SourcesWorkspace() {
   const source = data?.sources.find((s) => s.id === id);
   const followingIds = new Set(
     data?.subscriptions
+      .filter((s) => s.followed !== false)
       .map((s) => data.feeds.find((f) => f.id === s.feed_id)?.source_id)
       .filter(Boolean),
   );
+  for (const state of data?.states ?? []) {
+    if (state.state === "unfollowed") followingIds.delete(state.source_id);
+    else followingIds.add(state.source_id);
+  }
   const shown =
     data?.sources.filter((s) =>
       id ? s.id === id : view === "following" ? followingIds.has(s.id) : true,
@@ -105,8 +119,7 @@ export function SourcesWorkspace() {
             {[
               ["following", "Following"],
               ["discover", "Discover"],
-              ["available", "Available sources"],
-              ["collection", "Collection details"],
+              ["saved", "Your saved sources"],
             ].map(([value, label]) => (
               <Button
                 key={value}
@@ -200,14 +213,14 @@ export function SourcesWorkspace() {
         />
       ) : (
         <div className="space-y-6">
-          {view === "available" && !id && (
+          {view === "saved" && !id && (
             <p className="text-slate-400">
               These source records are available across your workspace. A record
               is only collecting for this project when you follow an available
               feed.
             </p>
           )}
-          {view === "collection" && !id && (
+          {view === "saved" && !id && (
             <p className="text-slate-400">
               Feed addresses, availability, project rules and run history live
               here. Following controls affect only this project; shared
@@ -248,8 +261,21 @@ export function SourcesWorkspace() {
           {shown.map((source) => {
             const feeds = data.feeds.filter((f) => f.source_id === source.id);
             const followed = feeds.filter((f) =>
-              data.subscriptions.some((s) => s.feed_id === f.id && s.enabled),
+              data.subscriptions.some(
+                (s) => s.feed_id === f.id && s.enabled && s.followed !== false,
+              ),
             );
+            const sourceState = data.states.find(
+              (s) => s.source_id === source.id,
+            );
+            const isFollowed =
+              sourceState?.state !== "unfollowed" &&
+              followingIds.has(source.id);
+            const isPaused =
+              isFollowed &&
+              (feeds.length
+                ? followed.length === 0
+                : sourceState?.state === "paused");
             const enabled = followed.filter((f) => f.is_active);
             return (
               <article
@@ -268,21 +294,22 @@ export function SourcesWorkspace() {
                     </h2>
                     <p className="mt-1 text-sm text-slate-300">
                       {feeds.length
-                        ? `${enabled.length} enabled of ${feeds.length} feeds · ${followed.length ? "Following in this project" : "Paused in this project"}`
+                        ? `${enabled.length} enabled of ${feeds.length} feeds - ${!isFollowed ? "Not followed in this project" : isPaused ? "Paused in this project" : "Following in this project"}`
                         : "Manual only · Automatic collection not configured"}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {feeds.length > 0 && (
+                    {(feeds.length > 0 || !isFollowed || isPaused) && (
                       <Button
                         disabled={data.archived || busy !== null}
                         onClick={async () => {
                           setBusy(source.id);
                           setError("");
                           try {
-                            await setSourceEnabled(
+                            await setSourceState(
                               source.id,
-                              followed.length === 0,
+                              isFollowed && !isPaused ? "paused" : "following",
+                              sourceState?.version ?? 0,
                             );
                             await refresh();
                           } catch (error) {
@@ -292,7 +319,33 @@ export function SourcesWorkspace() {
                           }
                         }}
                       >
-                        {followed.length ? "Pause source" : "Follow source"}
+                        {isPaused
+                          ? "Resume source"
+                          : isFollowed
+                            ? "Pause source"
+                            : "Follow source"}
+                      </Button>
+                    )}
+                    {isFollowed && (
+                      <Button
+                        disabled={data.archived || busy !== null}
+                        onClick={async () => {
+                          setBusy(source.id);
+                          try {
+                            await setSourceState(
+                              source.id,
+                              "unfollowed",
+                              sourceState?.version ?? 0,
+                            );
+                            await refresh();
+                          } catch (e) {
+                            setError(String(e));
+                          } finally {
+                            setBusy(null);
+                          }
+                        }}
+                      >
+                        Unfollow source
                       </Button>
                     )}
                     <Button onClick={() => setForm(source)}>
@@ -347,7 +400,7 @@ export function SourcesWorkspace() {
               </article>
             );
           })}
-          {(view === "collection" || view === "available") &&
+          {view === "saved" &&
             !id &&
             data.feeds
               .filter((f) => !f.source_id)
@@ -369,7 +422,9 @@ export function SourcesWorkspace() {
               .filter(
                 (f) =>
                   !f.source_id &&
-                  data.subscriptions.some((s) => s.feed_id === f.id),
+                  data.subscriptions.some(
+                    (s) => s.feed_id === f.id && s.followed !== false,
+                  ),
               )
               .map((feed) => (
                 <SourceFeedCard

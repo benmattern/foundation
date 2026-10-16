@@ -1,3 +1,4 @@
+import { CandidatePreviewPane } from "./CandidatePreviewPane";
 import { Button } from "./ui/Button";
 import { useRef, useState } from "react";
 import type { IngestionCandidate } from "../types/ingestionCandidate";
@@ -31,6 +32,7 @@ type Props = {
     candidate: IngestionCandidate,
     rejectionReason: string,
   ) => Promise<void>;
+  onLaterCandidate?: (candidate: IngestionCandidate) => Promise<void>;
   onMarkDuplicate: (candidate: IngestionCandidate) => Promise<void>;
   onSaveCandidate?: (
     candidate: IngestionCandidate,
@@ -76,6 +78,7 @@ function CandidateReviewFields({
   onAcceptCandidate,
   onRejectCandidate,
   onMarkDuplicate,
+  onLaterCandidate,
   onSaveCandidate,
 }: Props) {
   const [values, setValues] = useState<IngestionCandidateReviewValues>(() => ({
@@ -159,6 +162,20 @@ function CandidateReviewFields({
           Save draft and tags
         </Button>
       )}
+      {onLaterCandidate && (
+        <Button
+          disabled={!actionable}
+          onClick={() => void review(() => onLaterCandidate(candidate))}
+        >
+          Later
+        </Button>
+      )}
+      <Button
+        disabled={!actionable}
+        onClick={() => void review(() => onMarkDuplicate(candidate))}
+      >
+        Duplicate
+      </Button>
       {values.url && (
         <a
           href={values.url}
@@ -204,7 +221,9 @@ function CandidateReviewFields({
             needed.
           </p>
         </div>
-        <IngestionCandidateStatusBadge status={candidate.status} />
+        <IngestionCandidateStatusBadge
+          status={candidate.deferred ? "later" : candidate.status}
+        />
       </div>
 
       <div className="space-y-4">
@@ -244,6 +263,7 @@ function CandidateReviewFields({
             {error}
           </p>
         )}
+        <CandidatePreviewPane key={candidate.id} candidate={candidate} />
         {actionRow}
 
         <div>

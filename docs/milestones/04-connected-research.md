@@ -1,10 +1,9 @@
 # Milestone 04: Connected research without AI
 
-Status: approved next implementation, 2026-10-16; execute after Milestone 03 local
-acceptance. Baseline inspected: 7cd42fbe1eb0c2e1cd03981a16a67bab5cbc2050.
-Read AGENTS.md and ../reviews/04-connected-research.md. When assigned the full
-03/04 sequence, continue here without asking for routine implementation approval.
-This is a specification, not implemented functionality.
+Status: implemented and locally verified, 2026-10-16; not deployed.
+Reviewed working tree over 28b326a13e1542affeb0053d32f70e332937e988.
+See ../reviews/04-connected-research.md for evidence, design choices and rollout limits.
+Milestone 03 local acceptance preceded Milestone 04 implementation.
 
 ## Outcome
 
@@ -152,26 +151,26 @@ data and mocked APIs for tests; no production-only test writes without authoriza
 
 ## Acceptance and handoff
 
-- [ ] Create a question from a project's Library and link at least two articles.
-- [ ] One article links to two questions with independent link notes.
-- [ ] Write/save/reopen an answer/note with evidence references; missing/unlinked
+- [x] Create a question from a project's Library and link at least two articles.
+- [x] One article links to two questions with independent link notes.
+- [x] Write/save/reopen an answer/note with evidence references; missing/unlinked
       evidence is represented honestly without losing analyst prose.
-- [ ] Create/reuse entities and aliases; link people/institutions/places manually.
-- [ ] Known-name suggestions show evidence, ambiguity and confirmation controls.
-- [ ] Rescan/retry is idempotent; confirmed and dismissed states survive changes.
-- [ ] Related-article and entity views show correct project-scoped connections.
-- [ ] Coverage counts do not count suggestions as confirmations or claim
+- [x] Create/reuse entities and aliases; link people/institutions/places manually.
+- [x] Known-name suggestions show evidence, ambiguity and confirmation controls.
+- [x] Rescan/retry is idempotent; confirmed and dismissed states survive changes.
+- [x] Related-article and entity views show correct project-scoped connections.
+- [x] Coverage counts do not count suggestions as confirmations or claim
       independent corroboration; collector origin/publisher labels stay distinct.
-- [ ] Existing Events, Library edits/deletes, source unfollow and research links
+- [x] Existing Events, Library edits/deletes, source unfollow and research links
       interact without unintended data loss.
-- [ ] Anonymous/cross-owner/cross-project and mismatched-join tests deny access.
-- [ ] Fresh setup and upgrades preserve all prior data; new transaction/concurrency
+- [x] Anonymous/cross-owner/cross-project and mismatched-join tests deny access.
+- [x] Fresh setup and upgrades preserve all prior data; new transaction/concurrency
       checks pass against disposable SQL environments.
-- [ ] npm ci, lint, build, unit/UI/database/function checks, PostgreSQL scenarios,
-      browser journeys and existing CI pass.
-- [ ] Desktop/mobile screens are rendered and inspected; keyboard linking/editing
+- [x] npm ci, lint, build, unit/UI/database/function checks, PostgreSQL scenarios,
+      browser journeys pass locally; existing CI workflow retained (hosted CI not run).
+- [x] Desktop/mobile screens are rendered and inspected; keyboard linking/editing
       works without text selection, and empty/error states show useful next steps.
-- [ ] Record commit, design choices, evidence, demo and remaining hosted checks
+- [x] Record commit, design choices, evidence, demo and remaining hosted checks
       in ../reviews/04-connected-research.md. Update status/schema/architecture/
       decisions/backlog/recovery pointers to the actual final implementation.
 

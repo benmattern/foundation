@@ -1,4 +1,5 @@
 export type IngestionCandidateStatus =
+  | "later"
   | "pending"
   | "accepted"
   | "rejected"
@@ -11,6 +12,14 @@ export type IngestionImportSource =
   | "connector";
 
 export type IngestionCandidate = {
+  relevance_score?: number;
+  deferred?: boolean;
+  matching_preview?: {
+    id: string;
+    excerpt: string;
+    origin_url: string;
+    retrieved_at: string;
+  } | null;
   id: string;
   url: string;
   canonical_url: string | null;

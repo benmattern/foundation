@@ -14,7 +14,8 @@ import { createServer } from "node:net";
 import { setTimeout } from "node:timers/promises";
 import pg from "pg";
 
-const bin = process.env.PG_BIN ??
+const bin =
+  process.env.PG_BIN ??
   (process.platform === "win32"
     ? "C:/Program Files/PostgreSQL/18/bin"
     : "/usr/lib/postgresql/16/bin");
@@ -133,18 +134,19 @@ try {
     keywordTags: [],
   };
   const results = Object.fromEntries(
-    [p1, p2].map((
+    [p1, p2].map((project) => [
       project,
-    ) => [project, {
-      projectRules: rules,
-      subscriptionRules: null,
-      classification: {
-        route: "pending",
-        version: 1,
-        suggestedTags: [],
-        matches: [],
+      {
+        projectRules: rules,
+        subscriptionRules: null,
+        classification: {
+          route: "pending",
+          version: 1,
+          suggestedTags: [],
+          matches: [],
+        },
       },
-    }]),
+    ]),
   );
   const stage = (client, url) =>
     client.query("select stage_feed_item($1,$2,$3,$4,$5) as added", [
@@ -170,10 +172,12 @@ try {
   for (const client of [a, b]) {
     await client.query(`set request.jwt.claim.sub='${owner}';`);
   }
-  const candidate = (await admin.query(
-    "select id from ingestion_candidates where project_id=$1",
-    [p1],
-  )).rows[0].id;
+  const candidate = (
+    await admin.query(
+      "select id from ingestion_candidates where project_id=$1",
+      [p1],
+    )
+  ).rows[0].id;
   const approvals = await Promise.all([
     a.query("select * from review_candidate($1,'accept')", [candidate]),
     b.query("select * from review_candidate($1,'accept')", [candidate]),
@@ -204,29 +208,77 @@ try {
   assert.equal(afterPause.rows[0].added, 1);
   assert.equal(
     Number(
-      (await admin.query(
-        "select count(*) from ingestion_candidates where project_id=$1 and url='https://example.com/after-pause'",
-        [p1],
-      )).rows[0].count,
+      (
+        await admin.query(
+          "select count(*) from ingestion_candidates where project_id=$1 and url='https://example.com/after-pause'",
+          [p1],
+        )
+      ).rows[0].count,
     ),
     0,
   );
   console.log(
     "PASS: pause waits for in-flight publication, then prevents new project candidates",
   );
+  const source = (
+    await admin.query(
+      "insert into sources(owner_id,name,url) values($1,'Concurrency source','https://example.com') returning id",
+      [owner],
+    )
+  ).rows[0].id;
+  await admin.query("update rss_feeds set source_id=$1 where id=$2", [
+    source,
+    feed,
+  ]);
+  await a.query("select set_source_state($1,$2,'following',0)", [p1, source]);
+  await a.query("begin");
+  await stage(a, "https://example.com/before-unfollow");
+  const unfollow = b.query("select set_source_state($1,$2,'unfollowed',1)", [
+    p1,
+    source,
+  ]);
+  await waitsForLock(admin, bPid);
+  await a.query("commit");
+  await unfollow;
+  assert.equal(
+    (await stage(a, "https://example.com/after-unfollow")).rows[0].added,
+    1,
+  );
+  assert.equal(
+    Number(
+      (
+        await admin.query(
+          "select count(*) from ingestion_candidates where project_id=$1 and url='https://example.com/after-unfollow'",
+          [p1],
+        )
+      ).rows[0].count,
+    ),
+    0,
+  );
+  console.log(
+    "PASS: Unfollow serializes with staging and retains another project's intake",
+  );
   await a.query("begin");
   await a.query("select review_candidate($1,'accept')", [
-    (await admin.query(
-      "select id from ingestion_candidates where project_id=$1 and status='pending' limit 1",
-      [p2],
-    )).rows[0].id,
+    (
+      await admin.query(
+        "select id from ingestion_candidates where project_id=$1 and status='pending' limit 1",
+        [p2],
+      )
+    ).rows[0].id,
   ]);
-  const contested = (await a.query(
-    "select id from ingestion_candidates where project_id=$1 and status='accepted' limit 1",
-    [p2],
-  )).rows[0].id;
-  const reject = b.query("select review_candidate($1,'reject')", [contested])
-    .then(() => null, (error) => error);
+  const contested = (
+    await a.query(
+      "select id from ingestion_candidates where project_id=$1 and status='accepted' limit 1",
+      [p2],
+    )
+  ).rows[0].id;
+  const reject = b
+    .query("select review_candidate($1,'reject')", [contested])
+    .then(
+      () => null,
+      (error) => error,
+    );
   await waitsForLock(admin, bPid);
   await a.query("commit");
   assert.equal((await reject).code, "40001");
@@ -234,10 +286,12 @@ try {
     "PASS: conflicting accept/reject serializes and rejects the stale decision",
   );
   assert.equal(
-    (await admin.query(
-      "select finish_feed($1,'success','[]',null,'stale-validator') as status",
-      [runId],
-    )).rows[0].status,
+    (
+      await admin.query(
+        "select finish_feed($1,'success','[]',null,'stale-validator') as status",
+        [runId],
+      )
+    ).rows[0].status,
     "partial",
   );
   assert.equal(
@@ -247,6 +301,109 @@ try {
   );
   console.log(
     "PASS: subscription change prevents stale completion from caching a validator",
+  );
+  const question = (
+    await a.query(
+      'select * from save_question($1,\'{"title":"Concurrent investigation"}\')',
+      [p1],
+    )
+  ).rows[0];
+  const edits = await Promise.allSettled([
+    a.query(
+      'select * from save_question($1,\'{"answer":"First answer"}\',$2,1)',
+      [p1, question.id],
+    ),
+    b.query(
+      'select * from save_question($1,\'{"answer":"Second answer"}\',$2,1)',
+      [p1, question.id],
+    ),
+  ]);
+  assert.equal(edits.filter((r) => r.status === "fulfilled").length, 1);
+  assert.equal(edits.find((r) => r.status === "rejected").reason.code, "40001");
+  console.log(
+    "PASS: concurrent question edits preserve the winning answer and reject the stale revision",
+  );
+  const approved = approvals[0].rows[0].converted_article_id;
+  const links = await Promise.allSettled([
+    a.query("select * from link_question_article($1,$2,$3)", [
+      p1,
+      question.id,
+      approved,
+    ]),
+    b.query("select * from link_question_article($1,$2,$3)", [
+      p1,
+      question.id,
+      approved,
+    ]),
+  ]);
+  assert.equal(links.filter((r) => r.status === "fulfilled").length, 1);
+  assert.equal(links.find((r) => r.status === "rejected").reason.code, "40001");
+  const notes = await Promise.allSettled([
+    a.query("select * from save_article_note($1,$2,'First note')", [
+      p1,
+      approved,
+    ]),
+    b.query("select * from save_article_note($1,$2,'Second note')", [
+      p1,
+      approved,
+    ]),
+  ]);
+  assert.equal(notes.filter((r) => r.status === "fulfilled").length, 1);
+  assert.equal(notes.find((r) => r.status === "rejected").reason.code, "40001");
+  console.log(
+    "PASS: concurrent evidence-link and article-note creation reject stale overwrites",
+  );
+  const entity = (
+    await a.query(
+      'select * from save_entity(\'{"name":"Concurrent organization","entity_type":"organization"}\')',
+    )
+  ).rows[0];
+  const payload = JSON.stringify([
+    {
+      entity_id: entity.id,
+      alias: entity.name,
+      snapshot: "Manual research association",
+    },
+  ]);
+  const mentions = await Promise.all([
+    a.query("select save_mentions($1,$2,$3,true) as n", [
+      p1,
+      approved,
+      payload,
+    ]),
+    b.query("select save_mentions($1,$2,$3,true) as n", [
+      p1,
+      approved,
+      payload,
+    ]),
+  ]);
+  assert.deepEqual(mentions.map((r) => r.rows[0].n).sort(), [0, 1]);
+  console.log(
+    "PASS: simultaneous mention retries create one stable association",
+  );
+  const request = "31000000-0000-4000-8000-000000000001";
+  const createPayload = JSON.stringify({
+    title: "Retry-safe concurrent question",
+    request_id: request,
+  });
+  const created = await Promise.all([
+    a.query("select * from save_question($1,$2)", [p1, createPayload]),
+    b.query("select * from save_question($1,$2)", [p1, createPayload]),
+  ]);
+  assert.equal(created[0].rows[0].id, created[1].rows[0].id);
+  assert.equal(
+    Number(
+      (
+        await admin.query(
+          "select count(*) from research_questions where create_token=$1",
+          [request],
+        )
+      ).rows[0].count,
+    ),
+    1,
+  );
+  console.log(
+    "PASS: simultaneous create-request retries return one research object",
   );
 } finally {
   for (const client of connections) {
@@ -262,6 +419,7 @@ try {
   if (
     !target.startsWith(expectedRoot) ||
     !target.slice(expectedRoot.length).startsWith("foundation-pg-")
-  ) throw new Error("Refusing unsafe test-cluster cleanup");
+  )
+    throw new Error("Refusing unsafe test-cluster cleanup");
   rmSync(target, { recursive: true, force: true });
 }

@@ -1,21 +1,26 @@
 # FOUNDATION Recovery Prompt
 
-## Active handoff — 2026-10-16
+## Current local handoff - 2026-10-16
 
-Read AGENTS.md, [Milestone 03](milestones/03-selective-intake.md) and its
-[review](reviews/03-selective-intake.md), then [Milestone 04](milestones/04-connected-research.md)
-and its [review](reviews/04-connected-research.md). The owner approved both in that
-order. Implement complete milestones, make routine engineering choices, test
-meaningful behavior and update the reviews. Do not stop at another proposal.
+Read AGENTS.md and the updated [03 review](reviews/03-selective-intake.md) and
+[04 review](reviews/04-connected-research.md). Both milestones were implemented
+in sequence on `docs/selective-intake-connected-research` over `28b326a`.
+The working tree contains migrations 012-014, UI/services/shared matcher and tests.
+Do not restart their implementation or mistake them for a deployed release.
 
-This is a documentation handoff, not an implementation or deployment claim.
-Preserve deployed Milestones 01/02, existing research, RLS and collector/review
-safeguards. Descriptive scope currently does not filter intake; never silently
-activate it. Known-name entity suggestions are not confirmed identities or
-independent corroboration. Full geography databases and AI remain deferred.
+Next work is separately authorized rollout and hosted signed-in acceptance.
+Preserve the deployed 01/02 baseline, research IDs, RLS and collector locks.
+Apply migrations 012-014, deploy and verify the format-2-aware collector first,
+then release the frontend. Update fetch-rss-feed for the longer-excerpt parser.
+014 supplies Research, article connections and entity storage. Take/verify a backup
+before hosted migration. Do not infer production authorization from this handoff.
 
+Known-name suggestions remain unconfirmed until review. Legacy summaries stay
+separate from original acquisition and analyst notes; preview is metadata, not
+full text. Coverage is not independent corroboration. No AI or graph engine was
+introduced.
 
-## Current handoff - 2026-10-16
+## Deployed Milestones 01/02 handoff - 2026-10-16
 
 Milestone 01 ingestion is deployed. Its recorded database/function/scheduler and
 public frontend verification is in [the ingestion review](reviews/01-ingestion.md).

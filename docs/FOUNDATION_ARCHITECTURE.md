@@ -1,6 +1,35 @@
 # FOUNDATION Architecture
 
-## Current workflow architecture - 2026-10-16
+## Selective intake and connected research - local, 2026-10-16
+
+Migrations 012-014 extend the deployed 01/02 baseline. See the milestone reviews
+for exact verification boundaries. Database access remains in services; new
+Research/Entities/article-connection pages use project-scoped service reads.
+
+- Source decisions serialize with subscription creation using a project/source
+  advisory lock, then lock feed rows. Collector staging retains feed share locks.
+  Unfollow preserves subscriptions/rules/evidence and cannot be bypassed by adding
+  a new feed. Shared feed availability is independent of project Follow.
+- The shared rule evaluator preserves legacy substring behavior and explicitly
+  introduces format 2 for OR-of-AND conditions and Unicode whole/literal modes.
+  Pinned term groups are immutable version snapshots. SQL scores and paginates
+  the entire filtered result before returning a page.
+- Research questions, evidence links, article notes, findings, mentions and audit
+  history are project/owner constrained. Entity identities/aliases alone are
+  owner-wide. Read-only RLS browser grants and security-definer RPCs enforce writes;
+  composite FKs reject mismatched joins independently of frontend filtering.
+- New text edits use mandatory revision comparisons (null cannot bypass CAS).
+  Stable create-request UUIDs prevent duplicate questions/findings/entities/groups
+  on retries. Mention fingerprints retain confirmed/dismissed states on rescans.
+- Article deletion nulls article references while retaining snapshots, prose and
+  audit. Unlink is a reversible flag. Citations validate actual linked article IDs
+  and optional passages against separately identified available evidence fields.
+- Dictionary suggestions reuse intake normalization and whole-term boundaries;
+  they are bounded and explicitly reviewed. Related lists use confirmed identities,
+  linked questions or existing manual event joins. No inferred relationship,
+  automatic conclusion or publisher independence is asserted.
+
+## Deployed Milestones 01/02 workflow architecture - 2026-10-16
 
 Milestone 01 ingestion is deployed. Its recorded database/function/scheduler and
 public frontend verification is in [the ingestion review](reviews/01-ingestion.md).

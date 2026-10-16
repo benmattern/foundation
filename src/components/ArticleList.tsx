@@ -1,7 +1,10 @@
 import type { ArticleWithTags } from "../types/article";
+import { Link } from "react-router-dom";
 import { Card } from "./ui/Card";
 
 type Props = {
+  selectedIds?: string[];
+  onSelect?: (id: string, selected: boolean) => void;
   articles: ArticleWithTags[];
   highlightId?: string | null;
   emptyMessage?: string;
@@ -10,6 +13,8 @@ type Props = {
 };
 
 export function ArticleList({
+  selectedIds = [],
+  onSelect,
   articles,
   highlightId,
   emptyMessage = "No articles added yet.",
@@ -31,6 +36,16 @@ export function ArticleList({
               className={`min-w-0 rounded-lg border-b border-slate-800 p-3 ${highlightId === article.id ? "outline-2 outline-emerald-500" : ""}`}
             >
               <div className="flex flex-wrap items-start justify-between gap-4">
+                {onSelect && (
+                  <label className="flex min-h-11 items-center gap-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(article.id)}
+                      onChange={(e) => onSelect(article.id, e.target.checked)}
+                    />
+                    Select for research
+                  </label>
+                )}
                 <p className="font-medium text-white text-lg">
                   {article.title}
                 </p>
@@ -59,6 +74,12 @@ export function ArticleList({
                   </div>
                 )}
               </div>
+              <Link
+                className="block min-h-11 py-2 text-blue-300"
+                to={`/articles/${article.id}`}
+              >
+                Research connections and notes
+              </Link>
 
               <a
                 href={article.url}

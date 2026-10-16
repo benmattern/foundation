@@ -1,6 +1,6 @@
 # FOUNDATION Backlog
 
-## Approved sequence — 2026-10-16
+## Implemented locally; rollout pending — 2026-10-16
 
 1. [Milestone 03](milestones/03-selective-intake.md): source-control cleanup,
    intuitive active-filter setup, grouped/whole-term rules, named term groups,
@@ -11,7 +11,7 @@
 
 - [x] Inspect current source/rule behavior and record owner decisions.
 - [x] Publish complete implementation briefs and review handoffs.
-- [ ] Implement and verify 03, then implement and verify 04.
+- [x] Implement and locally verify 03, then implement and locally verify 04.
 - [ ] Complete separately authorized hosted rollout and live acceptance.
 
 No AI, world gazetteer, general graph engine, new paid connector family or

@@ -12,8 +12,9 @@ The owner approved the next two implementations on 2026-10-16:
 1. docs/milestones/03-selective-intake.md with docs/reviews/03-selective-intake.md.
 2. docs/milestones/04-connected-research.md with docs/reviews/04-connected-research.md.
 When assigned this sequence, implement 03 end to end, verify it, then continue
-to 04 without another routine planning-approval round. Both remain unimplemented
-at the documentation handoff. Inspect actual code and record material deviations.
+to 04 without another routine planning-approval round. Both are now implemented
+and locally verified in the working tree; read their updated reviews for results,
+schema changes and remaining hosted checks. Inspect actual code before changes.
 Follow the user's active task. This handoff does not independently authorize
 merges, hosted mutations, deployment or use of account credentials.
 

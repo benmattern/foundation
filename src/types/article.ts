@@ -1,6 +1,7 @@
 import type { Tag } from "./tag";
 
 export type Article = {
+  item_id?: string | null;
   id: string;
   source_id: string | null;
   title: string;

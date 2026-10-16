@@ -107,7 +107,9 @@ export function Subscriptions({
                 <input
                   type="checkbox"
                   checked={subscription?.enabled ?? false}
-                  disabled={project.archived}
+                  disabled={
+                    project.archived || subscription?.followed === false
+                  }
                   onChange={(e) =>
                     void save(
                       feed,
@@ -139,6 +141,19 @@ export function Subscriptions({
                     ? "Explicit override (empty lists override defaults)"
                     : "Inherits project defaults"}
                 </p>
+                <p>
+                  Effective mode:{" "}
+                  {inheritRules(project.rules, subscription?.rules ?? {})
+                    .mode ??
+                    (inheritRules(project.rules, subscription?.rules ?? {})
+                      .includeAny.length
+                      ? "restricted (legacy substring)"
+                      : "all incoming")}
+                  .{" "}
+                  {subscription?.followed === false
+                    ? "Re-follow this source before editing."
+                    : "Changes apply only to this project/feed."}
+                </p>
                 {subscription?.rules && (
                   <button
                     onClick={() =>
@@ -164,21 +179,25 @@ export function Subscriptions({
                       status: "pending",
                       page: 0,
                     });
-                    setPreview(
-                      candidates
-                        .filter((c) => c.raw_metadata.feed_id === feed.id)
-                        .slice(0, 20)
-                        .map(
-                          (c) =>
-                            `${c.title || c.url}: ${
-                              classifyItem(
-                                candidateEvidence(c),
-                                rules,
-                                new Date().toISOString(),
-                              ).route
-                            }`,
-                        ),
+                    const sample = candidates
+                      .filter((c) => c.raw_metadata.feed_id === feed.id)
+                      .slice(0, 20);
+                    const results = sample.map((c) =>
+                      classifyItem(
+                        candidateEvidence(c),
+                        rules,
+                        new Date().toISOString(),
+                      ),
                     );
+                    setPreview([
+                      sample.length
+                        ? `Sample: ${sample.length} items; ${results.filter((r) => r.route === "pending").length} included; ${results.filter((r) => r.route === "outside_scope").length} outside scope; ${results.filter((r) => r.warnings.length).length} missing text. Recent 50 project items sampled; not total coverage.`
+                        : "Insufficient preview data for this feed in the recent project sample. Collect items or review older evidence; rules can still be saved.",
+                      ...sample.map(
+                        (c, i) =>
+                          `${c.title || c.url}: ${results[i].route}. ${results[i].matches.map((m) => `${m.kind}: ${m.term} in ${m.field}${m.passage ? `: ${m.passage}` : ""}`).join("; ") || "Default / missing-text decision."}`,
+                      ),
+                    ]);
                   }}
                 />
               </details>

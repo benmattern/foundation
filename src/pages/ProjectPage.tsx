@@ -7,6 +7,7 @@ import { RuleEditor } from "../components/RuleEditor";
 import {
   activeProjectId,
   getProjects,
+  getSubscriptions,
   saveProject,
 } from "../services/projectService";
 import { getTags } from "../services/tagService";
@@ -14,6 +15,7 @@ import { queryCandidates } from "../services/ingestionCandidateService";
 import { reapplyRules, saveProjectRules } from "../services/ruleService";
 import {
   classifyItem,
+  inheritRules,
   type Rules,
 } from "../../supabase/functions/_shared/rules";
 import type { Project } from "../types/project";
@@ -42,15 +44,40 @@ export default function ProjectPage() {
     };
   }, []);
   async function previewRules(rules: Rules) {
-    const { candidates } = await queryCandidates({
-      status: "pending",
-      page: 0,
-    });
-    setPreview(
-      candidates.slice(0, 20).map((candidate) => {
+    const [{ candidates }, subscriptions] = await Promise.all([
+      queryCandidates({
+        status: "pending",
+        page: 0,
+      }),
+      getSubscriptions(),
+    ]);
+    const effective = (candidate: (typeof candidates)[number]) =>
+      inheritRules(
+        rules,
+        subscriptions.find((s) => s.feed_id === candidate.raw_metadata.feed_id)
+          ?.rules ?? {},
+      );
+    if (!candidates.length) {
+      setPreview([
+        "Insufficient preview data. Collect or capture items first; rules can still be saved now.",
+      ]);
+      return;
+    }
+    const results = candidates
+      .slice(0, 20)
+      .map((c) =>
+        classifyItem(
+          candidateEvidence(c),
+          effective(c),
+          new Date().toISOString(),
+        ),
+      );
+    setPreview([
+      `Sample: ${results.length} items; ${results.filter((r) => r.route === "pending").length} included; ${results.filter((r) => r.route === "outside_scope").length} outside scope; ${results.filter((r) => r.warnings.length).length} missing text. These are sample counts only.`,
+      ...candidates.slice(0, 20).map((candidate) => {
         const result = classifyItem(
           candidateEvidence(candidate),
-          rules,
+          effective(candidate),
           new Date().toISOString(),
         );
         return `${candidate.title || candidate.url}: ${result.route.replaceAll(
@@ -58,11 +85,14 @@ export default function ProjectPage() {
           " ",
         )} (${
           result.matches
-            .map((m) => `${m.kind}: ${m.term} in ${m.field}`)
+            .map(
+              (m) =>
+                `${m.kind}: ${m.term} in ${m.field}${m.passage ? `: ${m.passage}` : ""}`,
+            )
             .join("; ") || "default rule"
-        })`;
+        }). ${subscriptions.some((s) => s.feed_id === candidate.raw_metadata.feed_id && s.rules) ? "Feed override applied to project draft." : "Project draft defaults."}`;
       }),
-    );
+    ]);
   }
   return (
     <>
@@ -111,9 +141,26 @@ export default function ProjectPage() {
               ? "Reopen project"
               : "Archive project and pause intake"}
           </Button>
-          <details className="max-w-3xl rounded-xl border border-slate-700 p-4">
-            <summary>Advanced matching rules</summary>
+          <p>
+            Collection mode:{" "}
+            {project.rules.format === 2
+              ? project.rules.mode
+              : project.rules.includeAny.length
+                ? "restricted (legacy substring)"
+                : "all incoming items; no inclusion filter"}
+            .{" "}
+            <a href="#relevance-rules" className="text-blue-300">
+              Edit relevance rules
+            </a>
+          </p>
+          <details
+            open
+            id="relevance-rules"
+            className="max-w-3xl rounded-xl border border-slate-700 p-4"
+          >
+            <summary>Relevance rules and sample preview</summary>
             <RuleEditor
+              scopeTerms={[...project.topics, ...project.keywords]}
               initial={project.rules}
               tags={tags}
               onPreview={previewRules}

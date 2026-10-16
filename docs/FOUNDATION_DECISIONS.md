@@ -16,8 +16,29 @@
 
 See [03](milestones/03-selective-intake.md) and [04](milestones/04-connected-research.md)
 for implementation contracts. These are approved product/design directions;
-schema, code and hosted changes are not yet implemented by this commit.
+schema/code are now implemented locally in migrations 012-014. Hosted changes
+remain pending separately authorized rollout.
 
+
+## Implementation choices for 03/04 - 2026-10-16
+
+- New rule shape is explicit format 2; version remains a saved-rule revision.
+  Relevance v1 uses maximum field weight per distinct normalized positive term
+  (title 3, category 2, excerpt 1), total capped at 150. Eligibility/exclusion is
+  separate from rank; date/ID provides stable ordering across server pages.
+- Later is pending+deferred, without a reminder scheduler or destructive Keep undo.
+- Registry identity is owner-wide; every research association/count is project
+  scoped. Aliases may overlap. No entity merge or unknown-name NLP is introduced.
+- Manual links are labelled analyst associations. Suggestions require confirmation
+  even for unambiguous aliases. Dictionary preview is explicitly bounded; no claim
+  is made about unexamined full article text or all known identities beyond the cap.
+- Legacy mixed summaries remain readable but are excluded from publisher-text
+  matching/citation validation unless separately recorded acquisition text exists.
+- Source records are not an established publisher registry. Coverage reports exact
+  acquired-item identities (fallback exact URL), collector records and unknown
+  origins, without inventing independent publisher or corroboration counts.
+- Existing event context is derived from manual article-event joins; no duplicate
+  event registry or automatic event grouping was needed.
 
 ## Project workflow decisions - 2026-10-16
 

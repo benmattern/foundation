@@ -1,6 +1,34 @@
 # FOUNDATION Schema
 
-## Current schema boundary - 2026-10-16
+## Local migrations 012-014 - 2026-10-16 (not deployed)
+
+| Tables/columns | Scope and purpose |
+|---|---|
+| project_sources; project_subscriptions.followed | Project Follow/Pause/Unfollow with source revisions; disabled legacy subscriptions backfill paused |
+| term_groups, term_group_versions | Owner-wide stable group IDs and immutable pinned membership versions |
+| ingestion_candidates.deferred, matching_preview; candidate_previews | Durable Later and separately attributed opt-in metadata enrichment |
+| research_questions | Project title, description, controlled status, evolving answer and follow-ups |
+| question_articles | Project many-to-many evidence relationship/note, reversible linked flag and title/URL/date snapshot |
+| article_notes | Separate analyst body and article snapshot; does not reinterpret legacy summary |
+| research_findings | Observed claim, interpretation, uncertainties and validated citation snapshots |
+| entities | Owner-wide stable identity/type/aliases/description/reference; overlapping aliases allowed |
+| entity_mentions | Project article/entity links, source text/alias/span/matcher version, suggested/confirmed/dismissed state |
+| research_history | Owner/project scoped immutable before/after audit, including owner-wide identity changes with null project |
+
+New tables revoke default API writes and TRUNCATE, enable RLS and grant only
+owner reads to authenticated users. Validated RPCs are the mutation boundary;
+helpers are not public. Composite ownership/project FKs reject mismatched joins.
+Article FKs in research tables use column-specific SET NULL to retain project,
+prose and provenance after deletion. Citation IDs/snapshots are retained in JSON
+and checked transactionally against linked same-project articles on save.
+
+Revision fields reject stale/null edit expectations. Create tokens are unique per
+owner/object family; callers reuse their request UUID after ambiguous responses.
+Suggestions deduplicate by article/entity/normalized-alias/field/text fingerprint;
+manual associations use one stable article/entity key. Alias updates never mutate
+old snapshots or review states. All schema upgrades preserve legacy IDs/history.
+
+## Deployed Milestones 01/02 schema boundary - 2026-10-16
 
 Milestone 01 ingestion is deployed. Its recorded database/function/scheduler and
 public frontend verification is in [the ingestion review](reviews/01-ingestion.md).
@@ -1257,3 +1285,9 @@ Current candidate directions:
 Filtering & Search v1, Article Management v1, Event Refinement v1, Events v1.1 Intelligence Summary, Events v1.2 Activity & Analyst Workflow, Seed Data Script v1, Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue v1, RSS Ingestion v1, Review Queue UX v1.1-v1.4, Review Queue Preview Enhancement v1, and Review Queue Article Links are complete. Dashboard v1, URL Import v1, URL Metadata Fetch v1.1, Review Queue UX v1.1-v1.4, Review Queue Preview Enhancement v1, and Review Queue Article Links required no schema changes. Event v1 is implemented with `events` and `article_events`; Review Queue v1 is implemented with `ingestion_candidates`; RSS Ingestion v1 is implemented with `rss_feeds` and RSS-created `ingestion_candidates`.
 
 </details>
+
+Create-request retries also compare a stored content fingerprint. Reusing a saved
+request with edited content reports a conflict instead of silently ignoring the
+new draft. Version-1 stored scores are used unchanged across JavaScript/SQL
+Unicode case-folding differences; older scoreless results receive a server
+fallback score, returned to the pane so its explanation agrees with ordering.

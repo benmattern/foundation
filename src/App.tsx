@@ -13,6 +13,8 @@ import SourceDetailPage from "./pages/SourceDetailPage";
 import TagsPage from "./pages/TagsPage";
 import { WorkspaceGate } from "./components/WorkspaceGate";
 import ProjectPage from "./pages/ProjectPage";
+import ResearchPage from "./pages/ResearchPage";
+import ArticleResearchPage from "./pages/ArticleResearchPage";
 
 export default function App() {
   return (
@@ -24,6 +26,8 @@ export default function App() {
             <Route path="/sources" element={<SourcesPage />} />
             <Route path="/sources/:id" element={<SourceDetailPage />} />
             <Route path="/articles" element={<ArticlesPage />} />
+            <Route path="/articles/:id" element={<ArticleResearchPage />} />
+            <Route path="/research" element={<ResearchPage />} />
             <Route path="/tags" element={<TagsPage />} />
             <Route path="/events" element={<EventsPage />} />
             <Route path="/events/:id" element={<EventDetailPage />} />

@@ -1,6 +1,15 @@
 # FOUNDATION Conventions
 
-## Current delivery conventions - 2026-10-16
+## Local 03/04 conventions - 2026-10-16
+
+Questions and findings are analyst reasoning, not article summaries. Keep original
+acquisition, separately attributed page metadata, legacy mixed summaries, article
+notes, question-specific evidence notes and findings visibly distinct. Mention
+states must be explicit; only confirmed/manual associations count as connections.
+Scope counts to the active project. Label source/collector records honestly and
+never describe repeated coverage as independent corroboration.
+
+## Deployed 01/02 delivery conventions - 2026-10-16
 
 Milestone 01 ingestion is deployed. Its recorded database/function/scheduler and
 public frontend verification is in [the ingestion review](reviews/01-ingestion.md).

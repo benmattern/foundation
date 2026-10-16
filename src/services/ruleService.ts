@@ -25,9 +25,11 @@ export async function reapplyRules() {
   ]);
   const project = projects.find((p) => p.id === projectId)!;
   let count = 0;
-  for (const candidate of candidates.filter((c) => c.status === "pending")) {
-    const subscription = subscriptions.find((s) =>
-      s.feed_id === candidate.raw_metadata.feed_id
+  for (const candidate of candidates.filter(
+    (c) => c.status === "pending" && !c.deferred,
+  )) {
+    const subscription = subscriptions.find(
+      (s) => s.feed_id === candidate.raw_metadata.feed_id,
     );
     const rules = inheritRules(project.rules, subscription?.rules ?? {});
     const result = classifyItem(

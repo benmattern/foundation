@@ -57,6 +57,7 @@ export function SourceFeedCard({
       setBusy(false);
     }
   }
+  const sourcePath = source ? `/sources/${source.id}` : "/sources?view=saved";
   return (
     <section className="space-y-3 rounded-xl border border-slate-700 bg-slate-900 p-4">
       <h3 className="text-lg font-semibold">
@@ -101,7 +102,7 @@ export function SourceFeedCard({
           Check now
         </Button>
         <Button
-          disabled={archived || busy}
+          disabled={archived || busy || subscription?.followed === false}
           onClick={() =>
             void run(async () => {
               await saveSubscription(
@@ -113,7 +114,7 @@ export function SourceFeedCard({
             })
           }
         >
-          {subscription?.enabled ? "Pause feed" : "Follow feed"}
+          {subscription?.enabled ? "Pause feed" : "Resume feed"}
         </Button>
       </div>
       {busy && (
@@ -137,6 +138,9 @@ export function SourceFeedCard({
           </Link>
         </div>
       )}
+      <Link className={buttonClass()} to={sourcePath}>
+        Adjust source rules and collection
+      </Link>
       <details>
         <summary>Collection details and advanced management</summary>
         <div className="space-y-4 pt-2">

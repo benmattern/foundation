@@ -1,20 +1,27 @@
 # FOUNDATION Current Status
 
-## Active work — 2026-10-16
+## Current local implementation - 2026-10-16
 
-The owner approved [Milestone 03: selective intake](milestones/03-selective-intake.md)
-followed by [Milestone 04: connected research](milestones/04-connected-research.md).
-This commit adds implementation instructions only; neither milestone is built yet.
-Milestones 01/02 remain deployed as recorded below. New owner feedback confirms
-use of the hosted workflow, but does not replace a complete signed-in acceptance
-test record. Preserve that verification distinction.
+Milestones 03 and 04 are implemented in sequence on
+`docs/selective-intake-connected-research`, working tree over documentation
+baseline `28b326a13e1542affeb0053d32f70e332937e988`.
+[Selective intake review](reviews/03-selective-intake.md) and
+[connected research review](reviews/04-connected-research.md) record results.
 
-Current topics/keywords are descriptive; matching rules separately control routing.
-New grouped filtering, explicit Unfollow, question/entity linking and research
-notes are specified work, not current capabilities.
+Delivered locally: Follow/Pause/Unfollow, explicit grouped intake rules, pinned
+vocabulary versions, explained relevance, original/preview provenance and Later;
+then project questions, many-to-many evidence notes, sourced findings, separate
+article notes, entity identities/aliases, manual and known-name mention review,
+related articles and factual coverage signals. All function without AI.
 
+Migrations 012-014 are additive and locally tested. Browser tests use fictional
+mock APIs; SQL and concurrency tests use disposable databases. No hosted data,
+credentials, deployment or merge was used for this task. GitHub CI was not run;
+its commands are exercised locally. Milestones 01/02 remain the deployed release.
+Separately authorized backup, migrations, collector/frontend release and live
+signed-in acceptance are next. See the reviews for rollout order and limits.
 
-## Current status - 2026-10-16
+## Deployed Milestones 01/02 baseline - 2026-10-16
 
 Milestone 01 ingestion is deployed. Its recorded database/function/scheduler and
 public frontend verification is in [the ingestion review](reviews/01-ingestion.md).

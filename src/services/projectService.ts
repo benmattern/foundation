@@ -12,10 +12,12 @@ export function activeProjectId() {
 }
 export async function getProjects(): Promise<Project[]> {
   return queryAll<Project>((from, to) =>
-    supabase.from("projects").select("*").order("created_at").order("id").range(
-      from,
-      to,
-    )
+    supabase
+      .from("projects")
+      .select("*")
+      .order("created_at")
+      .order("id")
+      .range(from, to),
   );
 }
 export async function saveProject(values: Partial<Project>, id?: string) {
@@ -29,8 +31,12 @@ export async function saveProject(values: Partial<Project>, id?: string) {
 export async function getSubscriptions(): Promise<Subscription[]> {
   const project = activeProjectId();
   return queryAll<Subscription>((from, to) =>
-    supabase.from("project_subscriptions").select("*").eq("project_id", project)
-      .order("feed_id").range(from, to)
+    supabase
+      .from("project_subscriptions")
+      .select("*")
+      .eq("project_id", project)
+      .order("feed_id")
+      .range(from, to),
   );
 }
 export async function saveSubscription(
@@ -53,6 +59,37 @@ export async function setSourceEnabled(sourceId: string, enabled: boolean) {
     p_project: activeProjectId(),
     p_source: sourceId,
     p_enabled: enabled,
+  });
+  if (error) throw error;
+}
+
+export type ProjectSourceState = {
+  project_id: string;
+  source_id: string;
+  state: "following" | "paused" | "unfollowed";
+  version: number;
+};
+export function getSourceStates(): Promise<ProjectSourceState[]> {
+  const id = activeProjectId();
+  return queryAll<ProjectSourceState>((a, b) =>
+    supabase
+      .from("project_sources")
+      .select("*")
+      .eq("project_id", id)
+      .order("source_id")
+      .range(a, b),
+  );
+}
+export async function setSourceState(
+  sourceId: string,
+  state: ProjectSourceState["state"],
+  expected?: number,
+) {
+  const { error } = await supabase.rpc("set_source_state", {
+    p_project: activeProjectId(),
+    p_source: sourceId,
+    p_state: state,
+    p_expected: expected ?? null,
   });
   if (error) throw error;
 }

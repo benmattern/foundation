@@ -1,11 +1,9 @@
 # Milestone 03: Selective intake without AI
 
-Status: approved implementation assignment, 2026-10-16.
-Baseline inspected: 7cd42fbe1eb0c2e1cd03981a16a67bab5cbc2050.
-Read AGENTS.md and ../reviews/03-selective-intake.md before implementation.
-Milestones 01 and 02 are deployed. This document specifies new work, not delivered
-functionality. Complete this milestone before Milestone 04; proceed to 04 after
-its local acceptance passes when assigned this two-milestone sequence.
+Status: implemented and locally verified, 2026-10-16; not deployed.
+Reviewed working tree over 28b326a13e1542affeb0053d32f70e332937e988.
+See ../reviews/03-selective-intake.md for evidence, design choices and rollout limits.
+Milestone 03 local acceptance preceded Milestone 04 implementation.
 
 ## Outcome and scope
 
@@ -172,22 +170,22 @@ Prepare additive migrations for real data-model changes; preserve IDs, research,
 source state, RLS, transactional writes and existing links. Inspect current schema,
 tests and code before choosing exact columns/tables. No live reset or demo reseed.
 
-- [ ] Follow/Pause/Resume/Unfollow/re-follow work and preserve old research/rules.
-- [ ] Unfollow and collector staging are concurrency-safe and project-isolated.
-- [ ] New/existing project setup makes descriptive versus active rules unambiguous.
-- [ ] v1 rules retain behavior; new groups/modes/overrides pass positive/negative,
+- [x] Follow/Pause/Resume/Unfollow/re-follow work and preserve old research/rules.
+- [x] Unfollow and collector staging are concurrency-safe and project-isolated.
+- [x] New/existing project setup makes descriptive versus active rules unambiguous.
+- [x] v1 rules retain behavior; new groups/modes/overrides pass positive/negative,
       Unicode, empty-rule and exclusion-precedence fixtures.
-- [ ] Group edits do not silently change pinned active filter behavior.
-- [ ] Preview, server intake and reapply agree and preserve analyst decisions.
-- [ ] Ranking is deterministic, explained and correct across pages.
-- [ ] Excerpts and preview enrichment show origin; missing/failed content is honest.
-- [ ] Later/restore, shortcuts, bulk actions and busy/error states work.
-- [ ] Anonymous/cross-owner and cross-project mutation tests deny invalid access.
-- [ ] Fresh/upgrade migrations and independent-connection tests cover new writes.
-- [ ] npm ci, lint, build, unit/UI/database tests, check:functions, test:postgres,
+- [x] Group edits do not silently change pinned active filter behavior.
+- [x] Preview, server intake and reapply agree and preserve analyst decisions.
+- [x] Ranking is deterministic, explained and correct across pages.
+- [x] Excerpts and preview enrichment show origin; missing/failed content is honest.
+- [x] Later/restore, shortcuts, bulk actions and busy/error states work.
+- [x] Anonymous/cross-owner and cross-project mutation tests deny invalid access.
+- [x] Fresh/upgrade migrations and independent-connection tests cover new writes.
+- [x] npm ci, lint, build, unit/UI/database tests, check:functions, test:postgres,
       and browser journeys pass; preserve existing CI coverage.
-- [ ] Desktop/mobile views are rendered and visually inspected.
-- [ ] Write results/demo/limitations in ../reviews/03-selective-intake.md and
+- [x] Desktop/mobile views are rendered and visually inspected.
+- [x] Write results/demo/limitations in ../reviews/03-selective-intake.md and
       update current docs before continuing to Milestone 04.
 
 Hosted deployment, credentials, live data mutations and merging require the
