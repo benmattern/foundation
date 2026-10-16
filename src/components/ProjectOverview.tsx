@@ -97,6 +97,18 @@ export function ProjectOverview() {
         <p role="status">Loading project progress…</p>
       ) : (
         <>
+          <p className="mb-4 text-slate-300">
+            Intake:{" "}
+            {data.project?.rules.format === 2
+              ? data.project.rules.mode
+              : data.project?.rules.includeAny.length
+                ? "restricted (legacy substring)"
+                : "all incoming"}
+            .{" "}
+            <Link className="text-blue-300" to="/project#relevance-rules">
+              Edit relevance rules
+            </Link>
+          </p>
           <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
             {[
               ["Enabled sources", data.sources],
@@ -123,6 +135,11 @@ export function ProjectOverview() {
                 <Link className={buttonClass()} to="/articles?capture=1">
                   Capture a link
                 </Link>
+                {data.kept > 0 && (
+                  <Link className={buttonClass()} to="/research">
+                    Investigate a research question
+                  </Link>
+                )}
                 <Button onClick={() => setRevision((n) => n + 1)}>
                   Refresh progress
                 </Button>

@@ -5,7 +5,9 @@ export function projectFeeds(feeds: RssFeed[], subscriptions: Subscription[]) {
   return feeds.filter(
     (feed) =>
       feed.is_active &&
-      subscriptions.some((s) => s.feed_id === feed.id && s.enabled),
+      subscriptions.some(
+        (s) => s.feed_id === feed.id && s.enabled && s.followed !== false,
+      ),
   );
 }
 export function feedHealth(feed: RssFeed, runs: CollectionRun[]) {

@@ -269,7 +269,6 @@ test("keyboard project setup and readable settings preserve optional scope witho
   ]);
   expect(state.projects[0].rules.includeAny).toEqual([]);
   await capture(page, "settings");
-  await page.getByText("Advanced matching rules", { exact: true }).click();
   await page.getByLabel("Include any terms").fill("accidental term");
   await page
     .getByRole("button", { name: "Cancel rule edits", exact: true })

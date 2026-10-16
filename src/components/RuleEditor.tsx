@@ -1,8 +1,10 @@
+import { GroupedRuleEditor } from "./GroupedRuleEditor";
 import { Button } from "./ui/Button";
 import { useState } from "react";
 import type { Rules } from "../../supabase/functions/_shared/rules";
 import type { Tag } from "../types/tag";
 type Props = {
+  scopeTerms?: string[];
   initial: Rules;
   tags: Tag[];
   onSave: (rules: Rules) => Promise<void>;
@@ -14,7 +16,57 @@ const terms = (text: string) =>
     .map((s) => s.trim())
     .filter(Boolean);
 export function RuleEditor(props: Props) {
-  return <RuleFields key={JSON.stringify(props.initial)} {...props} />;
+  return <RuleChoice key={JSON.stringify(props.initial)} {...props} />;
+}
+function RuleChoice(props: Props) {
+  const [grouped, setGrouped] = useState(props.initial.format === 2);
+  if (grouped)
+    return (
+      <GroupedRuleEditor
+        {...props}
+        initial={
+          props.initial.format === 2
+            ? props.initial
+            : {
+                ...props.initial,
+                format: 2,
+                mode: props.initial.includeAny.length ? "restricted" : "all",
+                groups: props.initial.includeAny.length
+                  ? [
+                      [
+                        {
+                          terms: props.initial.includeAny,
+                          fields: ["title", "excerpt", "categories"],
+                          mode: "substring",
+                        },
+                      ],
+                    ]
+                  : [],
+                exclusions: props.initial.excludeAny.length
+                  ? [
+                      {
+                        terms: props.initial.excludeAny,
+                        fields: ["title", "excerpt", "categories"],
+                        mode: "substring",
+                      },
+                    ]
+                  : [],
+              }
+        }
+      />
+    );
+  return (
+    <div className="space-y-4">
+      <p>
+        Legacy literal-substring rules remain active. No descriptive metadata is
+        automatically used.
+      </p>
+      <Button onClick={() => setGrouped(true)}>
+        Build grouped relevance rules
+      </Button>
+      <RuleFields {...props} />
+    </div>
+  );
 }
 function RuleFields({ initial, tags, onSave, onPreview }: Props) {
   const [include, setInclude] = useState(initial.includeAny.join("\n"));

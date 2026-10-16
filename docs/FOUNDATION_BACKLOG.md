@@ -1,5 +1,24 @@
 # FOUNDATION Backlog
 
+## Implemented locally; rollout pending — 2026-10-16
+
+1. [Milestone 03](milestones/03-selective-intake.md): source-control cleanup,
+   intuitive active-filter setup, grouped/whole-term rules, named term groups,
+   explained relevance ordering, richer previews and faster manual review.
+2. [Milestone 04](milestones/04-connected-research.md): project research questions,
+   article/question notes and evidence links, entity identities/aliases,
+   manual/dictionary mention suggestions and inspectable related coverage.
+
+- [x] Inspect current source/rule behavior and record owner decisions.
+- [x] Publish complete implementation briefs and review handoffs.
+- [x] Implement and locally verify 03, then implement and locally verify 04.
+- [ ] Complete separately authorized hosted rollout and live acceptance.
+
+No AI, world gazetteer, general graph engine, new paid connector family or
+automatic conclusions are required. Keep operational monitoring and unresolved
+hosted verification from the previous release separate from these features.
+
+
 ## Current priority - 2026-10-16
 
 Milestone 01 ingestion is deployed. Its recorded database/function/scheduler and

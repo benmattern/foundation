@@ -1,7 +1,7 @@
 import { Button } from "../components/ui/Button";
 import { buttonClass } from "../components/ui/buttonStyles";
 import { EmptyState } from "../components/ui/EmptyState";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { PageHeader } from "../components/PageHeader";
 import { IngestionCandidateList } from "../components/IngestionCandidateList";
@@ -31,6 +31,7 @@ import type { Tag } from "../types/tag";
 
 const statuses: IngestionCandidateStatus[] = [
   "pending",
+  "later",
   "accepted",
   "rejected",
   "duplicate",
@@ -52,6 +53,7 @@ export default function IngestionQueuePage() {
     : "pending";
   const filters: CandidateQuery = {
     status,
+    order: (params.get("order") ?? "newest") as CandidateQuery["order"],
     route:
       status === "pending" ? (params.get("route") ?? "pending") : undefined,
     search: params.get("q") ?? "",
@@ -79,6 +81,7 @@ export default function IngestionQueuePage() {
     outside: number;
     reviewed: number;
   } | null>(null);
+  const [shortcuts, setShortcuts] = useState(false);
   const [busy, setBusy] = useState(false);
   const [outcomes, setOutcomes] = useState<string[]>([]);
   const [bulkTag, setBulkTag] = useState("");
@@ -159,7 +162,7 @@ export default function IngestionQueuePage() {
     Promise.all([
       queryCandidates({ status: "pending", route: "pending", page: 0 }),
       queryCandidates({ status: "pending", route: "outside_scope", page: 0 }),
-      ...["accepted", "rejected", "duplicate"].map((status) =>
+      ...["accepted", "rejected", "duplicate", "later"].map((status) =>
         queryCandidates({ status, page: 0 }),
       ),
     ])
@@ -178,12 +181,54 @@ export default function IngestionQueuePage() {
       active = false;
     };
   }, [revision]);
-  const visible = result?.key === queryKey ? result.candidates : [];
+  const visible = useMemo(
+    () => (result?.key === queryKey ? result.candidates : []),
+    [result, queryKey],
+  );
   const candidate = selectVisibleCandidate(visible, selectedId);
   const selected =
     selection.key === queryKey
       ? selection.ids.filter((id) => visible.some((c) => c.id === id))
       : [];
+  useEffect(() => {
+    if (!shortcuts) return;
+    const handler = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement;
+      if (
+        event.ctrlKey ||
+        event.altKey ||
+        event.metaKey ||
+        event.shiftKey ||
+        event.repeat ||
+        document.querySelector("dialog[open]") ||
+        target.closest("input,textarea,select,[contenteditable=true]") ||
+        busy
+      )
+        return;
+      const key = event.key.toLowerCase();
+      const index = visible.findIndex((c) => c.id === candidate?.id);
+      if (key === "n" || key === "p") {
+        event.preventDefault();
+        setSelectedId(
+          visible[
+            Math.max(
+              0,
+              Math.min(visible.length - 1, index + (key === "n" ? 1 : -1)),
+            )
+          ]?.id ?? null,
+        );
+      } else if (candidate && ["l", "d"].includes(key)) {
+        event.preventDefault();
+        setBusy(true);
+        void reviewCandidate(candidate.id, key === "l" ? "later" : "reject")
+          .then(() => setRevision((n) => n + 1))
+          .catch((e) => setError(String(e)))
+          .finally(() => setBusy(false));
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [shortcuts, candidate, visible, busy]);
   function change(key: string, value: string) {
     setParams((current) => {
       const next = new URLSearchParams(current);
@@ -235,6 +280,15 @@ export default function IngestionQueuePage() {
         title="Inbox"
         description="Incoming material awaits your review. Keeping adds it to Library."
       />
+      <label className="mb-4 flex min-h-11 items-center gap-3">
+        <input
+          type="checkbox"
+          checked={shortcuts}
+          onChange={(e) => setShortcuts(e.target.checked)}
+        />
+        Enable review shortcuts: N/P next/previous, L Later, D Dismiss. Off
+        while typing or in dialogs.
+      </label>
       {keptArticle && (
         <div
           role="status"
@@ -298,6 +352,46 @@ export default function IngestionQueuePage() {
         </p>
       )}
       <div className="mb-4 flex flex-wrap items-center gap-3 text-slate-300">
+        <label>
+          Order
+          <select
+            aria-label="Inbox order"
+            value={filters.order}
+            onChange={(e) => change("order", e.target.value)}
+          >
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="relevance">Relevance (not credibility)</option>
+          </select>
+        </label>
+        <Button
+          onClick={() =>
+            setSelectedId(
+              visible[
+                Math.max(
+                  0,
+                  visible.findIndex((c) => c.id === candidate?.id) - 1,
+                )
+              ]?.id ?? null,
+            )
+          }
+        >
+          Previous item
+        </Button>
+        <Button
+          onClick={() =>
+            setSelectedId(
+              visible[
+                Math.min(
+                  visible.length - 1,
+                  visible.findIndex((c) => c.id === candidate?.id) + 1,
+                )
+              ]?.id ?? null,
+            )
+          }
+        >
+          Next item
+        </Button>
         {status === "pending" && (
           <label>
             Route{" "}
@@ -383,6 +477,7 @@ export default function IngestionQueuePage() {
         <p>{selected.length} selected on this page</p>
         <div className="flex flex-wrap gap-3">
           {[
+            "later",
             "accept",
             "reject",
             "duplicate",
@@ -397,6 +492,7 @@ export default function IngestionQueuePage() {
             >
               {
                 {
+                  later: "Later",
                   accept: "Keep selected",
                   reject: "Dismiss selected",
                   duplicate: "Duplicate",
@@ -462,6 +558,7 @@ export default function IngestionQueuePage() {
           selectedStatus={status}
           statusCounts={
             result?.counts ?? {
+              later: 0,
               pending: 0,
               accepted: 0,
               rejected: 0,
@@ -491,7 +588,8 @@ export default function IngestionQueuePage() {
           )}
           {candidate &&
             candidate.status !== "accepted" &&
-            (candidate.status !== "pending" ||
+            (candidate.deferred ||
+              candidate.status !== "pending" ||
               candidate.route === "outside_scope") && (
               <Button
                 className="mb-3 text-blue-300"
@@ -517,6 +615,7 @@ export default function IngestionQueuePage() {
               onRejectCandidate={(item, reason) =>
                 act(item, "reject", { rejection_reason: reason })
               }
+              onLaterCandidate={(item) => act(item, "later")}
               onMarkDuplicate={(item) => act(item, "duplicate")}
             />
           </fieldset>

@@ -1,3 +1,7 @@
+import {
+  validateRules,
+  type Rules,
+} from "../../supabase/functions/_shared/rules";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -145,6 +149,7 @@ function NewProject({
   onCreated: (project: Project) => void;
   onCancel: () => void;
 }) {
+  const [restricted, setRestricted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const locked = useRef(false);
@@ -165,9 +170,36 @@ function NewProject({
           setBusy(true);
           setError("");
           try {
+            const terms = String(data.get("matching") ?? "")
+              .split("\n")
+              .map((s) => s.trim())
+              .filter(Boolean);
+            const rules: Rules = {
+              version: 1,
+              format: 2,
+              mode: restricted ? "restricted" : "all",
+              groups: restricted
+                ? [
+                    [
+                      {
+                        terms,
+                        fields: ["title", "excerpt", "categories"],
+                        mode: "whole",
+                      },
+                    ],
+                  ]
+                : [],
+              exclusions: [],
+              includeAny: [],
+              excludeAny: [],
+              defaultTags: [],
+              keywordTags: [],
+            };
+            validateRules(rules);
             onCreated(
               await saveProject({
                 name,
+                rules,
                 description: String(data.get("description") ?? ""),
                 topics: String(data.get("topics") ?? "")
                   .split(",")
@@ -213,6 +245,28 @@ function NewProject({
             </p>
           </div>
         </details>
+        <label className="block">
+          Inbox preference
+          <select
+            className={controlClass}
+            value={restricted ? "restricted" : "all"}
+            onChange={(e) => setRestricted(e.target.value === "restricted")}
+          >
+            <option value="all">All incoming items</option>
+            <option value="restricted">Only items matching my rules</option>
+          </select>
+        </label>
+        {restricted && (
+          <Textarea
+            label="Matching terms, one per line"
+            name="matching"
+            hint="Whole terms in title, excerpt or categories. Add grouped conditions and preview samples in Project settings."
+          />
+        )}
+        <p>
+          Next: choose sources. You can revisit matching rules and preview real
+          samples without restarting setup.
+        </p>
         {error && (
           <p role="alert" className="text-red-300">
             {error}

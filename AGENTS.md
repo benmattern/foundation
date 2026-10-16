@@ -6,15 +6,16 @@ docs/FOUNDATION_BACKLOG.md, and docs/FOUNDATION_CONVENTIONS.md, then inspect
 the code relevant to the task. Use docs/FOUNDATION_DECISIONS.md and
 docs/FOUNDATION_SCHEMA.md for architectural and data context.
 
-Milestone 01 ingestion is deployed; see docs/reviews/01-ingestion.md for recorded
-verification and remaining live signed-in checks.
-Milestone 02 workflow implementation is deployed; see
-docs/milestones/02-project-workflow.md and docs/reviews/02-project-workflow.md
-for the completed checklist, verification, demo and remaining hosted checks.
-The owner approved the project workflow/usability implementation on 2026-10-16.
-When assigned this milestone, implement it end to end and report evidence;
-do not stop at another plan or seek approval for routine UI choices.
-Follow the user's active task; these instructions do not independently authorize
+Milestones 01 and 02 are deployed; their reviews document verification and
+remaining real-account hosted checks.
+The owner approved the next two implementations on 2026-10-16:
+1. docs/milestones/03-selective-intake.md with docs/reviews/03-selective-intake.md.
+2. docs/milestones/04-connected-research.md with docs/reviews/04-connected-research.md.
+When assigned this sequence, implement 03 end to end, verify it, then continue
+to 04 without another routine planning-approval round. Both are now implemented
+and locally verified in the working tree; read their updated reviews for results,
+schema changes and remaining hosted checks. Inspect actual code before changes.
+Follow the user's active task. This handoff does not independently authorize
 merges, hosted mutations, deployment or use of account credentials.
 
 ## Product principles

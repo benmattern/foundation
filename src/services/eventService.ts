@@ -26,9 +26,13 @@ export type UpdateEventInput = CreateEventInput;
 export function getEvents(): Promise<FoundationEvent[]> {
   const project = activeProjectId();
   return queryAll<FoundationEvent>((from, to) =>
-    supabase.from("events").select("*").eq("project_id", project)
-      .order("occurred_at", { ascending: false, nullsFirst: false }).order("id")
-      .range(from, to)
+    supabase
+      .from("events")
+      .select("*")
+      .eq("project_id", project)
+      .order("occurred_at", { ascending: false, nullsFirst: false })
+      .order("id")
+      .range(from, to),
   );
 }
 export async function getEventsWithArticles(): Promise<
@@ -91,7 +95,9 @@ export async function deleteEvent(id: string): Promise<void> {
 }
 async function getEventById(id: string): Promise<FoundationEvent> {
   const { data, error } = await supabase
-    .from("events").select("*").eq("project_id", activeProjectId())
+    .from("events")
+    .select("*")
+    .eq("project_id", activeProjectId())
     .eq("id", id)
     .single();
 
@@ -102,12 +108,16 @@ async function getEventById(id: string): Promise<FoundationEvent> {
   return data;
 }
 
-async function getArticleEvents(): Promise<ArticleEvent[]> {
+export async function getArticleEvents(): Promise<ArticleEvent[]> {
   const project = activeProjectId();
   return queryAll<ArticleEvent>((from, to) =>
-    supabase.from("article_events").select("*").eq("project_id", project).order(
-      "article_id",
-    ).order("event_id").range(from, to)
+    supabase
+      .from("article_events")
+      .select("*")
+      .eq("project_id", project)
+      .order("article_id")
+      .order("event_id")
+      .range(from, to),
   );
 }
 async function getArticleEventsByEventId(

@@ -1,4 +1,4 @@
-import { saveSubscription } from "../services/projectService";
+import { saveSubscription, setSourceState } from "../services/projectService";
 import type { RssFeed } from "../types/rssFeed";
 import type { Subscription } from "../types/project";
 import { Button } from "./ui/Button";
@@ -77,7 +77,7 @@ export function SourceCatalog({
           const subscription = subscriptions.find(
             (s) => s.feed_id === feed?.id,
           );
-          const followed = !!subscription?.enabled;
+          const followed = !!subscription && subscription.followed !== false;
           return (
             <article
               className="space-y-2 border-t border-slate-700 pt-3"
@@ -107,7 +107,9 @@ export function SourceCatalog({
                   setBusy(true);
                   setMessage("");
                   try {
-                    if (feed)
+                    if (feed?.source_id && subscription?.followed === false)
+                      await setSourceState(feed.source_id, "following");
+                    else if (feed)
                       await saveSubscription(
                         feed.id,
                         true,

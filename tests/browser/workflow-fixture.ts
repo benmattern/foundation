@@ -5,6 +5,14 @@ import type { RssFeed } from "../../src/types/rssFeed";
 import type { IngestionCandidate } from "../../src/types/ingestionCandidate";
 import type { CollectionRun } from "../../src/services/rssFeedService";
 import { sourceCatalog } from "../../src/lib/sourceCatalog";
+import type {
+  Question,
+  QuestionArticle,
+  Finding,
+  Entity,
+  Mention,
+  ArticleNote,
+} from "../../src/types/research";
 
 const owner = "10000000-0000-0000-0000-000000000001";
 const rules = {
@@ -59,6 +67,27 @@ export async function workflowFixture(page: Page) {
     sourceWrites: 0,
     feedWrites: 0,
     checks: 0,
+    sourceStates: [] as {
+      project_id: string;
+      source_id: string;
+      state: string;
+      version: number;
+    }[],
+    questions: [] as Question[],
+    links: [] as QuestionArticle[],
+    findings: [] as Finding[],
+    entities: [] as Entity[],
+    mentions: [] as (Mention & { project_id: string })[],
+    notes: [] as (ArticleNote & { project_id: string })[],
+    failResearchSave: false,
+    previews: [] as {
+      id: string;
+      candidate_id: string;
+      project_id: string;
+      origin_url: string;
+      excerpt: string;
+      retrieved_at: string;
+    }[],
   };
   function candidate(
     project: string,
@@ -134,6 +163,227 @@ export async function workflowFixture(page: Page) {
               refresh_token: "test-refresh",
               user,
             };
+    } else if (
+      [
+        "research_questions",
+        "question_articles",
+        "research_findings",
+        "entities",
+        "entity_mentions",
+        "article_notes",
+      ].includes(table ?? "")
+    ) {
+      const rows =
+        table === "research_questions"
+          ? state.questions
+          : table === "question_articles"
+            ? state.links
+            : table === "research_findings"
+              ? state.findings
+              : table === "entities"
+                ? state.entities
+                : table === "entity_mentions"
+                  ? state.mentions
+                  : state.notes;
+      result = rows.filter(
+        (r) => !("project_id" in r) || r.project_id === project,
+      );
+    } else if (table === "research_evidence") {
+      const a = state.articles.find(
+        (a) => a.id === body.p_article && a.project_id === body.p_project,
+      );
+      result = a
+        ? [
+            {
+              field: "acquisition_title",
+              text: a.title,
+              origin: "Original acquisition title",
+            },
+            {
+              field: "acquisition_excerpt",
+              text: "Acme expanded in Taiwan. US operations remain under review.",
+              origin: "Original acquisition excerpt; not full article",
+            },
+          ]
+        : [];
+    } else if (table === "save_question") {
+      if (state.failResearchSave) {
+        state.failResearchSave = false;
+        status = 409;
+        result = { message: "Question changed; reload before saving" };
+      } else {
+        const q = state.questions.find((q) => q.id === body.p_id);
+        if (q) {
+          Object.assign(q, body.p_values);
+          q.version++;
+          result = q;
+        } else {
+          const q = {
+            id: `question-${state.questions.length}`,
+            project_id: body.p_project,
+            title: "",
+            description: "",
+            answer: "",
+            followups: "",
+            status: "open" as const,
+            version: 1,
+            ...body.p_values,
+          };
+          state.questions.push(q);
+          result = q;
+        }
+      }
+    } else if (table === "link_question_article") {
+      let l = state.links.find(
+        (l) =>
+          l.question_id === body.p_question && l.article_id === body.p_article,
+      );
+      const a = state.articles.find((a) => a.id === body.p_article)!;
+      if (l) {
+        Object.assign(l, body.p_values);
+        l.version++;
+      } else {
+        l = {
+          id: `link-${state.links.length}`,
+          project_id: body.p_project,
+          question_id: body.p_question,
+          article_id: body.p_article,
+          article_snapshot: { id: a.id, title: a.title },
+          disposition: "background",
+          note: "",
+          linked: true,
+          version: 1,
+          ...body.p_values,
+        };
+        state.links.push(l);
+      }
+      result = l;
+    } else if (table === "save_article_note") {
+      let n = state.notes.find((n) => n.article_id === body.p_article);
+      if (n) {
+        n.body = body.p_body;
+        n.version++;
+      } else {
+        n = {
+          id: `note-${state.notes.length}`,
+          project_id: body.p_project,
+          article_id: body.p_article,
+          article_snapshot: { id: body.p_article, title: "Snapshot" },
+          body: body.p_body,
+          version: 1,
+        };
+        state.notes.push(n);
+      }
+      result = n;
+    } else if (table === "save_finding") {
+      let f = state.findings.find((f) => f.id === body.p_id);
+      if (f) {
+        Object.assign(f, body.p_values);
+        f.version++;
+      } else {
+        f = {
+          id: `finding-${state.findings.length}`,
+          question_id: body.p_question,
+          observed: "",
+          interpretation: "",
+          uncertainties: "",
+          citations: [],
+          version: 1,
+          ...body.p_values,
+        };
+        state.findings.push(f!);
+      }
+      result = f;
+    } else if (table === "save_entity") {
+      let e = state.entities.find((e) => e.id === body.p_id);
+      if (e) {
+        Object.assign(e, body.p_values);
+        e.version++;
+      } else {
+        e = {
+          id: `entity-${state.entities.length}`,
+          name: "",
+          entity_type: "organization",
+          aliases: [],
+          description: "",
+          reference_url: "",
+          version: 1,
+          ...body.p_values,
+        };
+        state.entities.push(e!);
+      }
+      result = e;
+    } else if (table === "save_mentions") {
+      let added = 0;
+      for (const draft of body.p_suggestions) {
+        if (
+          state.mentions.some(
+            (m) =>
+              m.article_id === body.p_article &&
+              m.entity_id === draft.entity_id &&
+              m.matched_alias === draft.alias &&
+              m.source_field ===
+                (body.p_manual ? "manual analyst association" : draft.field),
+          )
+        )
+          continue;
+        const a = state.articles.find((a) => a.id === body.p_article)!;
+        state.mentions.push({
+          id: `mention-${state.mentions.length}`,
+          project_id: body.p_project,
+          article_id: a.id,
+          article_snapshot: { id: a.id, title: a.title },
+          entity_id: draft.entity_id,
+          matched_alias: draft.alias,
+          source_field: body.p_manual
+            ? "manual analyst association"
+            : draft.field,
+          snapshot: draft.snapshot ?? "",
+          span: draft.span,
+          matcher_version: 1,
+          state: body.p_manual ? "confirmed" : "suggested",
+          manual: body.p_manual,
+          version: 1,
+          updated_at: now,
+        });
+        added++;
+      }
+      result = added;
+    } else if (table === "review_mention") {
+      const m = state.mentions.find((m) => m.id === body.p_id)!;
+      m.state = body.p_state;
+      m.version++;
+      result = m;
+    } else if (table === "candidate_previews")
+      result = state.previews.filter(
+        (p) =>
+          p.project_id === project &&
+          `eq.${p.candidate_id}` === url.searchParams.get("candidate_id"),
+      );
+    else if (table === "fetch-url-metadata")
+      result = {
+        requestedUrl: body.url,
+        finalUrl: body.url,
+        canonicalUrl: null,
+        title: "Page metadata",
+        description: "Separately retrieved page metadata excerpt.",
+        siteName: null,
+        publishedAt: null,
+        sourceHints: { hostname: "example.com", siteName: null },
+        warnings: [],
+      };
+    else if (table === "save_candidate_preview") {
+      const c = state.candidates.find((c) => c.id === body.p_id)!;
+      const p = {
+        id: `preview-${state.previews.length}`,
+        candidate_id: c.id,
+        project_id: c.project_id,
+        origin_url: body.p_url,
+        excerpt: body.p_excerpt,
+        retrieved_at: now,
+      };
+      state.previews.push(p);
+      result = p;
     } else if (table === "projects") {
       if (request.method() === "POST") {
         const p = {
@@ -144,7 +394,7 @@ export async function workflowFixture(page: Page) {
           keywords: body.keywords ?? [],
           description: body.description ?? "",
           archived: false,
-          rules,
+          rules: body.rules ?? rules,
         };
         state.projects.push(p);
         result = p;
@@ -198,7 +448,9 @@ export async function workflowFixture(page: Page) {
         Object.assign(feed, body);
         result = feed;
       } else result = state.feeds;
-    } else if (table === "project_subscriptions")
+    } else if (table === "project_sources")
+      result = state.sourceStates.filter((s) => s.project_id === project);
+    else if (table === "project_subscriptions")
       result = state.subscriptions.filter((s) => s.project_id === project);
     else if (table === "collection_runs") result = [...state.runs].reverse();
     else if (table === "articles")
@@ -208,7 +460,10 @@ export async function workflowFixture(page: Page) {
       const items = state.candidates.filter(
         (c) =>
           c.project_id === body.p_project &&
-          c.status === f.status &&
+          (f.status === "later"
+            ? c.status === "pending" && c.deferred
+            : c.status === f.status &&
+              (c.status !== "pending" || !c.deferred)) &&
           (!f.route || c.route === f.route) &&
           (!body.p_search ||
             c.title?.toLowerCase().includes(body.p_search.toLowerCase())) &&
@@ -270,19 +525,42 @@ export async function workflowFixture(page: Page) {
           });
         result = null;
       }
-    } else if (table === "set_source_enabled") {
+    } else if (table === "set_source_enabled" || table === "set_source_state") {
+      const enabled =
+        table === "set_source_state"
+          ? body.p_state === "following"
+          : body.p_enabled;
+      if (table === "set_source_state") {
+        const s = state.sourceStates.find(
+          (s) =>
+            s.project_id === body.p_project && s.source_id === body.p_source,
+        );
+        if (s) {
+          s.state = body.p_state;
+          s.version++;
+        } else
+          state.sourceStates.push({
+            project_id: body.p_project,
+            source_id: body.p_source,
+            state: body.p_state,
+            version: 1,
+          });
+      }
       for (const feed of state.feeds.filter(
         (f) => f.source_id === body.p_source,
       )) {
         const s = state.subscriptions.find(
           (s) => s.project_id === body.p_project && s.feed_id === feed.id,
         );
-        if (s) s.enabled = body.p_enabled;
-        else
+        if (s) {
+          s.enabled = enabled;
+          s.followed = body.p_state !== "unfollowed";
+        } else
           state.subscriptions.push({
             project_id: body.p_project,
             feed_id: feed.id,
-            enabled: body.p_enabled,
+            enabled,
+            followed: body.p_state !== "unfollowed",
             rules: null,
           });
       }
@@ -351,7 +629,14 @@ export async function workflowFixture(page: Page) {
         });
       } else if (body.p_action === "reject") c.status = "rejected";
       else if (body.p_action === "duplicate") c.status = "duplicate";
-      else if (body.p_action === "restore") c.status = "pending";
+      else if (body.p_action === "restore") {
+        c.status = "pending";
+        c.deferred = false;
+      } else if (body.p_action === "later") c.deferred = true;
+      else if (body.p_action === "use_preview")
+        c.matching_preview = state.previews.find(
+          (p) => p.id === body.p_values.preview_id,
+        );
       else Object.assign(c, body.p_values);
       result = c;
     }

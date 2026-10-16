@@ -12,6 +12,7 @@ export type Project = {
 export type Subscription = {
   project_id: string;
   feed_id: string;
+  followed?: boolean;
   enabled: boolean;
   rules: Partial<Rules> | null;
 };

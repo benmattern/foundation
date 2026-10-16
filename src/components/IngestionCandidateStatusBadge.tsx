@@ -5,6 +5,7 @@ type Props = {
 };
 
 const statusStyles: Record<IngestionCandidateStatus, string> = {
+  later: "border-blue-700 text-blue-200",
   pending: "border-amber-500/40 bg-amber-500/10 text-amber-200",
   accepted: "border-emerald-500/40 bg-emerald-500/10 text-emerald-200",
   rejected: "border-red-500/40 bg-red-500/10 text-red-200",
@@ -18,6 +19,7 @@ export function IngestionCandidateStatusBadge({ status }: Props) {
     >
       {
         {
+          later: "Later",
           pending: "Awaiting review",
           accepted: "Kept",
           rejected: "Dismissed",

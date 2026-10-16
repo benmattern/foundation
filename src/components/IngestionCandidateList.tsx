@@ -15,6 +15,7 @@ const statusTabs: Array<{
   label: string;
 }> = [
   { status: "pending", label: "Awaiting review" },
+  { status: "later", label: "Later" },
   { status: "accepted", label: "Kept" },
   { status: "rejected", label: "Dismissed" },
   { status: "duplicate", label: "Duplicate" },
@@ -234,7 +235,9 @@ export function IngestionCandidateList({
                   >
                     {candidate.title || candidate.url}
                   </a>
-                  <IngestionCandidateStatusBadge status={candidate.status} />
+                  <IngestionCandidateStatusBadge
+                    status={candidate.deferred ? "later" : candidate.status}
+                  />
                 </div>
 
                 <p className="break-all text-sm text-blue-300">

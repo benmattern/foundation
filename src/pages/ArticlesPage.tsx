@@ -33,6 +33,7 @@ export default function ArticlesPage() {
   const captureOpen = params.get("capture") === "1";
   const highlight = params.get("article");
   const [articles, setArticles] = useState<ArticleWithTags[]>([]);
+  const [researchSelection, setResearchSelection] = useState<string[]>([]);
   const [sources, setSources] = useState<Source[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
@@ -136,7 +137,7 @@ export default function ArticlesPage() {
 
   async function deleteArticle(article: ArticleWithTags) {
     const confirmed = window.confirm(
-      `Delete "${article.title}"? This cannot be undone.`,
+      `Delete "${article.title}"? The article and its tag/event links will be removed. Research prose and citation snapshots remain, marked unavailable. This cannot be undone.`,
     );
 
     if (!confirmed) return;
@@ -302,7 +303,32 @@ export default function ArticlesPage() {
                 />
               )}
             </div>
+            {articles.length > 0 && (
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  className={buttonClass()}
+                  to={`/research?articles=${researchSelection.filter((id) => articles.some((a) => a.id === id)).join(",")}`}
+                >
+                  Create research question
+                </Link>
+                <Link
+                  className={buttonClass()}
+                  to={`/research?articles=${researchSelection.filter((id) => articles.some((a) => a.id === id)).join(",")}`}
+                >
+                  Add selected to question ({researchSelection.length})
+                </Link>
+                <Button onClick={() => setResearchSelection([])}>
+                  Clear research selection
+                </Button>
+              </div>
+            )}
             <ArticleList
+              selectedIds={researchSelection}
+              onSelect={(id, selected) =>
+                setResearchSelection((s) =>
+                  selected ? [...s, id] : s.filter((v) => v !== id),
+                )
+              }
               highlightId={highlight}
               articles={filteredArticles}
               emptyMessage="No articles match the current filters."

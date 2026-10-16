@@ -32,6 +32,7 @@ export type UpdateIngestionCandidateInput = {
 };
 export type AcceptIngestionCandidateInput = CreateArticleInput;
 export type CandidateQuery = {
+  order?: "newest" | "oldest" | "relevance";
   status: string;
   route?: string;
   search?: string;
@@ -58,9 +59,13 @@ export async function queryCandidates(filters: CandidateQuery) {
 export function getIngestionCandidates(): Promise<IngestionCandidate[]> {
   const projectId = activeProjectId();
   return queryAll<IngestionCandidate>((from, to) =>
-    supabase.from("ingestion_candidates").select("*")
-      .eq("project_id", projectId).order("created_at", { ascending: false })
-      .order("id").range(from, to)
+    supabase
+      .from("ingestion_candidates")
+      .select("*")
+      .eq("project_id", projectId)
+      .order("created_at", { ascending: false })
+      .order("id")
+      .range(from, to),
   );
 }
 export async function createIngestionCandidate(
@@ -137,10 +142,49 @@ export async function bulkReview(
 export async function getBulkHistory(): Promise<
   { id: string; action: string; created_at: string; results: BulkOutcome[] }[]
 > {
-  const { data, error } = await supabase.from("bulk_review_runs").select("*")
-    .eq("project_id", activeProjectId()).order("created_at", {
+  const { data, error } = await supabase
+    .from("bulk_review_runs")
+    .select("*")
+    .eq("project_id", activeProjectId())
+    .order("created_at", {
       ascending: false,
-    }).limit(10);
+    })
+    .limit(10);
   if (error) throw error;
   return data ?? [];
+}
+
+export type CandidatePreview = {
+  id: string;
+  candidate_id: string;
+  project_id: string;
+  origin_url: string;
+  excerpt: string;
+  retrieved_at: string;
+};
+export async function getCandidatePreviews(
+  id: string,
+): Promise<CandidatePreview[]> {
+  const { data, error } = await supabase
+    .from("candidate_previews")
+    .select("*")
+    .eq("candidate_id", id)
+    .eq("project_id", activeProjectId())
+    .order("retrieved_at", { ascending: false })
+    .limit(20);
+  if (error) throw error;
+  return data ?? [];
+}
+export async function saveCandidatePreview(
+  id: string,
+  url: string,
+  excerpt: string,
+) {
+  const { data, error } = await supabase.rpc("save_candidate_preview", {
+    p_id: id,
+    p_url: url,
+    p_excerpt: excerpt,
+  });
+  if (error) throw error;
+  return data as CandidatePreview;
 }
