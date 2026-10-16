@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-test("sign-in, project isolation, server search, bulk scope and recovery", async ({ page }) => {
+test("sign-in, project isolation, server search, bulk scope and recovery", async ({
+  page,
+}) => {
   const owner = "10000000-0000-0000-0000-000000000001";
   const projects = [
     "20000000-0000-0000-0000-000000000001",
@@ -35,7 +37,7 @@ test("sign-in, project isolation, server search, bulk scope and recovery", async
       updated_at: "2026-10-16T12:00:00Z",
       reviewed_at: null,
       rejection_reason: null,
-    }))
+    })),
   );
   const bulkCalls: string[][] = [];
   const errors: string[] = [];
@@ -71,13 +73,15 @@ test("sign-in, project isolation, server search, bulk scope and recovery", async
           exp: Math.floor(Date.now() / 1000) + 3600,
         }),
       ).toString("base64url");
-      result = url.pathname.endsWith("/user") ? user : {
-        access_token: `eyJhbGciOiJIUzI1NiJ9.${payload}.test`,
-        token_type: "bearer",
-        expires_in: 3600,
-        refresh_token: "test-refresh",
-        user,
-      };
+      result = url.pathname.endsWith("/user")
+        ? user
+        : {
+            access_token: `eyJhbGciOiJIUzI1NiJ9.${payload}.test`,
+            token_type: "bearer",
+            expires_in: 3600,
+            refresh_token: "test-refresh",
+            user,
+          };
     } else if (url.pathname === "/rest/v1/projects") {
       result = projects.map((id, i) => ({
         id,
@@ -91,10 +95,12 @@ test("sign-in, project isolation, server search, bulk scope and recovery", async
       }));
     } else if (url.pathname.endsWith("/rpc/search_candidates")) {
       const body = request.postDataJSON();
-      const filtered = candidates.filter((c) =>
-        c.project_id === body.p_project && c.status === body.p_filters.status &&
-        (!body.p_filters.route || c.route === body.p_filters.route) &&
-        c.title.toLowerCase().includes(body.p_search.toLowerCase())
+      const filtered = candidates.filter(
+        (c) =>
+          c.project_id === body.p_project &&
+          c.status === body.p_filters.status &&
+          (!body.p_filters.route || c.route === body.p_filters.route) &&
+          c.title.toLowerCase().includes(body.p_search.toLowerCase()),
       );
       result = { items: filtered, count: filtered.length };
     } else if (url.pathname.endsWith("/rpc/bulk_review")) {
@@ -111,9 +117,8 @@ test("sign-in, project isolation, server search, bulk scope and recovery", async
     } else if (url.pathname.endsWith("/rpc/review_candidate")) {
       const body = request.postDataJSON();
       const candidate = candidates.find((c) => c.id === body.p_id)!;
-      candidate.status = body.p_action === "restore"
-        ? "pending"
-        : candidate.status;
+      candidate.status =
+        body.p_action === "restore" ? "pending" : candidate.status;
       result = candidate;
     }
     if (Array.isArray(result)) {
@@ -130,20 +135,22 @@ test("sign-in, project isolation, server search, bulk scope and recovery", async
     });
   });
   await page.goto("/ingestion");
-  await page.getByRole("textbox", { name: "Email" }).fill(
-    "analyst@example.com",
-  );
-  await page.getByLabel("Password", { exact: true }).fill(
-    "local-test-password",
-  );
+  await page
+    .getByRole("textbox", { name: "Email" })
+    .fill("analyst@example.com");
+  await page
+    .getByLabel("Password", { exact: true })
+    .fill("local-test-password");
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page.getByLabel("Active project")).toHaveValue(projects[0]);
-  await expect(page.getByRole("button", { name: "Accept as Article" }).first())
-    .toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Keep" }).first(),
+  ).toBeVisible();
   await expect(page.getByText("Project 2 item 1", { exact: true })).toHaveCount(
     0,
   );
   await page.getByLabel("Active project").selectOption(projects[1]);
+  await page.getByRole("link", { name: "Inbox", exact: true }).click();
   await expect(
     page.getByRole("checkbox", { name: "Project 2 item 1", exact: true }),
   ).toBeVisible();
@@ -161,15 +168,21 @@ test("sign-in, project isolation, server search, bulk scope and recovery", async
   await expect(
     page.getByRole("checkbox", { name: "Project 2 item 1", exact: true }),
   ).toBeVisible();
+  await page
+    .getByText("Bulk review (0 selected on this page)", { exact: true })
+    .click();
   await page.getByRole("checkbox", { name: /Select this page only/ }).check();
-  await expect(page.getByText("2 selected on this page", { exact: true }))
-    .toBeVisible();
-  await page.getByRole("button", { name: "reject", exact: true }).click();
+  await expect(
+    page.getByText("2 selected on this page", { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Dismiss selected", exact: true })
+    .click();
   await expect(page.getByText(/Simulated conflict/)).toBeVisible();
   expect(bulkCalls).toEqual([["candidate-1-0", "candidate-1-1"]]);
-  await page.getByRole("button", { name: /^Rejected/ }).click();
-  await page.getByRole("button", { name: "Restore to pending" }).click();
-  await page.getByRole("button", { name: /^Pending/ }).click();
+  await page.getByRole("button", { name: /^Dismissed/ }).click();
+  await page.getByRole("button", { name: "Restore to inbox" }).click();
+  await page.getByRole("button", { name: /^Awaiting review/ }).click();
   await expect(
     page.getByRole("checkbox", { name: "Project 2 item 1", exact: true }),
   ).toBeVisible();

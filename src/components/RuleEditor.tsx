@@ -1,3 +1,4 @@
+import { Button } from "./ui/Button";
 import { useState } from "react";
 import type { Rules } from "../../supabase/functions/_shared/rules";
 import type { Tag } from "../types/tag";
@@ -8,7 +9,10 @@ type Props = {
   onPreview: (rules: Rules) => Promise<void>;
 };
 const terms = (text: string) =>
-  text.split("\n").map((s) => s.trim()).filter(Boolean);
+  text
+    .split("\n")
+    .map((s) => s.trim())
+    .filter(Boolean);
 export function RuleEditor(props: Props) {
   return <RuleFields key={JSON.stringify(props.initial)} {...props} />;
 }
@@ -24,9 +28,9 @@ function RuleFields({ initial, tags, onSave, onPreview }: Props) {
     includeAny: terms(include),
     excludeAny: terms(exclude),
     defaultTags,
-    keywordTags: keywords.filter((rule) => rule.term.trim() && rule.tag).map((
-      rule,
-    ) => ({ ...rule, term: rule.term.trim() })),
+    keywordTags: keywords
+      .filter((rule) => rule.term.trim() && rule.tag)
+      .map((rule) => ({ ...rule, term: rule.term.trim() })),
   });
   async function run(action: (rules: Rules) => Promise<void>) {
     setBusy(true);
@@ -47,7 +51,9 @@ function RuleFields({ initial, tags, onSave, onPreview }: Props) {
         affect future intake.
       </p>
       <label className="block">
-        Include any<textarea
+        Include any
+        <textarea
+          rows={4}
           aria-label="Include any terms"
           value={include}
           onChange={(e) => setInclude(e.target.value)}
@@ -55,7 +61,9 @@ function RuleFields({ initial, tags, onSave, onPreview }: Props) {
         />
       </label>
       <label className="block">
-        Exclude any<textarea
+        Exclude any
+        <textarea
+          rows={4}
           aria-label="Exclude any terms"
           value={exclude}
           onChange={(e) => setExclude(e.target.value)}
@@ -65,7 +73,10 @@ function RuleFields({ initial, tags, onSave, onPreview }: Props) {
       <fieldset>
         <legend>Default tags</legend>
         {tags.map((tag) => (
-          <label key={tag.id} className="mr-3 inline-block">
+          <label
+            key={tag.id}
+            className="mr-3 inline-flex min-h-11 items-center gap-2"
+          >
             <input
               type="checkbox"
               checked={defaultTags.includes(tag.id)}
@@ -74,7 +85,8 @@ function RuleFields({ initial, tags, onSave, onPreview }: Props) {
                   e.target.checked
                     ? [...defaultTags, tag.id]
                     : defaultTags.filter((id) => id !== tag.id),
-                )}
+                )
+              }
             />{" "}
             {tag.name}
           </label>
@@ -83,16 +95,20 @@ function RuleFields({ initial, tags, onSave, onPreview }: Props) {
       <fieldset className="space-y-2">
         <legend>Keyword tags</legend>
         {keywords.map((rule, index) => (
-          <div className="flex gap-2" key={index}>
+          <div
+            className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]"
+            key={index}
+          >
             <input
               aria-label={`Keyword ${index + 1}`}
               value={rule.term}
               onChange={(e) =>
                 setKeywords(
                   keywords.map((r, i) =>
-                    i === index ? { ...r, term: e.target.value } : r
+                    i === index ? { ...r, term: e.target.value } : r,
                   ),
-                )}
+                )
+              }
               className="bg-slate-800 p-2"
             />
             <select
@@ -101,39 +117,63 @@ function RuleFields({ initial, tags, onSave, onPreview }: Props) {
               onChange={(e) =>
                 setKeywords(
                   keywords.map((r, i) =>
-                    i === index ? { ...r, tag: e.target.value } : r
+                    i === index ? { ...r, tag: e.target.value } : r,
                   ),
-                )}
+                )
+              }
               className="bg-slate-800 p-2"
             >
               <option value="">Choose tag</option>
               {tags.map((tag) => (
-                <option key={tag.id} value={tag.id}>{tag.name}</option>
+                <option key={tag.id} value={tag.id}>
+                  {tag.name}
+                </option>
               ))}
             </select>
-            <button
+            <Button
               onClick={() =>
-                setKeywords(keywords.filter((_, i) => i !== index))}
+                setKeywords(keywords.filter((_, i) => i !== index))
+              }
             >
               Remove
-            </button>
+            </Button>
           </div>
         ))}
-        <button
+        <Button
           onClick={() => setKeywords([...keywords, { term: "", tag: "" }])}
         >
           Add keyword tag
-        </button>
+        </Button>
       </fieldset>
-      <div className="flex gap-4">
-        <button disabled={busy} onClick={() => void run(onPreview)}>
+      <div className="flex flex-wrap gap-4">
+        <Button disabled={busy} onClick={() => void run(onPreview)}>
           Preview recent sample
-        </button>
-        <button disabled={busy} onClick={() => void run(onSave)}>
+        </Button>
+        <Button
+          variant="primary"
+          disabled={busy}
+          onClick={() => void run(onSave)}
+        >
           Save rules
-        </button>
+        </Button>
+        <Button
+          disabled={busy}
+          onClick={() => {
+            setInclude(initial.includeAny.join("\n"));
+            setExclude(initial.excludeAny.join("\n"));
+            setDefaultTags(initial.defaultTags);
+            setKeywords(initial.keywordTags);
+            setError("");
+          }}
+        >
+          Cancel rule edits
+        </Button>
       </div>
-      {error && <p role="alert" className="text-red-300">{error}</p>}
+      {error && (
+        <p role="alert" className="text-red-300">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

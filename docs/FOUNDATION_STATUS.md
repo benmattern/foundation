@@ -1,5 +1,30 @@
 # FOUNDATION Current Status
 
+## Current status - 2026-10-16
+
+Milestone 01 ingestion is deployed. Its recorded database/function/scheduler and
+public frontend verification is in [the ingestion review](reviews/01-ingestion.md).
+Milestone 02 is implemented on docs/project-workflow-ux-2026-10-16 and verified
+locally; [the workflow review](reviews/02-project-workflow.md) contains the demo,
+exact checks, visual evidence and remaining hosted checks. This milestone has
+not been merged or deployed. No hosted data, credentials or configuration were
+used for its regression tests.
+
+Delivered locally: focused project creation and overview; unified Following,
+Discover and Available source views; source/feed setup with partial-save retry;
+project-specific follow controls, health and Check now; Inbox Keep/Dismiss and
+actual-article Library links; manual-only capture; readable shared controls and
+responsive navigation. Existing events, tags and deep links remain available.
+
+Verification: clean npm ci, lint/build, 42 tests, five browser journeys, three
+Deno entrypoint checks and six independent-connection PostgreSQL scenarios pass.
+Desktop 1440px/mobile 390px screenshots were rendered and inspected; all captured
+states assert no horizontal page overflow. Live signed-in verification of this
+new UI remains outstanding. No database or Edge Function change is required.
+
+<details>
+<summary>Historical planning, implementation and rollout records (superseded where noted above)</summary>
+
 ## Active milestone — project workflow, 2026-10-16
 
 Milestone 01 is deployed according to the production rollout evidence below.
@@ -943,3 +968,5 @@ Avoid:
 - premature AI integration
 
 Current focus is building a stable intelligence platform foundation before advanced intelligence workflows.
+
+</details>

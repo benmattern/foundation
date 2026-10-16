@@ -6,6 +6,7 @@ export type RssFeed = {
   is_active: boolean;
   last_checked_at: string | null;
   last_success_at?: string | null;
+  failure_count?: number;
   created_at: string;
   updated_at: string;
 };

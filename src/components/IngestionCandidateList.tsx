@@ -1,3 +1,4 @@
+import { Input } from "./ui/Input";
 import type { KeyboardEvent } from "react";
 import type {
   IngestionCandidate,
@@ -13,9 +14,9 @@ const statusTabs: Array<{
   status: IngestionCandidateStatus;
   label: string;
 }> = [
-  { status: "pending", label: "Pending" },
-  { status: "accepted", label: "Accepted" },
-  { status: "rejected", label: "Rejected" },
+  { status: "pending", label: "Awaiting review" },
+  { status: "accepted", label: "Kept" },
+  { status: "rejected", label: "Dismissed" },
   { status: "duplicate", label: "Duplicate" },
 ];
 
@@ -32,6 +33,9 @@ const importSourceOptions: Array<{
 
 type Props = {
   candidates: IngestionCandidate[];
+  bulkSelected?: string[];
+  bulkBusy?: boolean;
+  onToggleBulk?: (id: string, checked: boolean) => void;
   sources: Source[];
   selectedStatus: IngestionCandidateStatus;
   statusCounts: Record<IngestionCandidateStatus, number>;
@@ -50,6 +54,9 @@ type Props = {
 
 export function IngestionCandidateList({
   candidates,
+  bulkSelected = [],
+  bulkBusy = false,
+  onToggleBulk,
   sources,
   selectedStatus,
   statusCounts,
@@ -68,13 +75,16 @@ export function IngestionCandidateList({
   function getSourceName(sourceId: string | null): string {
     if (!sourceId) return "No source match";
 
-    return sources.find((source) => source.id === sourceId)?.name ?? "Unknown source";
+    return (
+      sources.find((source) => source.id === sourceId)?.name ?? "Unknown source"
+    );
   }
 
   function selectCandidateFromKeyboard(
     event: KeyboardEvent<HTMLDivElement>,
-    candidate: IngestionCandidate
+    candidate: IngestionCandidate,
   ) {
+    if ((event.target as HTMLElement).closest("input,a")) return;
     if (event.key !== "Enter" && event.key !== " ") return;
 
     event.preventDefault();
@@ -84,9 +94,7 @@ export function IngestionCandidateList({
   return (
     <Card className="lg:flex lg:max-h-[calc(100vh-8rem)] lg:min-h-0 lg:flex-col">
       <div className="mb-6 lg:flex-none">
-        <h2 className="text-2xl font-semibold text-white">
-          Review Queue
-        </h2>
+        <h2 className="text-2xl font-semibold text-white">Incoming items</h2>
         <div className="mt-4 flex flex-wrap gap-2">
           {statusTabs.map((tab) => {
             const selected = selectedStatus === tab.status;
@@ -110,8 +118,10 @@ export function IngestionCandidateList({
       </div>
 
       <div className="mb-4 space-y-3 lg:flex-none">
-        <input
+        <Input
+          label="Search inbox"
           type="search"
+          aria-label="Search inbox"
           placeholder="Search candidates"
           value={searchQuery}
           onChange={(event) => onSearchQueryChange(event.target.value)}
@@ -119,35 +129,43 @@ export function IngestionCandidateList({
         />
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <select
-            value={selectedSourceFilter}
-            onChange={(event) => onSourceFilterChange(event.target.value)}
-            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">All sources</option>
-            {sources.map((source) => (
-              <option key={source.id} value={source.id}>
-                {source.name}
-              </option>
-            ))}
-            <option value="unknown">Unknown source</option>
-          </select>
+          <label className="block space-y-2 text-sm text-slate-300">
+            Source
+            <select
+              aria-label="Inbox source filter"
+              value={selectedSourceFilter}
+              onChange={(event) => onSourceFilterChange(event.target.value)}
+              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All sources</option>
+              {sources.map((source) => (
+                <option key={source.id} value={source.id}>
+                  {source.name}
+                </option>
+              ))}
+              <option value="unknown">Unknown source</option>
+            </select>
+          </label>
 
-          <select
-            value={selectedImportSourceFilter}
-            onChange={(event) =>
-              onImportSourceFilterChange(
-                event.target.value as "all" | IngestionImportSource
-              )
-            }
-            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            {importSourceOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          <label className="block space-y-2 text-sm text-slate-300">
+            Capture method
+            <select
+              aria-label="Capture method"
+              value={selectedImportSourceFilter}
+              onChange={(event) =>
+                onImportSourceFilterChange(
+                  event.target.value as "all" | IngestionImportSource,
+                )
+              }
+              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {importSourceOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
 
         {hasActiveFilters && (
@@ -164,8 +182,8 @@ export function IngestionCandidateList({
       {candidates.length === 0 ? (
         <p className="text-slate-400">
           {hasActiveFilters
-            ? "No candidates match the current filters."
-            : `No ${selectedStatus} ingestion candidates.`}
+            ? "No items match the current filters."
+            : "No items in this review view."}
         </p>
       ) : (
         <div className="space-y-3 lg:min-h-0 lg:overflow-y-auto lg:pr-2">
@@ -189,6 +207,23 @@ export function IngestionCandidateList({
                     : "border-slate-800 bg-slate-950 hover:border-slate-600"
                 }`}
               >
+                {onToggleBulk && (
+                  <label
+                    className="mb-3 flex min-h-11 items-center gap-2 text-sm text-slate-400"
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    <input
+                      type="checkbox"
+                      aria-label={candidate.title || candidate.url}
+                      checked={bulkSelected.includes(candidate.id)}
+                      disabled={bulkBusy}
+                      onChange={(event) =>
+                        onToggleBulk(candidate.id, event.target.checked)
+                      }
+                    />
+                    Select for bulk review
+                  </label>
+                )}
                 <div className="mb-3 flex items-start justify-between gap-3">
                   <a
                     href={candidate.url}
@@ -203,7 +238,9 @@ export function IngestionCandidateList({
                 </div>
 
                 <p className="break-all text-sm text-blue-300">
-                  {candidate.canonical_url ?? candidate.final_url ?? candidate.url}
+                  {candidate.canonical_url ??
+                    candidate.final_url ??
+                    candidate.url}
                 </p>
 
                 <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-300">
@@ -214,7 +251,8 @@ export function IngestionCandidateList({
                   <p>Import: {candidate.import_source.replace("_", " ")}</p>
                   <p>Source: {getSourceName(candidate.source_id)}</p>
                   <p>
-                    Created: {new Date(candidate.created_at).toLocaleDateString()}
+                    Created:{" "}
+                    {new Date(candidate.created_at).toLocaleDateString()}
                   </p>
                   <p>
                     Published:{" "}

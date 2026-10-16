@@ -8,8 +8,9 @@ docs/FOUNDATION_SCHEMA.md for architectural and data context.
 
 Milestone 01 ingestion is deployed; see docs/reviews/01-ingestion.md for recorded
 verification and remaining live signed-in checks.
-Active assignment: docs/milestones/02-project-workflow.md.
-Current workflow review: docs/reviews/02-project-workflow.md.
+Milestone 02 workflow implementation is locally complete; see
+docs/milestones/02-project-workflow.md and docs/reviews/02-project-workflow.md
+for the completed checklist, verification, demo and remaining hosted checks.
 The owner approved the project workflow/usability implementation on 2026-10-16.
 When assigned this milestone, implement it end to end and report evidence;
 do not stop at another plan or seek approval for routine UI choices.

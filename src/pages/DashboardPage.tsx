@@ -1,3 +1,4 @@
+import { ProjectOverview } from "../components/ProjectOverview";
 import { useEffect, useState } from "react";
 import { DashboardEventHighlights } from "../components/DashboardEventHighlights";
 import { DashboardMetricCards } from "../components/DashboardMetricCards";
@@ -34,13 +35,14 @@ export default function DashboardPage() {
   useEffect(() => {
     async function loadDashboardData() {
       try {
-        const [sourceData, articleData, tagData, eventData] =
-          await Promise.all([
+        const [sourceData, articleData, tagData, eventData] = await Promise.all(
+          [
             getSources(),
             getArticlesWithTags(),
             getTags(),
             getEventsWithArticles(),
-          ]);
+          ],
+        );
 
         setSources(sourceData);
         setArticles(articleData);
@@ -73,57 +75,61 @@ export default function DashboardPage() {
 
   return (
     <>
-      <PageHeader
-        title="Dashboard"
-        description="Analyst overview of active events, supporting articles, source coverage, and topic concentration."
-      />
+      <ProjectOverview />
+      <details className="space-y-5">
+        <summary>Research insights and events</summary>
+        <PageHeader
+          title="Research insights"
+          description="Analyst overview of active events, supporting articles, source coverage, and topic concentration."
+        />
 
-      {loading ? (
-        <Card>
-          <p className="text-slate-400">Loading dashboard intelligence...</p>
-        </Card>
-      ) : errorMessage ? (
-        <Card>
-          <p className="font-medium text-red-300">{errorMessage}</p>
-          <p className="mt-2 text-sm text-slate-400">
-            Check the Supabase connection and try refreshing the page.
-          </p>
-        </Card>
-      ) : !hasAnyDashboardData ? (
-        <Card>
-          <h2 className="text-xl font-semibold text-white">
-            No intelligence records yet
-          </h2>
-          <p className="mt-2 text-sm text-slate-400">
-            Add sources, articles, tags, and events to populate the analyst
-            dashboard.
-          </p>
-        </Card>
-      ) : (
-        <div className="space-y-6">
-          <DashboardMetricCards metrics={dashboardMetrics} />
+        {loading ? (
+          <Card>
+            <p className="text-slate-400">Loading dashboard intelligence...</p>
+          </Card>
+        ) : errorMessage ? (
+          <Card>
+            <p className="font-medium text-red-300">{errorMessage}</p>
+            <p className="mt-2 text-sm text-slate-400">
+              Check the Supabase connection and try refreshing the page.
+            </p>
+          </Card>
+        ) : !hasAnyDashboardData ? (
+          <Card>
+            <h2 className="text-xl font-semibold text-white">
+              No intelligence records yet
+            </h2>
+            <p className="mt-2 text-sm text-slate-400">
+              Add sources, articles, tags, and events to populate the analyst
+              dashboard.
+            </p>
+          </Card>
+        ) : (
+          <div className="space-y-6">
+            <DashboardMetricCards metrics={dashboardMetrics} />
 
-          <EventStatusOverview events={events} />
+            <EventStatusOverview events={events} />
 
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-            <DashboardEventHighlights
-              title="Most Active Events"
-              events={mostActiveEvents}
-              emptyMessage="No events have supporting articles yet."
-            />
-            <DashboardEventHighlights
-              title="Recently Updated Events"
-              events={recentlyUpdatedEvents}
-              emptyMessage="No event activity is available yet."
-            />
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+              <DashboardEventHighlights
+                title="Most Active Events"
+                events={mostActiveEvents}
+                emptyMessage="No events have supporting articles yet."
+              />
+              <DashboardEventHighlights
+                title="Recently Updated Events"
+                events={recentlyUpdatedEvents}
+                emptyMessage="No event activity is available yet."
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+              <DashboardTopTags tags={topTags} />
+              <DashboardRecentArticles articles={recentArticles} />
+            </div>
           </div>
-
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-            <DashboardTopTags tags={topTags} />
-            <DashboardRecentArticles articles={recentArticles} />
-          </div>
-        </div>
-      )}
+        )}
+      </details>
     </>
   );
 }

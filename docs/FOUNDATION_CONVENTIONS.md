@@ -1,5 +1,30 @@
 # FOUNDATION Conventions
 
+## Current delivery conventions - 2026-10-16
+
+Milestone 01 ingestion is deployed. Its recorded database/function/scheduler and
+public frontend verification is in [the ingestion review](reviews/01-ingestion.md).
+Milestone 02 is implemented on docs/project-workflow-ux-2026-10-16 and verified
+locally; [the workflow review](reviews/02-project-workflow.md) contains the demo,
+exact checks, visual evidence and remaining hosted checks. This milestone has
+not been merged or deployed. No hosted data, credentials or configuration were
+used for its regression tests.
+
+Use shared visible controls, labels and contextual next actions on workflow
+surfaces. Website means publisher reference; feed means incoming collection.
+Follow/Pause affects this project. Shared feed availability must explicitly name
+its cross-project effect. Keep/Dismiss describe review decisions; technical names
+remain unchanged. Advanced rules and raw run details use progressive disclosure.
+
+Use Node 24/npm 11 and npm.cmd on Windows. Required checks are npm ci,
+npm run lint, npm run build, npm test and npm run test:e2e. Preserve CI coverage
+for Deno and independent PostgreSQL checks. Browser fixtures use only the invalid
+mock host, never .env.local. PGlite/SQL tests do not establish Supabase browser
+authentication or hosted scheduler behavior. Report those boundaries explicitly.
+
+<details>
+<summary>Historical workflow/convention updates</summary>
+
 ## Active workflow direction — 2026-10-16
 
 The approved next implementation is [Milestone 02](milestones/02-project-workflow.md).
@@ -40,6 +65,7 @@ Ingestion must remain fully usable without AI. The current assessment is
 documentation-only; schema migrations, authentication and scheduled collection
 in the proposed brief are not implemented or authorized for hosted deployment.
 
+</details>
 
 # Purpose Of This Document
 

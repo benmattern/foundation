@@ -1,5 +1,24 @@
 # FOUNDATION Architectural Decisions
 
+## Project workflow decisions - 2026-10-16
+
+- Overview -> Sources -> Inbox -> Library is the primary journey; Events and Tags
+  remain secondary. Technical URLs are preserved, with /rss redirected to Sources.
+- Project creation uses a native dialog and requires only a name. Project switches
+  return to overview and remount the project subtree, clearing stale page state.
+- Descriptive topics/keywords do not silently become active matching rules.
+- Source setup uses the existing source/feed/subscription operations. Successfully
+  returned IDs remain in the form for retries; cancellation leaves saved records
+  available for later management. Unknown server commits after network loss still
+  require reconciliation; this UI does not invent a distributed transaction.
+- Follow/Pause remains project-specific; workspace feed availability is advanced
+  and explicitly labeled. Cross-project staged totals are never described as this
+  project's new items. A neutral completion message links to the current Inbox.
+- Keep links to the actual converted article through a Library highlight rather
+  than introducing an unsupported article detail route.
+- Milestone 02 introduces no new backend behavior, schema, paid service or AI.
+
+
 ## Implementation decisions — 2026-10-16
 
 The owner instructed implementation to proceed with the review recommendations.
@@ -34,11 +53,10 @@ These choices supersede the historical prototype descriptions below:
 - Original evidence, observations, outside-scope candidates, review history and
   runs have no automatic deletion policy in v1. Monitor storage; retention changes
   require an explicit follow-up decision. No paid service was enabled.
-- Hosted mutations remain unperformed. The supplied table-only export supports
-  the reconstructed baseline; it does not establish live grants, policies,
-  functions or operational availability.
+- Milestone 01 production deployment is recorded in reviews/01-ingestion.md.
+  Milestone 02 reuses that deployed backend and has only local UI verification.
 
-## Direction update — 2026-10-16
+## Historical direction update — 2026-10-16
 
 ### Accepted product requirements from the current discussion
 - Ingestion/source management is a complete capability with AI optional.

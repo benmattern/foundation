@@ -1,5 +1,8 @@
+import { Button } from "../components/ui/Button";
+import { buttonClass } from "../components/ui/buttonStyles";
+import { EmptyState } from "../components/ui/EmptyState";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { PageHeader } from "../components/PageHeader";
 import { IngestionCandidateList } from "../components/IngestionCandidateList";
 import {
@@ -42,13 +45,15 @@ export default function IngestionQueuePage() {
   const [params, setParams] = useSearchParams(
     sessionStorage.getItem(`foundation.queue.${activeProjectId()}`) ?? "",
   );
-  const status =
-    statuses.includes(params.get("status") as IngestionCandidateStatus)
-      ? params.get("status") as IngestionCandidateStatus
-      : "pending";
+  const status = statuses.includes(
+    params.get("status") as IngestionCandidateStatus,
+  )
+    ? (params.get("status") as IngestionCandidateStatus)
+    : "pending";
   const filters: CandidateQuery = {
     status,
-    route: status === "pending" ? params.get("route") ?? "pending" : undefined,
+    route:
+      status === "pending" ? (params.get("route") ?? "pending") : undefined,
     search: params.get("q") ?? "",
     source: params.get("source") ?? "all",
     importSource: params.get("import") ?? "all",
@@ -68,6 +73,12 @@ export default function IngestionQueuePage() {
     ids: [],
   });
   const [error, setError] = useState("");
+  const [keptArticle, setKeptArticle] = useState<string | null>(null);
+  const [intake, setIntake] = useState<{
+    pending: number;
+    outside: number;
+    reviewed: number;
+  } | null>(null);
   const [busy, setBusy] = useState(false);
   const [outcomes, setOutcomes] = useState<string[]>([]);
   const [bulkTag, setBulkTag] = useState("");
@@ -82,27 +93,33 @@ export default function IngestionQueuePage() {
   }, [params]);
   useEffect(() => {
     let active = true;
-    getBulkHistory().then((history) => {
-      if (active) setBulkHistory(history);
-    }).catch((error) => {
-      if (active) setError(String(error));
-    });
+    getBulkHistory()
+      .then((history) => {
+        if (active) setBulkHistory(history);
+      })
+      .catch((error) => {
+        if (active) setError(String(error));
+      });
     return () => {
       active = false;
     };
   }, [revision]);
   useEffect(() => {
     let active = true;
-    getSources().then((data) => {
-      if (active) setSources(data);
-    }).catch((error) => {
-      if (active) setError(String(error));
-    });
-    getTags().then((data) => {
-      if (active) setTags(data);
-    }).catch((error) => {
-      if (active) setError(String(error));
-    });
+    getSources()
+      .then((data) => {
+        if (active) setSources(data);
+      })
+      .catch((error) => {
+        if (active) setError(String(error));
+      });
+    getTags()
+      .then((data) => {
+        if (active) setTags(data);
+      })
+      .catch((error) => {
+        if (active) setError(String(error));
+      });
     return () => {
       active = false;
     };
@@ -114,7 +131,7 @@ export default function IngestionQueuePage() {
       void Promise.all([
         queryCandidates(snapshot),
         ...statuses.map((status) =>
-          queryCandidates({ ...snapshot, status, route: undefined, page: 0 })
+          queryCandidates({ ...snapshot, status, route: undefined, page: 0 }),
         ),
       ])
         .then(([page, ...counts]) => {
@@ -127,7 +144,8 @@ export default function IngestionQueuePage() {
             ) as Result["counts"],
           });
           setError("");
-        }).catch((error: unknown) => {
+        })
+        .catch((error: unknown) => {
           if (active) setError(String(error));
         });
     }, 150);
@@ -136,11 +154,36 @@ export default function IngestionQueuePage() {
       clearTimeout(timer);
     };
   }, [queryKey, revision]);
+  useEffect(() => {
+    let active = true;
+    Promise.all([
+      queryCandidates({ status: "pending", route: "pending", page: 0 }),
+      queryCandidates({ status: "pending", route: "outside_scope", page: 0 }),
+      ...["accepted", "rejected", "duplicate"].map((status) =>
+        queryCandidates({ status, page: 0 }),
+      ),
+    ])
+      .then(([pending, outside, ...reviewed]) => {
+        if (active)
+          setIntake({
+            pending: pending.count,
+            outside: outside.count,
+            reviewed: reviewed.reduce((n, value) => n + value.count, 0),
+          });
+      })
+      .catch((error: unknown) => {
+        if (active) setError(String(error));
+      });
+    return () => {
+      active = false;
+    };
+  }, [revision]);
   const visible = result?.key === queryKey ? result.candidates : [];
   const candidate = selectVisibleCandidate(visible, selectedId);
-  const selected = selection.key === queryKey
-    ? selection.ids.filter((id) => visible.some((c) => c.id === id))
-    : [];
+  const selected =
+    selection.key === queryKey
+      ? selection.ids.filter((id) => visible.some((c) => c.id === id))
+      : [];
   function change(key: string, value: string) {
     setParams((current) => {
       const next = new URLSearchParams(current);
@@ -156,7 +199,8 @@ export default function IngestionQueuePage() {
     action: string,
     values: Record<string, unknown> = {},
   ) {
-    await reviewCandidate(candidate.id, action, values);
+    const reviewed = await reviewCandidate(candidate.id, action, values);
+    if (action === "accept") setKeptArticle(reviewed.converted_article_id);
     setRevision((n) => n + 1);
   }
   async function bulk(action: string) {
@@ -166,10 +210,11 @@ export default function IngestionQueuePage() {
     try {
       const results = await bulkReview(selected, action, bulkTag || null);
       setOutcomes(
-        results.map((r) =>
-          `${visible.find((c) => c.id === r.id)?.title || r.id}: ${
-            r.ok ? `${action} completed` : r.error
-          }`
+        results.map(
+          (r) =>
+            `${visible.find((c) => c.id === r.id)?.title || r.id}: ${
+              r.ok ? `${action} completed` : r.error
+            }`,
         ),
       );
       setSelection({
@@ -187,10 +232,71 @@ export default function IngestionQueuePage() {
   return (
     <>
       <PageHeader
-        title="Ingestion"
-        description="Review project intake. Collection and rules work without AI."
+        title="Inbox"
+        description="Incoming material awaits your review. Keeping adds it to Library."
       />
-      {error && <p role="alert" className="p-3 text-red-300">{error}</p>}
+      {keptArticle && (
+        <div
+          role="status"
+          className="mb-5 space-y-3 rounded-lg border border-emerald-700 p-4"
+        >
+          <p>Item kept in this project's Library.</p>
+          <Link
+            className={buttonClass()}
+            to={`/articles?article=${encodeURIComponent(keptArticle)}`}
+          >
+            View in library
+          </Link>
+        </div>
+      )}
+      {intake && result?.key === queryKey && result.candidates.length === 0 && (
+        <EmptyState
+          title={
+            params.get("q") ||
+            params.get("source") ||
+            params.get("tag") ||
+            params.get("since") ||
+            params.get("until") ||
+            params.get("import") ||
+            filters.page > 0
+              ? "No items match these filters"
+              : status !== "pending"
+                ? "No items in this review state"
+                : intake.outside && !intake.pending
+                  ? "No items match your current scope"
+                  : intake.reviewed && !intake.pending && !intake.outside
+                    ? "All collected items reviewed"
+                    : "Nothing collected yet"
+          }
+          action={
+            <>
+              <Button onClick={() => setParams({})}>Reset inbox filters</Button>
+              <Link className={buttonClass()} to="/sources">
+                Choose or check sources
+              </Link>
+              {intake.outside > 0 && (
+                <Link
+                  className={buttonClass()}
+                  to="/ingestion?route=outside_scope"
+                >
+                  Review outside-scope items
+                </Link>
+              )}
+            </>
+          }
+        >
+          {intake.outside > 0
+            ? "Items outside scope are retained for review. Adjust your matching rules or review those items directly."
+            : intake.reviewed > 0
+              ? "Your decisions are saved. New incoming items will appear here; kept articles are in Library."
+              : "Collection stages items here for your decision. Enable a feed, check source health, or capture a link manually."}
+        </EmptyState>
+      )}
+      {error && (
+        <p role="alert" className="p-3 text-red-300">
+          {error}
+        </p>
+      )}
       <div className="mb-4 flex flex-wrap items-center gap-3 text-slate-300">
         {status === "pending" && (
           <label>
@@ -201,7 +307,7 @@ export default function IngestionQueuePage() {
               value={filters.route}
               onChange={(e) => change("route", e.target.value)}
             >
-              <option value="pending">Pending</option>
+              <option value="pending">Awaiting review</option>
               <option value="outside_scope">Outside scope</option>
             </select>
           </label>
@@ -216,7 +322,9 @@ export default function IngestionQueuePage() {
           >
             <option value="">All tags</option>
             {tags.map((tag) => (
-              <option key={tag.id} value={tag.id}>{tag.name}</option>
+              <option key={tag.id} value={tag.id}>
+                {tag.name}
+              </option>
             ))}
           </select>
         </label>
@@ -240,21 +348,24 @@ export default function IngestionQueuePage() {
             onChange={(e) => change("until", e.target.value)}
           />
         </label>
-        <button
+        <Button
           disabled={filters.page === 0}
           onClick={() => change("page", String(filters.page - 1))}
         >
           Previous
-        </button>
-        <span>Page {filters.page + 1} · {count} matching items</span>
-        <button
+        </Button>
+        <span>
+          Page {filters.page + 1} · {count} matching items
+        </span>
+        <Button
           disabled={(filters.page + 1) * 50 >= count}
           onClick={() => change("page", String(filters.page + 1))}
         >
           Next
-        </button>
+        </Button>
       </div>
-      <div className="mb-4 space-y-3 rounded border border-slate-700 p-4 text-slate-300">
+      <details className="mb-4 space-y-3 rounded border border-slate-700 p-4 text-slate-300">
+        <summary>Bulk review ({selected.length} selected on this page)</summary>
         <label>
           <input
             type="checkbox"
@@ -264,7 +375,8 @@ export default function IngestionQueuePage() {
               setSelection({
                 key: queryKey,
                 ids: e.target.checked ? visible.map((c) => c.id) : [],
-              })}
+              })
+            }
           />{" "}
           Select this page only ({visible.length} visible)
         </label>
@@ -278,13 +390,22 @@ export default function IngestionQueuePage() {
             "outside_scope",
             "pending",
           ].map((action) => (
-            <button
+            <Button
               key={action}
               disabled={busy || selected.length === 0}
               onClick={() => void bulk(action)}
             >
-              {action.replaceAll("_", " ")}
-            </button>
+              {
+                {
+                  accept: "Keep selected",
+                  reject: "Dismiss selected",
+                  duplicate: "Duplicate",
+                  restore: "Restore",
+                  outside_scope: "Move outside scope",
+                  pending: "Move to awaiting review",
+                }[action]
+              }
+            </Button>
           ))}
           <select
             aria-label="Bulk tag"
@@ -294,38 +415,23 @@ export default function IngestionQueuePage() {
           >
             <option value="">Choose tag</option>
             {tags.map((tag) => (
-              <option key={tag.id} value={tag.id}>{tag.name}</option>
+              <option key={tag.id} value={tag.id}>
+                {tag.name}
+              </option>
             ))}
           </select>
-          <button
+          <Button
             disabled={busy || !bulkTag || selected.length === 0}
             onClick={() => void bulk("tags")}
           >
             Add tag
-          </button>
+          </Button>
         </div>
-        {visible.map((item) => (
-          <label className="mr-4 inline-block" key={item.id}>
-            <input
-              type="checkbox"
-              checked={selected.includes(item.id)}
-              disabled={busy}
-              onChange={(e) =>
-                setSelection({
-                  key: queryKey,
-                  ids: e.target.checked
-                    ? [...selected, item.id]
-                    : selected.filter((id) =>
-                      id !== item.id
-                    ),
-                })}
-            />{" "}
-            {item.title || item.url}
-          </label>
-        ))}
         {outcomes.length > 0 && (
           <ul aria-live="polite">
-            {outcomes.map((message, i) => <li key={i}>{message}</li>)}
+            {outcomes.map((message, i) => (
+              <li key={i}>{message}</li>
+            ))}
           </ul>
         )}
         <details>
@@ -338,19 +444,35 @@ export default function IngestionQueuePage() {
             </p>
           ))}
         </details>
-      </div>
+      </details>
       <div className="grid gap-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
         <IngestionCandidateList
           candidates={visible}
+          bulkSelected={selected}
+          bulkBusy={busy}
+          onToggleBulk={(id, checked) =>
+            setSelection({
+              key: queryKey,
+              ids: checked
+                ? [...selected, id]
+                : selected.filter((value) => value !== id),
+            })
+          }
           sources={sources}
           selectedStatus={status}
-          statusCounts={result?.counts ??
-            { pending: 0, accepted: 0, rejected: 0, duplicate: 0 }}
+          statusCounts={
+            result?.counts ?? {
+              pending: 0,
+              accepted: 0,
+              rejected: 0,
+              duplicate: 0,
+            }
+          }
           searchQuery={filters.search ?? ""}
           selectedSourceFilter={filters.source ?? "all"}
-          selectedImportSourceFilter={(filters.importSource ?? "all") as
-            | "all"
-            | IngestionImportSource}
+          selectedImportSourceFilter={
+            (filters.importSource ?? "all") as "all" | IngestionImportSource
+          }
           hasActiveFilters={params.size > 0}
           selectedCandidateId={candidate?.id}
           onSelectStatus={(status) => change("status", status)}
@@ -362,33 +484,42 @@ export default function IngestionQueuePage() {
         />
         <div>
           {candidate && (
-            <CandidateHistory key={candidate.id} candidate={candidate} />
+            <CandidateHistory
+              key={`${candidate.id}:${revision}`}
+              candidate={candidate}
+            />
           )}
-          {candidate && candidate.status !== "accepted" &&
+          {candidate &&
+            candidate.status !== "accepted" &&
             (candidate.status !== "pending" ||
-              candidate.route === "outside_scope") &&
-            (
-              <button
+              candidate.route === "outside_scope") && (
+              <Button
                 className="mb-3 text-blue-300"
                 onClick={() =>
                   void act(candidate, "restore").catch((error) =>
-                    setError(String(error))
-                  )}
+                    setError(String(error)),
+                  )
+                }
               >
-                Restore to pending
-              </button>
+                Restore to inbox
+              </Button>
             )}
-          <IngestionCandidateReview
-            candidate={candidate}
-            sources={sources}
-            tags={tags}
-            onSaveCandidate={(item, values) => act(item, "save", values)}
-            onAcceptCandidate={(item, values: IngestionCandidateReviewValues) =>
-              act(item, "accept", values)}
-            onRejectCandidate={(item, reason) =>
-              act(item, "reject", { rejection_reason: reason })}
-            onMarkDuplicate={(item) => act(item, "duplicate")}
-          />
+          <fieldset disabled={busy}>
+            <IngestionCandidateReview
+              candidate={candidate}
+              sources={sources}
+              tags={tags}
+              onSaveCandidate={(item, values) => act(item, "save", values)}
+              onAcceptCandidate={(
+                item,
+                values: IngestionCandidateReviewValues,
+              ) => act(item, "accept", values)}
+              onRejectCandidate={(item, reason) =>
+                act(item, "reject", { rejection_reason: reason })
+              }
+              onMarkDuplicate={(item) => act(item, "duplicate")}
+            />
+          </fieldset>
         </div>
       </div>
     </>

@@ -50,8 +50,9 @@ describe("form and queue regressions", () => {
         onSubmit={submit}
       />,
     );
-    expect((screen.getByPlaceholderText("Title") as HTMLInputElement).value)
-      .toBe("First");
+    expect(
+      (screen.getByPlaceholderText("Title") as HTMLInputElement).value,
+    ).toBe("First");
     fireEvent.change(screen.getByPlaceholderText("Title"), {
       target: { value: "Edited" },
     });
@@ -63,8 +64,9 @@ describe("form and queue regressions", () => {
         onSubmit={submit}
       />,
     );
-    expect((screen.getByPlaceholderText("Title") as HTMLInputElement).value)
-      .toBe("Second");
+    expect(
+      (screen.getByPlaceholderText("Title") as HTMLInputElement).value,
+    ).toBe("Second");
     rerender(
       <ArticleForm
         sources={[]}
@@ -73,8 +75,9 @@ describe("form and queue regressions", () => {
         onSubmit={submit}
       />,
     );
-    expect((screen.getByPlaceholderText("Title") as HTMLInputElement).value)
-      .toBe("");
+    expect(
+      (screen.getByPlaceholderText("Title") as HTMLInputElement).value,
+    ).toBe("");
   });
   it("resets event and feed edit state without effects", () => {
     const submit = vi.fn();
@@ -131,10 +134,11 @@ describe("form and queue regressions", () => {
   });
   it("prevents overlapping review clicks and keeps draft on failure", async () => {
     let reject!: (error: Error) => void;
-    const accept = vi.fn(() =>
-      new Promise<void>((_, fail) => {
-        reject = fail;
-      })
+    const accept = vi.fn(
+      () =>
+        new Promise<void>((_, fail) => {
+          reject = fail;
+        }),
     );
     render(
       <IngestionCandidateReview
@@ -147,7 +151,7 @@ describe("form and queue regressions", () => {
       />,
     );
     const buttons = screen.getAllByRole("button", {
-      name: "Accept as Article",
+      name: "Keep",
     });
     fireEvent.click(buttons[0]);
     fireEvent.click(buttons[1]);
@@ -159,7 +163,7 @@ describe("form and queue regressions", () => {
     await waitFor(() =>
       expect(screen.getAllByRole("alert")[0].textContent).toContain(
         "Database unavailable",
-      )
+      ),
     );
     expect(screen.getByDisplayValue("a")).toBeTruthy();
     expect((buttons[0] as HTMLButtonElement).disabled).toBe(false);
@@ -187,16 +191,16 @@ describe("form and queue regressions", () => {
     ).toBeNull();
   });
   it("normalizes HTTP(S) identity and rejects explicit unsupported schemes/credentials", () => {
-    expect(normalizeImportUrl(" example.com/a?utm_source=rss&keep=yes#x "))
-      .toBe("https://example.com/a?keep=yes");
-    for (
-      const value of [
-        "ftp://example.com/a",
-        "mailto:a@example.com",
-        "javascript:alert(1)",
-        "https://u:p@example.com/",
-        "",
-      ]
-    ) expect(() => normalizeImportUrl(value)).toThrow();
+    expect(
+      normalizeImportUrl(" example.com/a?utm_source=rss&keep=yes#x "),
+    ).toBe("https://example.com/a?keep=yes");
+    for (const value of [
+      "ftp://example.com/a",
+      "mailto:a@example.com",
+      "javascript:alert(1)",
+      "https://u:p@example.com/",
+      "",
+    ])
+      expect(() => normalizeImportUrl(value)).toThrow();
   });
 });

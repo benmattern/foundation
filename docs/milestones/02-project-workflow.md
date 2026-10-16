@@ -1,11 +1,12 @@
 # Milestone 02: Clear project setup and research workflow
 
-Status: ready for implementation, authorized by the owner on 2026-10-16.
+Status: implemented and locally verified on 2026-10-16; not merged or deployed.
+Owner implementation authorization: 2026-10-16. See the workflow review for evidence.
 Reviewed baseline: a42454ea9c7930e56db0bfbfb0779a4729f1a70f.
 Implementation entry point: read AGENTS.md, then this file and
 ../reviews/02-project-workflow.md. Implement the complete milestone; do not stop
 at another proposal or ask the owner to approve routine layout/component choices.
-Publishing this brief does not mean its UI is implemented.
+The behavior below is implemented locally; hosted verification remains separate.
 
 ## Problem and outcome
 
@@ -185,29 +186,29 @@ No AI, paid integrations, graph work, broad catalog research or autonomous actio
 
 ## Verification and completion
 
-- [ ] New project -> choose enabled feed -> Check now -> Inbox -> Keep -> Library
+- [x] New project -> choose enabled feed -> Check now -> Inbox -> Keep -> Library
       is usable end to end without opening /rss or needing external instructions.
-- [ ] Existing projects, legacy source records and approved research remain usable.
-- [ ] Manual-only source and link capture work and are clearly differentiated.
-- [ ] Following state/health is accurate; source/feed/subscription partial failures
+- [x] Existing projects, legacy source records and approved research remain usable.
+- [x] Manual-only source and link capture work and are clearly differentiated.
+- [x] Following state/health is accurate; source/feed/subscription partial failures
       preserve form values and do not cause duplicates on retry.
-- [ ] No enabled source, collecting, empty feed, outside-scope, failed feed,
+- [x] No enabled source, collecting, empty feed, outside-scope, failed feed,
       filtered-empty and completed-review states have distinct useful guidance.
-- [ ] Project switching and collection counts never leak/mislabel another project.
-- [ ] Existing deep links, back/forward and direct route refresh remain supported.
-- [ ] Keep/Dismiss/restore and selected-page bulk review preserve backend semantics.
-- [ ] Shared controls are visibly interactive, labeled and usable with keyboard.
-- [ ] Desktop (1440px) and mobile (390px) screenshots are rendered and visually
+- [x] Project switching and collection counts never leak/mislabel another project.
+- [x] Existing deep links, back/forward and direct route refresh remain supported.
+- [x] Keep/Dismiss/restore and selected-page bulk review preserve backend semantics.
+- [x] Shared controls are visibly interactive, labeled and usable with keyboard.
+- [x] Desktop (1440px) and mobile (390px) screenshots are rendered and visually
       inspected; layouts have readable fields, no clipped actions or overflow.
-- [ ] npm ci, lint, build, tests and browser tests pass. Run existing function/SQL
+- [x] npm ci, lint, build, tests and browser tests pass. Run existing function/SQL
       checks if corresponding backend behavior changes; preserve full CI coverage.
-- [ ] Add meaningful journey coverage for a new project, manual-only source,
+- [x] Add meaningful journey coverage for a new project, manual-only source,
       failed collection/save, Keep-to-library, and project switching. Mocks do not
       establish hosted signed-in behavior.
-- [ ] Reconcile current docs and AGENTS pointers so deployed Milestone 01 and this
+- [x] Reconcile current docs and AGENTS pointers so deployed Milestone 01 and this
       active Milestone 02 are unambiguous; retain history separately, not as
       contradictory current instructions.
-- [ ] Record evidence, deviations, remaining hosted checks and a short demo script
+- [x] Record evidence, deviations, remaining hosted checks and a short demo script
       in ../reviews/02-project-workflow.md. Do not mark implementation complete
       just because this brief or mocked tests exist.
 

@@ -1,5 +1,28 @@
 # FOUNDATION Backlog
 
+## Current priority - 2026-10-16
+
+Milestone 01 ingestion is deployed. Its recorded database/function/scheduler and
+public frontend verification is in [the ingestion review](reviews/01-ingestion.md).
+Milestone 02 is implemented on docs/project-workflow-ux-2026-10-16 and verified
+locally; [the workflow review](reviews/02-project-workflow.md) contains the demo,
+exact checks, visual evidence and remaining hosted checks. This milestone has
+not been merged or deployed. No hosted data, credentials or configuration were
+used for its regression tests.
+
+- [x] Implement the complete project-to-library journey and shared control pass.
+- [x] Verify new/existing projects, manual capture, partial-save and check failures.
+- [x] Verify switching, deep links, keyboard dialogs, desktop/mobile layouts.
+- [x] Consolidate current documentation and write the Milestone 02 review/demo.
+- [ ] Publish the Milestone 02 frontend and verify the real signed-in journey.
+- [ ] Continue operational monitoring of upstream feed failures and retention.
+- [ ] Verify the previously documented DNS/egress rebinding boundary separately.
+
+No AI, paid integration, new connector family or graph work is part of this release.
+
+<details>
+<summary>Historical planning, implementation and rollout records (superseded where noted above)</summary>
+
 ## Active priority — project workflow, 2026-10-16
 
 Implement [Milestone 02](milestones/02-project-workflow.md) as a complete package:
@@ -994,3 +1017,5 @@ Phase 1 will be considered successful when FOUNDATION can reliably:
 - and support repeatable analyst workflows.
 
 At that point, FOUNDATION transitions from prototype to operational platform foundation.
+
+</details>

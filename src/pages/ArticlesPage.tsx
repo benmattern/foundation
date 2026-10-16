@@ -1,3 +1,7 @@
+import { Link, useSearchParams } from "react-router-dom";
+import { Button } from "../components/ui/Button";
+import { buttonClass } from "../components/ui/buttonStyles";
+import { EmptyState } from "../components/ui/EmptyState";
 import { useEffect, useState } from "react";
 import { PageHeader } from "../components/PageHeader";
 import { ArticleForm } from "../components/ArticleForm";
@@ -22,6 +26,12 @@ import type { Tag } from "../types/tag";
 import { getTags } from "../services/tagService";
 
 export default function ArticlesPage() {
+  const [params] = useSearchParams();
+  const [manualOpen, setManualOpen] = useState(false);
+  const [error, setError] = useState("");
+  const [captureMessage, setCaptureMessage] = useState("");
+  const captureOpen = params.get("capture") === "1";
+  const highlight = params.get("article");
   const [articles, setArticles] = useState<ArticleWithTags[]>([]);
   const [sources, setSources] = useState<Source[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
@@ -32,21 +42,22 @@ export default function ArticlesPage() {
   const [editingArticle, setEditingArticle] = useState<ArticleWithTags | null>(
     null,
   );
-  const [articleDraft, setArticleDraft] = useState<
-    ArticleFormDraftValues | null
-  >(null);
+  const [articleDraft, setArticleDraft] =
+    useState<ArticleFormDraftValues | null>(null);
 
   const normalizedSearchQuery = searchQuery.trim().toLowerCase();
   const filteredArticles = articles.filter((article) => {
-    const matchesSearch = normalizedSearchQuery === "" ||
+    const matchesSearch =
+      normalizedSearchQuery === "" ||
       article.title.toLowerCase().includes(normalizedSearchQuery) ||
       (article.summary ?? "").toLowerCase().includes(normalizedSearchQuery);
 
-    const matchesTag = selectedTagId === "" ||
+    const matchesTag =
+      selectedTagId === "" ||
       article.tags.some((tag) => tag.id === selectedTagId);
 
-    const matchesSource = selectedSourceId === "" ||
-      article.source_id === selectedSourceId;
+    const matchesSource =
+      selectedSourceId === "" || article.source_id === selectedSourceId;
 
     return matchesSearch && matchesTag && matchesSource;
   });
@@ -69,7 +80,7 @@ export default function ArticlesPage() {
       setSources(sourceData);
       setTags(tagData);
     } catch (error) {
-      console.error("Error loading articles page data:", error);
+      setError("Library could not load. Refresh to retry. " + String(error));
     } finally {
       setLoading(false);
     }
@@ -77,19 +88,23 @@ export default function ArticlesPage() {
 
   useEffect(() => {
     let active = true;
-    Promise.all([getArticlesWithTags(), getSources(), getTags()]).then(
-      ([articleData, sourceData, tagData]) => {
+    Promise.all([getArticlesWithTags(), getSources(), getTags()])
+      .then(([articleData, sourceData, tagData]) => {
         if (active) {
           setArticles(articleData);
           setSources(sourceData);
           setTags(tagData);
         }
-      },
-    ).catch((error: unknown) => {
-      if (active) console.error(error);
-    }).finally(() => {
-      if (active) setLoading(false);
-    });
+      })
+      .catch((error: unknown) => {
+        if (active)
+          setError(
+            "Library could not load. Refresh to retry. " + String(error),
+          );
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
     return () => {
       active = false;
     };
@@ -135,7 +150,7 @@ export default function ArticlesPage() {
 
       await loadArticles();
     } catch (error) {
-      console.error("Error deleting article:", error);
+      setError("Article could not be deleted. " + String(error));
     }
   }
 
@@ -143,8 +158,8 @@ export default function ArticlesPage() {
     result: UrlImportResult,
     metadata?: UrlMetadataResponse,
   ) {
-    const metadataUrl = metadata?.canonicalUrl ?? metadata?.finalUrl ??
-      result.normalizedUrl;
+    const metadataUrl =
+      metadata?.canonicalUrl ?? metadata?.finalUrl ?? result.normalizedUrl;
 
     setEditingArticle(null);
     setArticleDraft({
@@ -161,6 +176,7 @@ export default function ArticlesPage() {
   function editArticle(article: ArticleWithTags) {
     setArticleDraft(null);
     setEditingArticle(article);
+    setManualOpen(true);
   }
 
   async function saveImportToQueue(
@@ -186,44 +202,93 @@ export default function ArticlesPage() {
       raw_metadata: metadata ? { ...metadata } : {},
       warnings,
     });
+    setCaptureMessage(
+      "Link saved to Inbox for your review. It has not been added to Library.",
+    );
   }
 
   return (
     <>
       <PageHeader
-        title="Articles"
-        description="Collect, review, and organize articles gathered from OSINT sources."
+        title="Library"
+        description="Articles you've kept for this project."
       />
 
-      {loading
-        ? <p className="text-slate-400">Loading articles...</p>
-        : (
+      {error && (
+        <p role="alert" className="mb-4 text-red-300">
+          {error}
+        </p>
+      )}
+      {highlight && articles.some((a) => a.id === highlight) && (
+        <p
+          role="status"
+          className="mb-4 rounded-lg border border-emerald-700 p-4 text-emerald-200"
+        >
+          Your kept article is highlighted below.
+        </p>
+      )}
+      <div className="mb-5 flex flex-wrap gap-3">
+        <Link className={buttonClass()} to="/articles?capture=1">
+          Capture a link
+        </Link>
+        <Button onClick={() => setManualOpen((v) => !v)}>
+          Add article manually
+        </Button>
+      </div>
+      {loading ? (
+        <p className="text-slate-400">Loading articles...</p>
+      ) : (
+        <div className="space-y-6">
+          <ArticleFilters
+            searchQuery={searchQuery}
+            selectedTagId={selectedTagId}
+            selectedSourceId={selectedSourceId}
+            sources={sources}
+            tags={tags}
+            resultCount={filteredArticles.length}
+            totalCount={articles.length}
+            onSearchQueryChange={setSearchQuery}
+            onSelectedTagIdChange={setSelectedTagId}
+            onSelectedSourceIdChange={setSelectedSourceId}
+            onClearFilters={clearFilters}
+          />
+
+          {articles.length === 0 && !error && (
+            <EmptyState
+              title="Your library starts with a decision"
+              action={
+                <Link className={buttonClass("primary")} to="/ingestion">
+                  Review inbox
+                </Link>
+              }
+            >
+              Collection brings material to Inbox. Keep relevant items there to
+              add them to this project's Library, or add an article manually.
+            </EmptyState>
+          )}
+          {captureMessage && (
+            <div
+              role="status"
+              className="space-y-3 rounded-lg border border-blue-700 p-4"
+            >
+              <p>{captureMessage}</p>
+              <Link className={buttonClass()} to="/ingestion">
+                Open inbox
+              </Link>
+            </div>
+          )}
           <div className="space-y-6">
-            <ArticleFilters
-              searchQuery={searchQuery}
-              selectedTagId={selectedTagId}
-              selectedSourceId={selectedSourceId}
-              sources={sources}
-              tags={tags}
-              resultCount={filteredArticles.length}
-              totalCount={articles.length}
-              onSearchQueryChange={setSearchQuery}
-              onSelectedTagIdChange={setSelectedTagId}
-              onSelectedSourceIdChange={setSelectedSourceId}
-              onClearFilters={clearFilters}
-            />
+            <div className="space-y-6">
+              {!editingArticle && captureOpen && (
+                <ArticleUrlImport
+                  articles={articles}
+                  sources={sources}
+                  onImportDraft={importArticleDraft}
+                  onSaveToQueue={saveImportToQueue}
+                />
+              )}
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-              <div className="space-y-6">
-                {!editingArticle && (
-                  <ArticleUrlImport
-                    articles={articles}
-                    sources={sources}
-                    onImportDraft={importArticleDraft}
-                    onSaveToQueue={saveImportToQueue}
-                  />
-                )}
-
+              {(manualOpen || editingArticle || articleDraft) && (
                 <ArticleForm
                   sources={sources}
                   tags={tags}
@@ -231,20 +296,22 @@ export default function ArticlesPage() {
                   initialArticle={editingArticle}
                   initialDraft={articleDraft}
                   onSubmit={editingArticle ? updateArticle : createArticle}
-                  onCancel={editingArticle
-                    ? () => setEditingArticle(null)
-                    : undefined}
+                  onCancel={
+                    editingArticle ? () => setEditingArticle(null) : undefined
+                  }
                 />
-              </div>
-              <ArticleList
-                articles={filteredArticles}
-                emptyMessage="No articles match the current filters."
-                onEditArticle={editArticle}
-                onDeleteArticle={deleteArticle}
-              />
+              )}
             </div>
+            <ArticleList
+              highlightId={highlight}
+              articles={filteredArticles}
+              emptyMessage="No articles match the current filters."
+              onEditArticle={editArticle}
+              onDeleteArticle={deleteArticle}
+            />
           </div>
-        )}
+        </div>
+      )}
     </>
   );
 }

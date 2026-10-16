@@ -1,5 +1,35 @@
 # FOUNDATION Recovery Prompt
 
+## Current handoff - 2026-10-16
+
+Milestone 01 ingestion is deployed. Its recorded database/function/scheduler and
+public frontend verification is in [the ingestion review](reviews/01-ingestion.md).
+Milestone 02 is implemented on docs/project-workflow-ux-2026-10-16 and verified
+locally; [the workflow review](reviews/02-project-workflow.md) contains the demo,
+exact checks, visual evidence and remaining hosted checks. This milestone has
+not been merged or deployed. No hosted data, credentials or configuration were
+used for its regression tests.
+
+Read AGENTS.md and the completed Milestone 02 checklist before further changes.
+Do not replay legacy data migration, provision another owner, or infer that a
+mocked browser session establishes hosted sign-in behavior. The current route
+flow is / -> /sources -> /ingestion -> /articles. /rss redirects to
+/sources?view=collection; /sources/:id uses the same source workspace.
+
+The next external step is publishing this branch and validating the real signed-in
+project journey within the owner's active authorization. There is no pending
+product/layout question. Public feed failures, retention and the preexisting
+DNS-rebinding verification limit are distinct from this UI milestone.
+
+Local checks: npm ci, npm run lint, npm run build, npm test,
+npm run test:e2e, npm run check:functions and npm run test:postgres.
+Browser tests mock only foundation-test.invalid; screenshots are generated into
+ignored artifacts.local/workflow. Private .deployment.local files from the
+prior rollout must never be printed, committed or used by regression tests.
+
+<details>
+<summary>Historical planning, implementation and rollout records (superseded where noted above)</summary>
+
 ## Active handoff — project workflow, 2026-10-16
 
 Read [AGENTS.md](../AGENTS.md), [Milestone 02](milestones/02-project-workflow.md)
@@ -519,3 +549,5 @@ Current focus is:
 - strong architecture,
 - stable workflows,
 - and scalable relational intelligence design.
+
+</details>

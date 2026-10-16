@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import { DashboardLayout } from "./layouts/DashboardLayout";
 
@@ -9,7 +9,6 @@ import EntitiesPage from "./pages/EntitiesPage";
 import EventDetailPage from "./pages/EventDetailPage";
 import EventsPage from "./pages/EventsPage";
 import IngestionQueuePage from "./pages/IngestionQueuePage";
-import RssFeedsPage from "./pages/RssFeedsPage";
 import SourceDetailPage from "./pages/SourceDetailPage";
 import TagsPage from "./pages/TagsPage";
 import { WorkspaceGate } from "./components/WorkspaceGate";
@@ -17,8 +16,8 @@ import ProjectPage from "./pages/ProjectPage";
 
 export default function App() {
   return (
-    <WorkspaceGate>
-      <BrowserRouter>
+    <BrowserRouter>
+      <WorkspaceGate>
         <Routes>
           <Route element={<DashboardLayout />}>
             <Route path="/" element={<DashboardPage />} />
@@ -29,12 +28,15 @@ export default function App() {
             <Route path="/events" element={<EventsPage />} />
             <Route path="/events/:id" element={<EventDetailPage />} />
             <Route path="/ingestion" element={<IngestionQueuePage />} />
-            <Route path="/rss" element={<RssFeedsPage />} />
+            <Route
+              path="/rss"
+              element={<Navigate to="/sources?view=collection" replace />}
+            />
             <Route path="/project" element={<ProjectPage />} />
             <Route path="/entities" element={<EntitiesPage />} />
           </Route>
         </Routes>
-      </BrowserRouter>
-    </WorkspaceGate>
+      </WorkspaceGate>
+    </BrowserRouter>
   );
 }
