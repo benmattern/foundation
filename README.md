@@ -5,7 +5,8 @@
 The current branch adds authenticated projects, server-owned ingestion,
 subscriptions/rules, transactional review, bulk actions and migration history.
 Database migrations, all three functions and server scheduling are deployed.
-Frontend rollout and authenticated browser verification remain pending. The older planning
+The release is merged to main; Render rollout and authenticated browser
+verification remain unverified. The older planning
 and prototype descriptions below are historical.
 
 Use Node 24/npm 11, then run `npm ci`, `npm run lint`, `npm run build`,

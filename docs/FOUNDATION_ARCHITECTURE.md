@@ -23,7 +23,10 @@ Edge browser workflow, Deno checks for all three functions, lint and production
 build without warnings. Actual-backup restore/upgrade rehearsal also passes.
 Compatible dependency updates resolve all ten CI audit advisories (zero remaining).
 The Linux PostgreSQL harness now uses its own Unix socket directory, and CI
-actions use Node 24 runtimes. Frontend publication and Render verification remain outstanding. Render integration
+actions use Node 24 runtimes. The corrected GitHub CI run passed every check.
+PR #1 is merged to main at daa5e08, publishing the frontend release to the
+documented Render auto-deploy branch. Render deployment status and the live
+frontend remain unverified; the live URL or connected provider access is needed. Render integration
 has been suggested but is not connected. An automatic cron invocation returned HTTP 200 without timeout. Hosted SQL role
 checks confirm owner visibility and isolation from another identity. End-user
 authenticated browser operation remains unverified. No owner password
