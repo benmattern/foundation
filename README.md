@@ -6,8 +6,8 @@ The current branch adds authenticated projects, server-owned ingestion,
 subscriptions/rules, transactional review, bulk actions and migration history.
 Database migrations, all three functions and server scheduling are deployed.
 The live Render site serves the tested release and its sign-in screen passes
-browser checks. A Render SPA rewrite is still required for direct app-route
-visits; authenticated browser verification remains pending. The older planning
+browser checks. The Render SPA rewrite is applied; direct visits and refreshes
+pass across all primary routes. Signed-in browser verification remains pending. The older planning
 and prototype descriptions below are historical.
 
 Use Node 24/npm 11, then run `npm ci`, `npm run lint`, `npm run build`,

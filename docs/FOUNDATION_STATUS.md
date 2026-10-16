@@ -29,10 +29,13 @@ documented Render auto-deploy branch. Live frontend verification at
 https://foundation-ljfo.onrender.com returns HTTP 200 and serves entry assets
 matching the tested production build. Headless Edge verifies desktop/mobile
 sign-in and required fields without console errors or failed requests.
-Direct visits to /articles return 404: Render needs a static-site rewrite with
-Source /*, Destination /index.html, Action Rewrite. Provider access or an owner
-settings update is pending; this hosting fix is not yet applied. See
-https://render.com/docs/redirects-rewrites for the documented setting. An automatic cron invocation returned HTTP 200 without timeout. Hosted SQL role
+The owner applied the Render SPA rewrite (/* to /index.html). Hosted Edge
+verification now passes direct visits and refreshes on /, /articles, /events,
+/ingestion, /rss, /sources, /tags and /project: all return HTTP 200 and display
+the sign-in gate. No console errors, page errors or failed requests occurred.
+The hosting-route issue is resolved. Signed-in browser workflows remain
+unverified against the real account; local browser coverage and live SQL owner
+isolation checks pass. An automatic cron invocation returned HTTP 200 without timeout. Hosted SQL role
 checks confirm owner visibility and isolation from another identity. End-user
 authenticated browser operation remains unverified. No owner password
 or user session has been requested or created. Private backup/credential artifacts
