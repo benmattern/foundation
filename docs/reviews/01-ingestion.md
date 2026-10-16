@@ -25,9 +25,14 @@ Compatible dependency updates resolve all ten CI audit advisories (zero remainin
 The Linux PostgreSQL harness now uses its own Unix socket directory, and CI
 actions use Node 24 runtimes. The corrected GitHub CI run passed every check.
 PR #1 is merged to main at daa5e08, publishing the frontend release to the
-documented Render auto-deploy branch. Render deployment status and the live
-frontend remain unverified; the live URL or connected provider access is needed. Render integration
-has been suggested but is not connected. An automatic cron invocation returned HTTP 200 without timeout. Hosted SQL role
+documented Render auto-deploy branch. Live frontend verification at
+https://foundation-ljfo.onrender.com returns HTTP 200 and serves entry assets
+matching the tested production build. Headless Edge verifies desktop/mobile
+sign-in and required fields without console errors or failed requests.
+Direct visits to /articles return 404: Render needs a static-site rewrite with
+Source /*, Destination /index.html, Action Rewrite. Provider access or an owner
+settings update is pending; this hosting fix is not yet applied. See
+https://render.com/docs/redirects-rewrites for the documented setting. An automatic cron invocation returned HTTP 200 without timeout. Hosted SQL role
 checks confirm owner visibility and isolation from another identity. End-user
 authenticated browser operation remains unverified. No owner password
 or user session has been requested or created. Private backup/credential artifacts

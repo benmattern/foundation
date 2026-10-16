@@ -5,8 +5,9 @@
 The current branch adds authenticated projects, server-owned ingestion,
 subscriptions/rules, transactional review, bulk actions and migration history.
 Database migrations, all three functions and server scheduling are deployed.
-The release is merged to main; Render rollout and authenticated browser
-verification remain unverified. The older planning
+The live Render site serves the tested release and its sign-in screen passes
+browser checks. A Render SPA rewrite is still required for direct app-route
+visits; authenticated browser verification remains pending. The older planning
 and prototype descriptions below are historical.
 
 Use Node 24/npm 11, then run `npm ci`, `npm run lint`, `npm run build`,
