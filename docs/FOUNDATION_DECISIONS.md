@@ -1,5 +1,24 @@
 # FOUNDATION Architectural Decisions
 
+## Accepted direction for Milestones 03/04 — 2026-10-16
+
+- Keep Discover as a curated catalog; simplify saved sources and move collection
+  configuration into individual sources.
+- Distinguish Follow, temporary Pause and Unfollow; retain previous research.
+- Make descriptive scope and active matching explicit during project setup.
+  Reusable groups and deterministic pre-sorting precede AI.
+- Preserve legacy rule behavior and make new match modes/group membership visible.
+- An article may support multiple project research questions with separate notes.
+- Entities have stable identity/type/aliases; tags classify subjects and Events
+  retain their existing role. Start with manual and known-name linking.
+- Keep suggested/confirmed mentions, original evidence and analyst synthesis
+  distinct. Shared coverage is not automatic corroboration.
+
+See [03](milestones/03-selective-intake.md) and [04](milestones/04-connected-research.md)
+for implementation contracts. These are approved product/design directions;
+schema, code and hosted changes are not yet implemented by this commit.
+
+
 ## Project workflow decisions - 2026-10-16
 
 - Overview -> Sources -> Inbox -> Library is the primary journey; Events and Tags

@@ -1,5 +1,19 @@
 # FOUNDATION Current Status
 
+## Active work — 2026-10-16
+
+The owner approved [Milestone 03: selective intake](milestones/03-selective-intake.md)
+followed by [Milestone 04: connected research](milestones/04-connected-research.md).
+This commit adds implementation instructions only; neither milestone is built yet.
+Milestones 01/02 remain deployed as recorded below. New owner feedback confirms
+use of the hosted workflow, but does not replace a complete signed-in acceptance
+test record. Preserve that verification distinction.
+
+Current topics/keywords are descriptive; matching rules separately control routing.
+New grouped filtering, explicit Unfollow, question/entity linking and research
+notes are specified work, not current capabilities.
+
+
 ## Current status - 2026-10-16
 
 Milestone 01 ingestion is deployed. Its recorded database/function/scheduler and

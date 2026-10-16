@@ -1,5 +1,20 @@
 # FOUNDATION Recovery Prompt
 
+## Active handoff — 2026-10-16
+
+Read AGENTS.md, [Milestone 03](milestones/03-selective-intake.md) and its
+[review](reviews/03-selective-intake.md), then [Milestone 04](milestones/04-connected-research.md)
+and its [review](reviews/04-connected-research.md). The owner approved both in that
+order. Implement complete milestones, make routine engineering choices, test
+meaningful behavior and update the reviews. Do not stop at another proposal.
+
+This is a documentation handoff, not an implementation or deployment claim.
+Preserve deployed Milestones 01/02, existing research, RLS and collector/review
+safeguards. Descriptive scope currently does not filter intake; never silently
+activate it. Known-name entity suggestions are not confirmed identities or
+independent corroboration. Full geography databases and AI remain deferred.
+
+
 ## Current handoff - 2026-10-16
 
 Milestone 01 ingestion is deployed. Its recorded database/function/scheduler and
