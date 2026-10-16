@@ -129,6 +129,7 @@ test("Library to two questions, sourced finding, manual and dictionary connectio
   await page
     .getByRole("button", { name: "Create research question", exact: true })
     .click();
+  await expect(page.getByRole('heading',{name:'Create research question',exact:true})).toBeVisible();
   await page
     .getByLabel("Question title", { exact: true })
     .fill("Who is involved?");
@@ -257,6 +258,7 @@ test("failed question saves preserve keyboard drafts and project switch hides co
   await page
     .getByRole("button", { name: "Create project", exact: true })
     .click();
+  await expect(page.getByRole('heading',{name:'Isolated project',exact:true})).toBeVisible();
   await page.goto("/research");
   await expect(
     page.getByText("Start with a question, then link kept Library articles."),
