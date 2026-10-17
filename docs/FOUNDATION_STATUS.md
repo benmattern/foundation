@@ -1,7 +1,7 @@
 ## Local Milestones 05/06 implementation — 2026-10-17 UTC
 
 Milestones 05 and 06 are implemented locally on `docs/next-enhancements-draft` in
-that sequence. Milestone 05 acceptance was committed as `2c8f2b0`; subsequent
+that sequence. Milestone 05 acceptance was committed as `2c8f2b0`; Milestone 06 is `1d7cd99`. Final local checks: 69 tests, ten browser journeys, thirteen PostgreSQL scenario groups, lint/build/Edge checks and five separate live feed checks all passed. Subsequent
 coverage work also tightens view retry/schema handling, article fingerprints and
 initial overview loading. See [05 review](reviews/05-research-sessions-and-briefs.md)
 and [06 review](reviews/06-official-source-coverage.md) for exact behavior, tests,

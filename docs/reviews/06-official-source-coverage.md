@@ -110,3 +110,39 @@ before an authorized rollout. No Edge Function change is required. Existing real
 account signed-in hosted acceptance remains unverified; local mocked browser and
 SQL-role evidence do not establish end-user Auth behavior. No owner password or
 private deployment files were used.
+
+## Final implementation verification
+
+Branch: `docs/next-enhancements-draft`. Milestone 05 implementation: `2c8f2b0`.
+Milestone 06 and final integrity refinements: `1d7cd999c021d8a4fdeed52c46ab3b87685e6796`.
+The latter includes retry-safe saved-view creation, surface validation, article
+fingerprints/citation-availability drift detection, bounded initial overview access
+and a text-only inline preview. Both migrations remain local and unapplied remotely.
+
+Final checks all passed:
+
+- npm ci: 275 packages installed; zero audit vulnerabilities.
+- npm run lint: zero errors or warnings.
+- npm run build: production TypeScript/Vite build passed.
+- npm test: **69 tests, 15 files passed**, including full migration/legacy regression.
+- npm run test:e2e: **10 journeys passed**. Windows Edge uses one worker to avoid
+  competing native screenshot resources; Linux keeps normal Playwright defaults.
+  The standalone workspace fixture now implements the session response and exposes
+  PostgREST count headers; project-switch checks wait for the destination overview.
+- npm run test:postgres: **13 independent-connection scenario groups passed** in a
+  disposable PostgreSQL cluster; all existing races plus session boundaries,
+  catalog/Pause serialization, duplicate adoption and stale tuning writes.
+- npm run check:functions: all three existing Edge Functions type-check successfully.
+- npm run check:catalog: all five configured automatic feeds returned HTTP 200 and
+  usable parsed items. Finance truncation and ECB missing descriptions remain
+  expected publisher-content limitations, recorded above/in the source review.
+- git diff --check: passed. Desktop 1440px/mobile 390px screenshots inspected for
+  comparison/brief and coverage/calibration; no horizontal overflow. Downloaded
+  HTML contents preserve Unicode/prose and contain no application credentials or
+  scripts. The inline preview renders draft text directly, without a live iframe.
+
+No hosted CI run, merge, production migration, deployment or real-account signed-in
+acceptance is claimed. Local fixtures use only an invalid API hostname and fictional
+SQL data. A future authorized rollout must back up/rehearse the actual database,
+apply additive 015 then 016 and exercise the real signed-in workflow. See the other
+milestone review for its demo, boundaries and supporting evidence.
