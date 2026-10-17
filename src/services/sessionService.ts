@@ -71,4 +71,8 @@ export const questionChoices = (
   sessionRpc<{
     links: QuestionPacket["links"];
     findings: QuestionPacket["findings"];
-  }>("question_choices", { p_question: question, p_after: after,p_fafter:findingAfter });
+  }>("question_choices", {
+    p_question: question,
+    p_after: after,
+    p_fafter: findingAfter,
+  });

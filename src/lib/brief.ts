@@ -5,6 +5,7 @@ const text = (s: string) =>
 const md = (s: string) => text(s).replaceAll("[", "\\[").replaceAll("]", "\\]");
 export function packetVersions(p: QuestionPacket) {
   return JSON.stringify({
+    citation_availability: p.citation_availability,
     question: p.question,
     links: p.links,
     findings: p.findings,
@@ -19,7 +20,9 @@ export function composeBrief(p: QuestionPacket) {
       i = refs.length;
       refs.push({
         snapshot: s,
-        available: p.citation_availability?.[s.id] ?? p.links.some((l) => l.linked && l.article?.id === s.id),
+        available:
+          p.citation_availability?.[s.id] ??
+          p.links.some((l) => l.linked && l.article?.id === s.id),
       });
     }
     return `[${i + 1}]`;
@@ -50,7 +53,7 @@ export function composeBrief(p: QuestionPacket) {
   const references = refs
     .map(
       ({ snapshot: s, available }, i) =>
-        `${i + 1}. ${md(s.title)}${available ? "" : " — UNAVAILABLE / unlinked evidence snapshot"}\n   Original URL: ${md(s.url ?? "(unknown)")}\n   Publication: ${s.published_at ?? "(unknown)"}; captured: ${s.captured_at ?? "(unknown)"}`,
+        `${i + 1}. ${md(s.title)}${available ? "" : " — UNAVAILABLE / unlinked evidence snapshot"}\n   Original URL: ${md(s.url ?? "(unknown)")}\n   Publication: ${s.published_at ?? "(unknown)"}; snapshot captured: ${s.captured_at ?? "(unknown)"}`,
     )
     .join("\n");
   const manifest = {
@@ -60,6 +63,7 @@ export function composeBrief(p: QuestionPacket) {
       id: l.id,
       version: l.version,
       article_id: l.article_id,
+      article_revision: l.article_revision ?? null,
     })),
     findings: p.findings.map((f) => ({ id: f.id, version: f.version })),
   };

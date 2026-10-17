@@ -1,3 +1,29 @@
+## Local Milestones 05/06 implementation — 2026-10-17 UTC
+
+Milestones 05 and 06 are implemented locally on `docs/next-enhancements-draft` in
+that sequence. Milestone 05 acceptance was committed as `2c8f2b0`; subsequent
+coverage work also tightens view retry/schema handling, article fingerprints and
+initial overview loading. See [05 review](reviews/05-research-sessions-and-briefs.md)
+and [06 review](reviews/06-official-source-coverage.md) for exact behavior, tests,
+source evidence, demos and limits. Earlier deployed handoffs below remain the
+production record; these changes are **not deployed**.
+
+Continue research uses explicit transactional checkpoints and a paginated complete
+change journal. Saved Library/Inbox views are project scoped. Existing questions
+open bounded comparison and editable cited Markdown/standalone HTML brief exports.
+Ten official catalog records form optional overlapping packs; five feeds verified
+with the actual parser. Manual/blocked/stale entries are distinct. Sources now
+contains coverage observations, server-counted calibration and separate Useful/
+Not useful/held-out labels. Proposed rules preview against reused examples before
+explicit save; no AI, inferred confirmation or automatic review decisions.
+
+Additive migrations 015 and 016 have not run on Supabase. Preserve the production
+001–014 ledger and existing owner/data. A future authorized rollout must back up,
+rehearse actual-schema upgrades, apply 015 then 016, release the frontend, and
+verify a real signed-in journey. No Edge Function change is required. The existing
+hosted signed-in acceptance gap remains; local mocks and SQL roles do not close it.
+Do not read private deployment files into tests or infer deployment permission.
+
 # FOUNDATION Current Status
 
 ## Deployed Milestones 03/04 - 2026-10-16

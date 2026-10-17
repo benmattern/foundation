@@ -90,11 +90,13 @@ begin
  perform pg_advisory_xact_lock(hashtextextended(p_id::text,15));
  select * into v from saved_views where id=p_id and project_id=p_project for update;
  if v.id is null and exists(select 1 from saved_views where id=p_id) then raise exception 'View unavailable';end if;
+ if p_expected=0 and v.id is not null and not p_delete and v.name=p_name and v.surface=p_surface and v.filters=p_filters then return v;end if;
  if coalesce(v.version,0) is distinct from p_expected then raise exception 'View changed; reload' using errcode='40001';end if;
  if p_delete then delete from saved_views where id=v.id;return v;end if;
  if p_id is null or p_surface not in ('articles','ingestion') or jsonb_typeof(p_filters) is distinct from 'object' or length(p_filters::text)>4000 then raise exception 'Invalid view';end if;
  for k,value in select * from jsonb_each_text(p_filters) loop
   if k not in ('q','source','tag','since','until','period','order','status','route','import') or jsonb_typeof(p_filters->k)<>'string' then raise exception 'Unsupported view filter %',k;end if;
+  if p_surface='articles' and (k in ('status','route','import') or (k='order' and value='relevance')) then raise exception 'Unsupported Library filter %',k;end if;
   if k='period' and value not in ('7','30') then raise exception 'Invalid relative period';end if;
   if k in ('since','until') and value<>'' then perform value::date;end if;
   if k='source' and value not in ('','all') and not exists(select 1 from sources where id=value::uuid and owner_id=who) then raise exception 'Source unavailable';end if;
@@ -120,6 +122,7 @@ begin
  select jsonb_build_object('as_of',statement_timestamp(),'project',jsonb_build_object('name',p.name,'description',p.description),
  'question',to_jsonb(q),'links',coalesce((select jsonb_agg(to_jsonb(l)||jsonb_build_object(
  'article',(select to_jsonb(a) from articles a where a.id=l.article_id and a.project_id=p_project),
+ 'article_revision',(select md5(to_jsonb(a)::text) from articles a where a.id=l.article_id and a.project_id=p_project),
  'collected_at',(select min(c.created_at) from ingestion_candidates c where c.project_id=p_project and c.converted_article_id=l.article_id),
  'source',(select s.name from articles a join sources s on s.id=a.source_id where a.id=l.article_id and a.project_id=p_project),
  'entities',(select coalesce(jsonb_agg(distinct e.name),'[]') from entity_mentions m join entities e on e.id=m.entity_id where m.project_id=p_project and m.article_id=l.article_id and m.state='confirmed'),
@@ -129,6 +132,7 @@ begin
  'findings',coalesce((select jsonb_agg(to_jsonb(f) order by f.id) from research_findings f where f.project_id=p_project and f.question_id=q.id and f.id=any(p_findings)),'[]')) into result
  from research_questions q join projects p on p.id=q.project_id where q.id=p_question and q.project_id=p_project;
  if result is null then raise exception 'Question unavailable';end if;
+ if jsonb_array_length(result->'links')>6 then raise exception 'Select at most 6 evidence links';end if;
  return result;
 end $$;
 create function public.question_choices(p_project uuid,p_question uuid,p_after uuid default null,p_fafter uuid default null) returns jsonb

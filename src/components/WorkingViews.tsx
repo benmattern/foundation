@@ -15,6 +15,7 @@ export function WorkingViews({
     [name, setName] = useState(""),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
+  const [createId, setCreateId] = useState(() => crypto.randomUUID());
   async function read() {
     setViews(await getWorkingViews());
   }
@@ -36,6 +37,7 @@ export function WorkingViews({
     try {
       await saveWorkingView(view, remove);
       await read();
+      if (view.version === 0) setCreateId(crypto.randomUUID());
       setName("");
       setError("");
     } catch (e) {
@@ -61,7 +63,7 @@ export function WorkingViews({
         disabled={busy || !name.trim()}
         onClick={() =>
           void save({
-            id: crypto.randomUUID(),
+            id: createId,
             name,
             surface,
             filters: viewFilters(params),

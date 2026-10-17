@@ -44,6 +44,7 @@ export default function ArticlesPage() {
   const selectedSourceId = params.get("source") ?? "";
   function filter(key: string, value: string) {
     const next = new URLSearchParams(params);
+    if (key === "since" || key === "until") next.delete("period");
     if (value) next.set(key, value);
     else next.delete(key);
     setParams(next);
@@ -70,7 +71,9 @@ export default function ArticlesPage() {
         article.tags.some((tag) => tag.id === selectedTagId);
 
       const matchesSource =
-        selectedSourceId === "" || article.source_id === selectedSourceId;
+        selectedSourceId === "" ||
+        selectedSourceId === "all" ||
+        article.source_id === selectedSourceId;
 
       const resolved = resolveView(Object.fromEntries(params));
       const since = resolved.get("since"),

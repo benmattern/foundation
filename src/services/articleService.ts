@@ -14,44 +14,58 @@ export type CreateArticleInput = {
   tag_ids?: string[];
 };
 export type UpdateArticleInput = CreateArticleInput;
+export async function getArticleCount(): Promise<number> {
+  const { count, error } = await supabase
+    .from("articles")
+    .select("id", { count: "exact", head: true })
+    .eq("project_id", activeProjectId());
+  if (error) throw error;
+  if (count === null) throw Error("Article count unavailable");
+  return count;
+}
 
 export function getArticles(): Promise<Article[]> {
   const projectId = activeProjectId();
   return queryAll<Article>((from, to) =>
-    supabase.from("articles").select("*")
-      .eq("project_id", projectId).order("created_at", { ascending: false })
-      .order("id").range(from, to)
+    supabase
+      .from("articles")
+      .select("*")
+      .eq("project_id", projectId)
+      .order("created_at", { ascending: false })
+      .order("id")
+      .range(from, to),
   );
 }
 export async function getArticlesWithTags(): Promise<ArticleWithTags[]> {
   const [articles, articleTags, tags] = await Promise.all([
     getArticles(),
     queryAll<ArticleTag>((from, to) =>
-      supabase.from("article_tags").select("*").order("article_id").order(
-        "tag_id",
-      ).range(from, to)
+      supabase
+        .from("article_tags")
+        .select("*")
+        .order("article_id")
+        .order("tag_id")
+        .range(from, to),
     ),
     queryAll<Tag>((from, to) =>
-      supabase.from("tags").select("*").order("id").range(from, to)
+      supabase.from("tags").select("*").order("id").range(from, to),
     ),
   ]);
   const tagsById = new Map(tags.map((tag) => [tag.id, tag]));
   return articles.map((article) => ({
     ...article,
     tags: articleTags
-      .filter((link) => link.article_id === article.id).map((link) =>
-        tagsById.get(link.tag_id)
-      )
-      .filter((tag): tag is Tag => !!tag).sort((a, b) =>
-        a.name.localeCompare(b.name)
-      ),
+      .filter((link) => link.article_id === article.id)
+      .map((link) => tagsById.get(link.tag_id))
+      .filter((tag): tag is Tag => !!tag)
+      .sort((a, b) => a.name.localeCompare(b.name)),
   }));
 }
 export async function getArticlesBySourceId(
   sourceId: string,
 ): Promise<Article[]> {
-  return (await getArticles()).filter((article) =>
-    article.source_id === sourceId
+  return (await getArticles()).filter(
+    (article) => article.source_id === sourceId,
   );
 }
 async function saveArticle(article: CreateArticleInput, id: string | null) {

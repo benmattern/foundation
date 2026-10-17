@@ -39,6 +39,127 @@ beforeAll(async () => {
 afterAll(async () => {
   await db?.close();
 });
+it("adopts selected stable catalog records without duplicates, rule loss or resuming paused/unfollowed sources", async () => {
+  const source = {
+    id: "official-test",
+    name: "Fictional official",
+    url: "https://example.com/official",
+    feedUrl: "https://example.com/official/rss",
+    topics: ["trade"],
+    region: "Fictional",
+    language: "English",
+  };
+  const payload = "'" + JSON.stringify(source) + "'";
+  const id = (await user(`select select_catalog_source('${p}',${payload}) id`))
+    .rows[0].id as string;
+  await user(`select set_source_state('${p}','${id}','paused')`);
+  await user(`select select_catalog_source('${p}',${payload})`);
+  expect(
+    (
+      await db.query(
+        `select enabled from project_subscriptions s join rss_feeds f on f.id=s.feed_id where f.source_id='${id}' and project_id='${p}'`,
+      )
+    ).rows[0].enabled,
+  ).toBe(false);
+  const renamed = {
+    ...source,
+    name: "Renamed",
+    url: "https://example.com/new",
+  };
+  expect(
+    (
+      await user(
+        `select select_catalog_source('${p}','${JSON.stringify(renamed)}') id`,
+      )
+    ).rows[0].id,
+  ).toBe(id);
+  await user(`select set_source_state('${p}','${id}','unfollowed')`);
+  await user(`select select_catalog_source('${p}',${payload})`);
+  expect(
+    (
+      await db.query(
+        `select followed from project_subscriptions s join rss_feeds f on f.id=s.feed_id where f.source_id='${id}' and project_id='${p}'`,
+      )
+    ).rows[0].followed,
+  ).toBe(false);
+  await expect(
+    user(`select select_catalog_source('${p}',${payload})`, other),
+  ).rejects.toThrow();
+  expect(
+    (
+      await db.query(
+        `select count(*)::int n from sources where catalog_id='official-test'`,
+      )
+    ).rows[0].n,
+  ).toBe(1);
+});
+it("counts a deep deduplicated period, paginates examples and isolates tuning labels from decisions", async () => {
+  await db.exec(`insert into ingestion_candidates(project_id,owner_id,url,title,created_at,route,status,deferred,original_acquisition) select '${p}','${owner}','https://example.com/calibration/'||g,'Example '||g,'2026-01-10',case when g%2=0 then 'outside_scope' else 'pending' end,case when g<=30 then 'rejected' else 'pending' end,g between 31 and 40,jsonb_build_object('title','Example '||g) from generate_series(1,130)g;
+ insert into ingestion_candidates(project_id,owner_id,url,title,created_at,route) values('${p}','${owner}','https://example.com/calibration/1','Repeated URL','2026-01-11','pending'),('${p2}','${owner}','https://example.com/calibration/1','Other project','2026-01-10','pending'),('${p}','${owner}','https://example.com/upper-bound','Excluded at upper','2026-02-01','pending');`);
+  type W = {
+    collected: number;
+    dismissed: number;
+    deferred: number;
+    items: { id: string; status: string }[];
+    has_more: boolean;
+    sample_population: number;
+  };
+  let w = (
+    await user(`select calibration_window('${p}','2026-01-01','2026-02-01') w`)
+  ).rows[0].w as W;
+  expect(w.collected).toBe(130);
+  expect(w.dismissed).toBe(30);
+  expect(w.deferred).toBe(10);
+  const ids = w.items.map((c) => c.id);
+  while (w.has_more) {
+    w = (
+      await user(
+        `select calibration_window('${p}','2026-01-01','2026-02-01',null,'${w.items.at(-1)!.id}') w`,
+      )
+    ).rows[0].w as W;
+    ids.push(...w.items.map((c) => c.id));
+  }
+  expect(new Set(ids).size).toBe(130);
+  const c = ids[0],
+    before = (
+      await db.query(
+        `select status,route,deferred from ingestion_candidates where id='${c}'`,
+      )
+    ).rows;
+  await user(`select save_tuning_example('${p}','${c}',true,true)`);
+  expect(
+    (
+      await db.query(
+        `select status,route,deferred from ingestion_candidates where id='${c}'`,
+      )
+    ).rows,
+  ).toEqual(before);
+  await expect(
+    user(`select save_tuning_example('${p}','${c}',false,false)`),
+  ).rejects.toThrow(/changed/);
+  await expect(
+    user(`select save_tuning_example('${p2}','${c}',false,false)`),
+  ).rejects.toThrow(/unavailable/);
+  await expect(
+    user(`select calibration_window('${p}','2026-01-01','2026-02-01')`, other),
+  ).rejects.toThrow();
+  await expect(
+    user(`select calibration_window('${p}','2026-01-01','2026-12-01')`),
+  ).rejects.toThrow(/90 days/);
+  const sample = (
+    await user(
+      `select calibration_window('${p}','2026-01-01','2026-02-01',null,null,true) w`,
+    )
+  ).rows[0].w as W;
+  expect(sample.items).toHaveLength(10);
+  expect(sample.sample_population).toBe(130);
+  expect(
+    (await user("select * from tuning_examples", other)).rows,
+  ).toHaveLength(0);
+  await expect(user(`update tuning_examples set useful=false`)).rejects.toThrow(
+    /permission/,
+  );
+});
 it("paginates deep changes and advances only a captured boundary with stale-tab protection", async () => {
   await db.exec(
     `insert into research_history(project_id,owner_id,object_id,object_type,after_state) select '${p}','${owner}','${q}','research_questions',jsonb_build_object('id','${q}','title','Edit '||g) from generate_series(1,130)g`,
@@ -88,6 +209,13 @@ it("validates saved views and snapshots only selected same-project research", as
   await user(
     `select save_working_view('${p}','${id}','Last week','articles','{"period":"7","order":"oldest"}')`,
   );
+  await user(
+    `select save_working_view('${p}','${id}','Last week','articles','{"period":"7","order":"oldest"}')`,
+  );
+  expect(
+    (await db.query(`select count(*)::int n from saved_views where id='${id}'`))
+      .rows[0].n,
+  ).toBe(1);
   await expect(
     user(
       `select save_working_view('${p}','${id}','Overwrite','articles','{}')`,
@@ -108,8 +236,16 @@ it("validates saved views and snapshots only selected same-project research", as
   );
   const packet = (
     await user(`select question_packet('${p}','${q}',array['${a}']::uuid[]) p`)
-  ).rows[0].p as { links: { note: string }[] };
+  ).rows[0].p as { links: { note: string; article_revision: string }[] };
   expect(packet.links[0].note).toBe("Question-specific");
+  expect(packet.links[0].article_revision).toMatch(/^[a-f0-9]{32}$/);
+  await db.exec(`update articles set title='Metadata edit' where id='${a}'`);
+  const changed = (
+    await user(`select question_packet('${p}','${q}',array['${a}']::uuid[]) p`)
+  ).rows[0].p as typeof packet;
+  expect(changed.links[0].article_revision).not.toBe(
+    packet.links[0].article_revision,
+  );
   await expect(user(`select question_packet('${p2}','${q}')`)).rejects.toThrow(
     /unavailable/,
   );

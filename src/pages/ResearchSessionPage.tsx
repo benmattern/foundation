@@ -207,7 +207,10 @@ function Session({ id }: { id: string }) {
                   }
                   const c = await questionChoices(id, nextCursor);
                   setCursor(nextCursor);
-                  setChoices({ ...choices, links: [...choices.links, ...c.links] });
+                  setChoices({
+                    ...choices,
+                    links: [...choices.links, ...c.links],
+                  });
                   if (!c.links.length) setNotice("No more evidence choices.");
                 })
               }
@@ -221,7 +224,7 @@ function Session({ id }: { id: string }) {
               <label className="flex min-h-11 gap-3" key={f.id}>
                 <input
                   type="checkbox"
-                    disabled={!findings.includes(f.id)&&findings.length>=20}
+                  disabled={!findings.includes(f.id) && findings.length >= 20}
                   checked={findings.includes(f.id)}
                   onChange={(e) =>
                     setFindings((a) =>
@@ -235,7 +238,27 @@ function Session({ id }: { id: string }) {
               </label>
             ))}
           </fieldset>
-          {!!choices.findings.length&&<Button disabled={busy} onClick={()=>void act(async()=>{const c=await questionChoices(id,null,choices.findings.at(-1)!.id);setChoices({...choices,findings:[...choices.findings,...c.findings]});if(!c.findings.length)setNotice('No more findings.');})}>More finding choices</Button>}
+          {!!choices.findings.length && (
+            <Button
+              disabled={busy}
+              onClick={() =>
+                void act(async () => {
+                  const c = await questionChoices(
+                    id,
+                    null,
+                    choices.findings.at(-1)!.id,
+                  );
+                  setChoices({
+                    ...choices,
+                    findings: [...choices.findings, ...c.findings],
+                  });
+                  if (!c.findings.length) setNotice("No more findings.");
+                })
+              }
+            >
+              More finding choices
+            </Button>
+          )}
           <Button disabled={busy} onClick={() => void act(assemble)}>
             Assemble / regenerate selected preview
           </Button>
@@ -261,7 +284,9 @@ function Session({ id }: { id: string }) {
                     "unknown"}
                   <br />
                   Project kept: {l.article?.created_at ?? "unavailable"}
-                  <br/>Collected into Inbox: {l.collected_at??'unknown / manually added'}
+                  <br />
+                  Collected into Inbox:{" "}
+                  {l.collected_at ?? "unknown / manually added"}
                   <br />
                   Link snapshot captured:{" "}
                   {l.article_snapshot.captured_at ?? "unknown"}
@@ -336,14 +361,18 @@ function Session({ id }: { id: string }) {
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
           />
-          <iframe
-            title="Print-friendly brief preview"
-            sandbox=""
-            className="h-96 w-full bg-white"
-            srcDoc={briefHtml(draft)}
-          />
+          <section
+            aria-label="Print-friendly brief preview"
+            className="max-h-96 overflow-auto bg-white p-6 text-slate-900"
+          >
+            <pre className="mx-auto max-w-[75ch] whitespace-pre-wrap break-words font-sans leading-relaxed">
+              {draft}
+            </pre>
+          </section>
           <div className="flex flex-wrap gap-3">
-            <Button disabled={busy} onClick={()=>void act(assemble)}>Regenerate brief preview</Button>
+            <Button disabled={busy} onClick={() => void act(assemble)}>
+              Regenerate brief preview
+            </Button>
             <Button
               disabled={busy}
               onClick={() => void act(() => download(false))}

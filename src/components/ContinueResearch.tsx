@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { sessionWindow, saveSession, getWorkingViews } from "../services/sessionService";
-import type { WorkingView } from '../types/session';
+import {
+  sessionWindow,
+  saveSession,
+  getWorkingViews,
+} from "../services/sessionService";
+import type { WorkingView } from "../types/session";
 import type { SessionWindow } from "../types/session";
 import { Button } from "./ui/Button";
 export function ContinueResearch() {
   const [window, setWindow] = useState<SessionWindow | null>(null),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
-  const [views,setViews]=useState<WorkingView[]>([]);
+  const [views, setViews] = useState<WorkingView[]>([]);
   async function refresh() {
     try {
       setWindow(await sessionWindow());
@@ -19,7 +23,13 @@ export function ContinueResearch() {
   }
   useEffect(() => {
     let active = true;
-    getWorkingViews().then(v=>{if(active)setViews(v.slice(0,5));}).catch(e=>{if(active)setError(String(e));});
+    getWorkingViews()
+      .then((v) => {
+        if (active) setViews(v.slice(0, 5));
+      })
+      .catch((e) => {
+        if (active) setError(String(e));
+      });
     sessionWindow()
       .then((w) => {
         if (active) setWindow(w);
@@ -34,7 +44,20 @@ export function ContinueResearch() {
   return (
     <section className="mb-6 space-y-3 rounded-xl border border-slate-700 p-4">
       <h2 className="text-2xl">Continue research</h2>
-      {!!views.length&&<div>Saved views: {views.map(v=><Link className="mr-4 text-blue-300" key={v.id} to={`/${v.surface}?${new URLSearchParams(v.filters)}`}>{v.name}</Link>)}</div>}
+      {!!views.length && (
+        <div>
+          Saved views:{" "}
+          {views.map((v) => (
+            <Link
+              className="mr-4 text-blue-300"
+              key={v.id}
+              to={`/${v.surface}?${new URLSearchParams(v.filters)}`}
+            >
+              {v.name}
+            </Link>
+          ))}
+        </div>
+      )}
       {error && <p role="alert">{error}</p>}
       {!window && !error && <p>Loading research checkpoint…</p>}
       {window && (

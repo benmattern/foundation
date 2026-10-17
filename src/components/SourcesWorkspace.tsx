@@ -18,6 +18,7 @@ import { feedHealth } from "../lib/projectWorkflow";
 import { SourceSetupForm } from "./SourceSetupForm";
 import { SourceFeedCard } from "./SourceFeedCard";
 import { SourceCatalog } from "./SourceCatalog";
+import { SourceCoverage } from "./SourceCoverage";
 import { Subscriptions } from "./Subscriptions";
 import { PageHeader } from "./PageHeader";
 import { Dialog } from "./ui/Dialog";
@@ -120,6 +121,7 @@ export function SourcesWorkspace() {
               ["following", "Following"],
               ["discover", "Discover"],
               ["saved", "Your saved sources"],
+              ["coverage", "Coverage and calibration"],
             ].map(([value, label]) => (
               <Button
                 key={value}
@@ -203,6 +205,14 @@ export function SourcesWorkspace() {
         >
           This source could not be found in your workspace.
         </EmptyState>
+      ) : view === "coverage" && !id ? (
+        <SourceCoverage
+          runs={data.runs}
+          sources={data.sources}
+          feeds={data.feeds}
+          subscriptions={data.subscriptions}
+          states={data.states}
+        />
       ) : view === "discover" && !id ? (
         <SourceCatalog
           feeds={data.feeds}

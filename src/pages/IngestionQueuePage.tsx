@@ -71,6 +71,8 @@ export default function IngestionQueuePage() {
   const [result, setResult] = useState<Result | null>(null);
   const [sources, setSources] = useState<Source[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
+  const [sourcesLoaded, setSourcesLoaded] = useState(false),
+    [tagsLoaded, setTagsLoaded] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selection, setSelection] = useState<{ key: string; ids: string[] }>({
     key: "",
@@ -113,14 +115,20 @@ export default function IngestionQueuePage() {
     let active = true;
     getSources()
       .then((data) => {
-        if (active) setSources(data);
+        if (active) {
+          setSources(data);
+          setSourcesLoaded(true);
+        }
       })
       .catch((error) => {
         if (active) setError(String(error));
       });
     getTags()
       .then((data) => {
-        if (active) setTags(data);
+        if (active) {
+          setTags(data);
+          setTagsLoaded(true);
+        }
       })
       .catch((error) => {
         if (active) setError(String(error));
@@ -279,7 +287,18 @@ export default function IngestionQueuePage() {
   return (
     <>
       <WorkingViews surface="ingestion" />
-      {((filters.source&&filters.source!=='all'&&sources.length&&!sources.some(s=>s.id===filters.source))||(filters.tag&&tags.length&&!tags.some(t=>t.id===filters.tag)))&&<p role="alert">A saved source or tag is unavailable. Clear or edit the view; its filter has not been broadened.</p>}
+      {((filters.source &&
+        filters.source !== "all" &&
+        sourcesLoaded &&
+        !sources.some((s) => s.id === filters.source)) ||
+        (filters.tag &&
+          tagsLoaded &&
+          !tags.some((t) => t.id === filters.tag))) && (
+        <p role="alert">
+          A saved source or tag is unavailable. Clear or edit the view; its
+          filter has not been broadened.
+        </p>
+      )}
       <PageHeader
         title="Inbox"
         description="Incoming material awaits your review. Keeping adds it to Library."

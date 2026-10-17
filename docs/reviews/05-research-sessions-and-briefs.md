@@ -1,7 +1,7 @@
-﻿# Research sessions and briefs: implementation review
+# Research sessions and briefs: implementation review
 
 Implemented locally on `docs/next-enhancements-draft`, 2026-10-16 (checks continued
-into October 17 UTC). Baseline `07ea5e8`; implementation is the dedicated Milestone
+into October 17 UTC). Baseline `07ea5e8`; implementation commit is `2c8f2b0`, the dedicated Milestone
 05 commit in this branch. No hosted migration, merge or deployment.
 
 ## Delivered and verified
@@ -33,7 +33,7 @@ into October 17 UTC). Baseline `07ea5e8`; implementation is the dedicated Milest
   Download checks the packet again and requires regeneration if research changed.
 - [x] Markdown and standalone print-friendly HTML download locally. HTML previews
   the exact draft as escaped preformatted text, with UTF-8, no scripts, external
-  assets or account credentials, restrictive CSP and sandboxed preview. Open HTML
+  assets or account credentials, restrictive CSP and inert React text preview. Open HTML
   and use browser Print / Save as PDF. Markdown syntax remains visibly literal;
   no Markdown renderer dependency was added.
 - [x] Existing regression checks, new SQL/export tests and browser journey pass.
@@ -43,12 +43,12 @@ into October 17 UTC). Baseline `07ea5e8`; implementation is the dedicated Milest
 Clean npm ci: 275 packages, zero vulnerabilities. Lint and production build pass.
 Vitest: **64 tests / 14 files passed**. Browser: **9 journeys passed**, including
 checkpoint, saved-filter reopening, comparison-note change, stale export detection,
-keyboard regeneration, HTML download and iframe draft-content verification.
+keyboard regeneration, HTML download/content and inline draft verification.
 Native PostgreSQL: **12 scenario groups passed**, including the checkpoint race.
 Snapshots under ignored artifacts.local/sessions inspected at 1440 and 390px;
-no horizontal overflow. The sandboxed cross-origin iframe can appear white in a
-full-page headless screenshot; its actual text is independently asserted.
-Final refinement and Edge checks are recorded in the final implementation handoff.
+no horizontal overflow. The final inline preview renders inert document text,
+matching the standalone HTML text, without an iframe or remote assets.
+All three Edge Function type checks pass. Final refinement results are recorded below.
 
 Migration **015** is additive: research heads/change journal, sessions and saved
 views; guarded RPCs, explicit privileges and RLS. Existing audit rows are backfilled

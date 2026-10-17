@@ -28,7 +28,8 @@ export type WorkingView = {
   version: number;
 };
 export type PacketLink = QuestionArticle & {
-  collected_at?: string|null;
+  article_revision?: string | null;
+  collected_at?: string | null;
   article: Article | null;
   source: string | null;
   entities: string[];

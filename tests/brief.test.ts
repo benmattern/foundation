@@ -60,6 +60,9 @@ it("deduplicates references, preserves Unicode, unavailable snapshots, prose and
   expect(md).toContain("Original acquisition excerpt");
   expect(md).toContain('"version": 3');
   expect(packetVersions({ ...p, as_of: "later" })).toBe(packetVersions(p));
+  expect(packetVersions({ ...p, citation_availability: { a: true } })).not.toBe(
+    packetVersions({ ...p, citation_availability: { a: false } }),
+  );
 });
 it("exports inert self-contained HTML even after malicious draft editing", () => {
   const html = briefHtml(

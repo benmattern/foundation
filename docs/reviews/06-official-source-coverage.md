@@ -1,21 +1,112 @@
 # Official source coverage and intake calibration: implementation review
 
-Status: approved assignment; implementation not started by this documentation commit.
-Owner approval: 2026-10-16. Baseline: 07ea5e85617d589fba4e3e3a278068cfe25c181d.
-Brief: [Milestone 06](../milestones/06-official-source-coverage.md).
+Implemented locally on `docs/next-enhancements-draft` after Milestone 05 commit
+`2c8f2b0` passed local acceptance. Review date: 2026-10-17 UTC (October 16 local).
+No hosted mutation, merge, deployment, paid service or outbound delivery.
 
-## Required completion handoff
+## Acceptance results
 
-Replace this status after implementation. Record branch/commit, delivered
-behavior, migration/upgrade implications, tests and exact results, desktop/mobile
-visual inspection, demo steps, material deviations, known limits and remaining
-hosted acceptance. Mark every acceptance criterion using actual evidence.
+- [x] Ten official publisher records, preserving the original two, overlap three
+  optional packs: Taiwan/Indo-Pacific, semiconductors/supply chain, economic policy.
+  Five advertised RSS/Atom endpoints parsed successfully with the actual application
+  parser. Five entries are explicitly manual-only; no guessed endpoint is enabled.
+- [x] Preview counts and individual selection precede adoption. Stable catalog IDs
+  reuse renamed/URL-edited records. SQL tests and a concurrent retry test prove
+  deduplication; pack adoption retains existing Pause/Unfollow and feed overrides.
+  Users resume existing decisions explicitly through source controls.
+- [x] Manual-only, blocked and verification older than 90 days have distinct labels.
+  Listing evidence, date, language, region, topics, fields, perspective and limits
+  are visible. Automatic collection still reports actual feed health, never the
+  catalog verification date as ongoing success.
+- [x] Sources → Coverage and calibration shows chosen pack labels, current project
+  state, last attempt/success, persistent consecutive failure count, recent error
+  sample and configuration gaps. No credibility ranking or completeness claim.
+- [x] Server counts are project/owner scoped over [from, until), at most 90 days.
+  Acquisition identity (fallback exact URL) is counted once within that period.
+  Current stored routing, current Keep/Dismiss/Duplicate/pending decisions and Later
+  are separate dimensions. Reviewed keep rate = Keep / (Keep + Dismiss), excluding
+  unreviewed/Later/Duplicate. It is not recall, truth or investment performance.
+- [x] Stable candidate-ID cursors page 25 examples, independent of audit/run samples.
+  Requested samples page ten outside-scope OR relevance <=1 examples, including
+  unscored fallback-zero items. Population, size and deterministic convenience
+  selection are disclosed; neither random nor representative sampling is claimed.
+- [x] Useful/Not useful and held-out labels are independently revision guarded.
+  They never change the original acquisition, review state, routing or evidence.
+  First recorded and latest stored rule results are inspectable alongside current
+  project/feed versions. A proposed project draft applies feed overrides, warns
+  about useful examples it would exclude, and withholds reserved rows. Reused
+  examples are explicitly tuning data. Only explicit Save changes future rules;
+  no automatic reclassification, source removal or rule edits occur.
+- [x] Deterministic SQL, browser and synthetic feed-fixture checks pass; live checks
+  are separate from CI. Deep pagination, date boundary, fallback duplicate URL,
+  other-project intake, foreign owner, direct write and stale label tests pass.
 
-Record current primary-publisher listing evidence and verification dates for every
-new catalog endpoint. Separate live availability checks from deterministic CI.
-Verify calibration denominators, sampling disclosure, rule-version handling and
-project isolation; do not claim keep rate measures recall or truth.
+## Primary publisher verification
 
-No schema, feature implementation, hosted mutation or deployment is established
-by this review template. Distinguish local verification from real-account
-hosted operation and preserve previously recorded acceptance gaps.
+All checks below were performed during implementation on **2026-10-17 UTC**.
+The catalog is in `src/lib/sourceCatalog.ts`; exact automatic endpoint URLs are
+stored there and linked below. Browser search/listing inspection established the
+publisher links; bounded Node fetches used the actual application parser. No
+publisher article bodies are committed as test fixtures.
+
+| Stable ID | Primary listing / official page | Endpoint result and subject/access limits |
+|---|---|---|
+| us-fed-press | [Fed feeds](https://www.federalreserve.gov/feeds/feeds.htm) | [RSS](https://www.federalreserve.gov/feeds/press_all.xml): HTTP 200, 20 usable/dated/described items; broad US monetary/regulatory releases. |
+| uk-mod | [UK Defence](https://www.gov.uk/government/organisations/ministry-of-defence) | [Atom](https://www.gov.uk/government/organisations/ministry-of-defence.atom): HTTP 200, 20 usable/dated/described items; broad UK institutional defence perspective, regional relevance varies. |
+| tw-mofa-news | [MOFA news Open data RSS link](https://en.mofa.gov.tw/News.aspx?n=1eaddcfd4c6ec567&sms=) | [RSS](https://en.mofa.gov.tw/OpenData.aspx?SN=07564A7F01D47BAD): HTTP 200, 50 usable/dated/described items, 150149 bytes; English government statements/responses. |
+| tw-mof-news | [Taiwan Finance RSS listing](https://www.mof.gov.tw/eng/Rss) | [RSS](https://www.mof.gov.tw/eng/Rss/f48d641f159a4866b1d31c0916fbcc71): HTTP 200, first 50 of 330 usable/dated/described items, 844257 bytes. Near the 1 MiB cap; broad fiscal/trade coverage, not dedicated chip reporting. Truncation is an expected documented warning. |
+| eu-ecb-press | [ECB feeds](https://www.ecb.europa.eu/home/html/rss.en.html) | [RSS](https://www.ecb.europa.eu/rss/press.html): HTTP 200, 15 usable/dated items, **zero descriptions**; 5752 bytes. Macroeconomic context; missing excerpts stay unknown. |
+| tw-cbc | [CBC English press releases](https://www.cbc.gov.tw/en/lp-448-2.html) | Official listing inspected; manual-only, no supported endpoint verified. Taiwan monetary authority perspective. |
+| tw-tsmc | [TSMC investor results](https://investor.tsmc.com/english/quarterly-results), [press archive](https://pr.tsmc.com/english/news-archives) | Official pages inspected; manual-only, no supported endpoint verified. Company disclosures, not independent industry reporting. |
+| tw-umc | [UMC press releases](https://www.umc.com/en/News/press_release) | Official listing inspected; manual-only, no supported endpoint verified. Company corporate/investor perspective. |
+| jp-meti | [METI RSS documentation](https://www.meti.go.jp/english/rss/index.html) | Official indexed documentation found; direct listing fetch **403**. Manual-only, no endpoint promoted and no block bypass. Japan industrial/trade policy perspective. |
+| us-bis | [BIS releases](https://media.bis.gov/news-updates/all-press-releases), [official semiconductor release](https://www.bis.gov/press-release/commerce-strengthens-export-controls-restrict-chinas-capability-produce-advanced-semiconductors-military) | Official material inspected; manual-only, no supported endpoint verified. US export-control institutional perspective. |
+
+English is the selected listing language, not a promise of full parallel-language
+coverage. No accounts, payments or new subscriptions are required. No numeric
+feed-specific polling rate was found in the inspected listings; retain existing
+five-minute scheduling, validators/backoff and publisher restrictions. GOV.UK
+[reuse guidance](https://www.gov.uk/help/reuse-govuk-content) points to OGL and warns
+of rate limiting. ECB [terms](https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html)
+require accurate attribution and identifying modifications, with separate authored-
+paper permissions. Other sites/documents retain their own terms; this catalog is
+not a license to redistribute full articles. The export uses analyst prose and
+selected attributed passages.
+
+## Verification and maintenance
+
+`npm run check:catalog` passed at **04:17:13–04:17:16 UTC**, five HTTP 200 feeds.
+It fetches only the five explicitly configured endpoints, sequentially, with a
+15-second timeout and streamed 1 MiB cap, continues independent failures and exits
+unsuccessfully if any endpoint fails. It prints metadata, not full feed content.
+This opt-in check is separate from deterministic CI; publisher downtime is not
+an application regression. Recheck listings and terms before changing endpoints;
+retain stable IDs, refresh verification metadata only after actual checks, and
+keep blocked/unverified sources manual. Revisit at least every 90 days and when
+health shows recurring failure. In particular monitor the large Finance feed.
+
+At local acceptance: **69 tests / 15 files**, **13 independent PostgreSQL scenario
+groups**, clean production build; targeted new browser acceptance passed. Final
+whole-suite browser/lint and responsive results are recorded in the branch's final
+handoff below. Synthetic fixtures test feed shapes and missing descriptions without
+external requests; actual catalog checks establish availability only at check time.
+
+Migration **016** adds catalog identity/membership and tuning labels plus authorized
+server count/page RPCs. It preserves IDs, research, rules and source decisions.
+No historical rule version is fabricated if no evaluation was recorded. Period
+counts use current decisions and current routing; they do not reconstruct status
+at the period end. Counts do not estimate collector misses or publisher completeness.
+
+## Demo and rollout boundary
+
+Discover → preview Semiconductors pack → select Finance and TSMC → adopt the subset.
+Coverage and calibration → inspect manual-only/health gaps → choose dates → request
+an outside-scope/low-ranked sample → label Useful → preview a draft that excludes
+that example → inspect warning. Reserve another example as held out and confirm
+it is not evaluated. Existing Keep/Dismiss decisions remain unchanged.
+
+Deployment is separate. Back up and rehearse additive migrations **015 then 016**
+before an authorized rollout. No Edge Function change is required. Existing real-
+account signed-in hosted acceptance remains unverified; local mocked browser and
+SQL-role evidence do not establish end-user Auth behavior. No owner password or
+private deployment files were used.

@@ -1,5 +1,40 @@
 # FOUNDATION Architecture
 
+## Local research sessions and official coverage — 2026-10-17 UTC
+
+Implemented locally, not deployed. Overview's ContinueResearch reads paginated
+server changes and advances checkpoints only explicitly, through a captured
+transactional upper bound and revision guard. Initial overview obtains an exact
+article count; the legacy detailed insights dataset loads only when expanded.
+WorkingViews composes validated project-scoped filter definitions with native
+Library/Inbox URLs, fixed dates and explicitly relative UTC periods.
+
+`/research/session?question=…` opens the existing question's bounded comparison,
+current-question selection and brief workflow. sessionService owns RPC access;
+one-statement question packets freeze selected versions and article fingerprints.
+brief helpers compose existing analyst prose, selected attributed passages and
+deduplicated references; availability changes block stale downloads. Inline preview
+renders draft text directly through React. Standalone HTML escapes all text, has
+a restrictive CSP, no scripts/remote assets/tokens and works with browser Print.
+Markdown syntax remains visible in the print document. Downloads are local only.
+
+Sources retains Discover/Following/saved controls and adds Coverage and calibration.
+sourceCatalog holds ten stable official identities and primary verification
+metadata; three overlapping optional packs select only explicit subsets. Existing
+source decisions/rules are retained. Five endpoints use the unchanged RSS/Atom
+collector; unverified/blocked publishers are manual-only. coverageService owns
+catalog adoption and bounded count/page/feedback RPCs. IntakeCalibration uses the
+existing rule editor/evaluator, applies feed overrides, excludes held-out examples
+and highlights useful examples lost by a proposed rule. Saving future rules is
+explicit and does not reclassify existing review decisions.
+
+Deterministic synthetic feed/SQL/browser fixtures never contact live Supabase or
+publishers. `npm run check:catalog` separately checks five endpoints with timeout
+and streamed size cap; external failure is not a CI regression. Coverage/error
+observations distinguish persistent feed health from the bounded recent-run sample.
+No AI, credibility inference, new connector framework or outward delivery is added.
+Migrations 015/016 are additive and local; see the new reviews for rollout limits.
+
 ## Selective intake and connected research - deployed, 2026-10-16
 
 Production migrations 012-014 extend the deployed 01/02 baseline. See the milestone reviews

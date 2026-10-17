@@ -1,10 +1,11 @@
 import { test, expect } from "@playwright/test";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { workflowFixture, login } from "./workflow-fixture";
 test("session checkpoint, saved browsing view, comparison note and safe frozen brief downloads", async ({
   page,
 }) => {
-  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
   const s = await workflowFixture(page);
   s.articles.push({
     id: "a",
@@ -85,12 +86,18 @@ test("session checkpoint, saved browsing view, comparison note and safe frozen b
   await expect(page.getByRole("status")).toContainText(
     "Research changed since assembly",
   );
-  const regenerated=page.waitForResponse(r=>r.url().endsWith('/question_packet'));
-  const regenerate=page.getByRole("button", { name: "Assemble / regenerate selected preview" });
+  const regenerated = page.waitForResponse((r) =>
+    r.url().endsWith("/question_packet"),
+  );
+  const regenerate = page.getByRole("button", {
+    name: "Assemble / regenerate selected preview",
+  });
   await regenerate.focus();
-  await regenerate.press('Enter');
+  await regenerate.press("Enter");
   expect((await regenerated).status()).toBe(200);
-  expect((await (await regenerated).json()).links[0].note).toBe('Specific challenge');
+  expect((await (await regenerated).json()).links[0].note).toBe(
+    "Specific challenge",
+  );
   await expect(page.getByLabel("Brief Markdown draft")).toHaveValue(
     /Specific challenge/,
   );
@@ -99,7 +106,17 @@ test("session checkpoint, saved browsing view, comparison note and safe frozen b
     .getByRole("button", { name: "Download HTML for Print / Save as PDF" })
     .click();
   expect((await download).suggestedFilename()).toBe("foundation-brief.html");
-  await expect(page.frameLocator('iframe[title="Print-friendly brief preview"]').locator('pre')).toContainText('Specific challenge');
+  const downloaded = readFileSync((await (await download).path())!, "utf8");
+  expect(downloaded).toContain("Specific challenge");
+  expect(downloaded).toContain("台灣");
+  expect(downloaded).not.toMatch(
+    /access_token|refresh_token|sb_publishable|<script/,
+  );
+  await expect(
+    page
+      .getByRole("region", { name: "Print-friendly brief preview" })
+      .locator("pre"),
+  ).toContainText("Specific challenge");
   mkdirSync("artifacts.local/sessions", { recursive: true });
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 1000 });

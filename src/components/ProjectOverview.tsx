@@ -1,4 +1,4 @@
-import { getArticles } from "../services/articleService";
+import { getArticleCount } from "../services/articleService";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -44,7 +44,7 @@ export function ProjectOverview() {
       getCollectionRuns(),
       queryCandidates({ status: "pending", route: "pending", page: 0 }),
       queryCandidates({ status: "pending", route: "outside_scope", page: 0 }),
-      getArticles(),
+      getArticleCount(),
     ])
       .then(([projects, subs, feeds, runs, pending, outside, articles]) => {
         if (!active) return;
@@ -57,7 +57,7 @@ export function ProjectOverview() {
             .size,
           pending: pending.count,
           outside: outside.count,
-          kept: articles.length,
+          kept: articles,
           checked: enabled.some((f) => !!f.last_checked_at),
           failed: health.some((h) => h.kind === "error"),
           running: health.some((h) => h.kind === "running"),

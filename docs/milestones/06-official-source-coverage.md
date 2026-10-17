@@ -1,6 +1,6 @@
 # Milestone 06: Official source coverage and intake calibration
 
-Status: approved implementation assignment, 2026-10-16.
+Status: implemented and verified locally; see [review results](../reviews/06-official-source-coverage.md). Not deployed.
 Prepared 2026-10-16. Baseline reviewed: 07ea5e85617d589fba4e3e3a278068cfe25c181d.
 Context: [next-enhancement proposals](../planning/next-enhancements.md).
 Sequence: implement after Milestone 05 local acceptance.

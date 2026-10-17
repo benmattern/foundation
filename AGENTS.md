@@ -13,7 +13,9 @@ Active approved implementation sequence (owner approval 2026-10-16):
 2. docs/milestones/06-official-source-coverage.md.
 Read docs/planning/next-enhancements.md for rationale. Complete 05 end to end
 and verify it, then continue to 06 without another routine planning-approval
-round. Neither is implemented by this documentation change.
+round. Both are now implemented and locally verified on
+`docs/next-enhancements-draft`; read their completed reviews before changing or
+restarting them. Hosted rollout remains separate from implementation.
 Record results in docs/reviews/05-research-sessions-and-briefs.md and
 docs/reviews/06-official-source-coverage.md; update STATUS, schema, architecture,
 decisions, backlog and recovery instructions to actual implementation.
