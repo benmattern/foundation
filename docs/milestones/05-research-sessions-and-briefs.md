@@ -1,6 +1,6 @@
-# Draft Milestone 05: Research sessions and evidence-backed briefs
+# Milestone 05: Research sessions and evidence-backed briefs
 
-Status: proposed, not approved for implementation.
+Status: approved implementation assignment, 2026-10-16.
 Prepared 2026-10-16. Baseline reviewed: 07ea5e85617d589fba4e3e3a278068cfe25c181d.
 Context: [next-enhancement proposals](../planning/next-enhancements.md).
 Prerequisite: preserve deployed 01-04; inspect actual code before implementation.
@@ -117,7 +117,7 @@ not each fetch every article/entity/history record. Server pagination and bounde
 query shape are part of this feature, not a new general search platform.
 Existing functionality and IDs remain intact; keep original evidence immutable.
 
-## Proposed acceptance
+## Acceptance criteria
 
 - [ ] Finish a session, make controlled research changes, return and see exactly
       those changes. Newly arriving changes are not swallowed by checkpoints.
@@ -132,5 +132,7 @@ Existing functionality and IDs remain intact; keep original evidence immutable.
       visual inspection pass. Test deep pagination beyond bounded history samples.
 - [ ] Provide one short demo and update docs with implementation/verification limits.
 
-Implementation and rollout are separate future authorization. Do not mark these
-criteria complete while this document is only a proposed brief.
+Implementation is approved. Complete and verify this milestone, update its review
+report, then continue to Milestone 06 without another routine approval round.
+Rollout remains separate; do not mark criteria complete merely because this brief
+exists. Report local versus hosted verification accurately.

@@ -1,12 +1,12 @@
 # FOUNDATION Backlog
 
-## Next-round proposals — draft, 2026-10-16
+## Approved next sequence — 2026-10-16
 
-The owner requested a draft while review time is limited. See
+The owner approved both packages; implement 05, verify locally, then 06. See
 [priorities and rationale](planning/next-enhancements.md).
-Proposed 05: return-to-research sessions, saved views, evidence comparison and
-cited brief export. Proposed 06: verified official source packs and rule calibration.
-Neither is approved for implementation or delivered. Milestones 01-04 remain
+Milestone 05: return-to-research sessions, saved views, evidence comparison and
+cited brief export. Milestone 06: verified official source packs and rule calibration.
+Both are approved for implementation but not yet delivered. Milestones 01-04 remain
 deployed per the evidence below; preserve their remaining acceptance boundary.
 
 

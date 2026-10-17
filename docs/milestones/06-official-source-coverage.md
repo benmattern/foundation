@@ -1,9 +1,9 @@
-# Draft Milestone 06: Official source coverage and intake calibration
+# Milestone 06: Official source coverage and intake calibration
 
-Status: proposed, not approved for implementation.
+Status: approved implementation assignment, 2026-10-16.
 Prepared 2026-10-16. Baseline reviewed: 07ea5e85617d589fba4e3e3a278068cfe25c181d.
 Context: [next-enhancement proposals](../planning/next-enhancements.md).
-Can be prioritized ahead of 05 if source coverage is the owner's immediate pain.
+Sequence: implement after Milestone 05 local acceptance.
 
 ## Outcome
 
@@ -72,7 +72,7 @@ For a selected source or project:
 Version/count queries run server-side with stable pagination and owner/project
 authorization. Do not present latest-100 history samples as complete period totals.
 
-## Proposed acceptance
+## Acceptance criteria
 
 - [ ] Every automatic catalog entry has current primary-source listing evidence,
       verified endpoint and honest content/access limits.
@@ -91,4 +91,5 @@ authorization. Do not present latest-100 history samples as complete period tota
 Keep endpoint tests bounded; use deterministic fixtures in CI and separate
 publisher live checks so external downtime does not masquerade as an app regression.
 No broad crawling, paid connectors, AI, full geography database or graph system.
-Implementation, new costs and hosted changes are not authorized by this draft.
+Implementation is approved. New costs, hosted changes, merge and deployment need
+corresponding authorization in the active task; prepare reviewable work first.

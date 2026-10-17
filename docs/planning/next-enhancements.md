@@ -1,9 +1,12 @@
-# Next enhancement proposals
+# Next enhancement sequence
 
-Status: draft for owner review; not implementation or deployment authorization.
+Status: Milestones 05 and 06 approved for implementation on 2026-10-16.
+Order: complete and locally verify 05, then continue to 06.
+This approval does not by itself authorize hosted mutation, merge or deployment.
 Prepared 2026-10-16 (America/Chicago).
 Reviewed main: 07ea5e85617d589fba4e3e3a278068cfe25c181d.
-Request: draft high-value enhancements while the owner has limited review time.
+Original request: draft high-value enhancements. The owner subsequently approved
+both packages. Treat this as the implementation sequence, not an open proposal.
 
 ## Recommendation
 
@@ -18,9 +21,9 @@ another major destination or AI dependency before exercising the current workflo
 | Then: 06 | Official source coverage and intake calibration | Find relevant official sources and understand why useful items are missed or buried | Small verified packs; no invented feeds or credibility scores |
 | Later | Optional AI pilot | Compare model-assisted work against the working manual baseline | Separate design decision; no current model/provider/budget commitment |
 
-These are proposed defaults so the owner can review a concrete plan later.
-Do not ask for field-by-field layout choices now, and do not start implementation
-merely because these documents exist.
+The owner approved both packages. Implement routine details independently and
+record consequential deviations. Do not stop at another generic plan or ask for
+field-by-field layout approval. Complete local acceptance for 05 before 06.
 
 ## Baseline evidence and gaps
 
@@ -88,9 +91,11 @@ walkthrough, not a burdensome approval exercise.
 - Large graph visualization, team roles and automatic outbound brief delivery.
 - An accuracy/credibility/confidence score inferred from keyword or publisher counts.
 
-## Review handoff
+## Implementation handoff
 
 Read [05](../milestones/05-research-sessions-and-briefs.md) and
-[06](../milestones/06-official-source-coverage.md) for scope and acceptance drafts.
-The owner can approve, reorder or trim these later. Deployment, hosted migrations,
-new costs or sending material to others are not authorized by this draft request.
+[06](../milestones/06-official-source-coverage.md) for scope and acceptance criteria.
+Update docs/reviews/05-research-sessions-and-briefs.md and
+ docs/reviews/06-official-source-coverage.md with implementation evidence.
+Deployment, hosted migrations, new costs or sending material to others are not
+authorized merely by this implementation handoff.
