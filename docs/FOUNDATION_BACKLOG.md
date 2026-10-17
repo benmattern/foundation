@@ -1,5 +1,15 @@
 # FOUNDATION Backlog
 
+## Next-round proposals — draft, 2026-10-16
+
+The owner requested a draft while review time is limited. See
+[priorities and rationale](planning/next-enhancements.md).
+Proposed 05: return-to-research sessions, saved views, evidence comparison and
+cited brief export. Proposed 06: verified official source packs and rule calibration.
+Neither is approved for implementation or delivered. Milestones 01-04 remain
+deployed per the evidence below; preserve their remaining acceptance boundary.
+
+
 ## Deployed sequence - 2026-10-16
 
 1. [Milestone 03](milestones/03-selective-intake.md): source-control cleanup,

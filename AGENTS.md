@@ -18,6 +18,14 @@ remaining real-account signed-in browser acceptance. Inspect code before changes
 Follow the user's active task. This handoff does not independently authorize
 merges, hosted mutations, deployment or use of account credentials.
 
+## Proposed next work (draft only)
+
+The owner requested drafting, not implementation. Read
+[the prioritized proposals](docs/planning/next-enhancements.md) and draft
+Milestones 05/06 for review. These do not supersede deployed 01-04 or authorize
+starting the next feature, hosted changes, merge or deployment. Keep unresolved
+signed-in acceptance explicit; do not infer user approval of an unreviewed draft.
+
 ## Product principles
 - FOUNDATION is a research platform. Taiwan, Pacific geopolitics, and
   semiconductors are the initial domain, not restrictions on the software.
