@@ -1,8 +1,8 @@
 # FOUNDATION Architecture
 
-## Local research sessions and official coverage — 2026-10-17 UTC
+## Deployed research sessions and official coverage — 2026-10-17 UTC
 
-Implemented locally, not deployed. Overview's ContinueResearch reads paginated
+Deployed via PR #5, merge e7991e0. Overview's ContinueResearch reads paginated
 server changes and advances checkpoints only explicitly, through a captured
 transactional upper bound and revision guard. Initial overview obtains an exact
 article count; the legacy detailed insights dataset loads only when expanded.
@@ -33,7 +33,8 @@ publishers. `npm run check:catalog` separately checks five endpoints with timeou
 and streamed size cap; external failure is not a CI regression. Coverage/error
 observations distinguish persistent feed health from the bounded recent-run sample.
 No AI, credibility inference, new connector framework or outward delivery is added.
-Migrations 015/016 are additive and local; see the new reviews for rollout limits.
+Migrations 015/016 are deployed and recorded in the ledger; see the new reviews for
+backup/rehearsal evidence and the remaining signed-in hosted acceptance boundary.
 
 ## Selective intake and connected research - deployed, 2026-10-16
 

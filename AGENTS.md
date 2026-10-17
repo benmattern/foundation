@@ -6,16 +6,16 @@ docs/FOUNDATION_BACKLOG.md, and docs/FOUNDATION_CONVENTIONS.md, then inspect
 the code relevant to the task. Use docs/FOUNDATION_DECISIONS.md and
 docs/FOUNDATION_SCHEMA.md for architectural and data context.
 
-Milestones 01 through 04 are deployed; their reviews document verification and
+Milestones 01 through 06 are deployed; their reviews document verification and
 remaining real-account hosted checks.
-Active approved implementation sequence (owner approval 2026-10-16):
+Completed approved implementation sequence (owner approval 2026-10-16):
 1. docs/milestones/05-research-sessions-and-briefs.md.
 2. docs/milestones/06-official-source-coverage.md.
-Read docs/planning/next-enhancements.md for rationale. Complete 05 end to end
-and verify it, then continue to 06 without another routine planning-approval
-round. Both are now implemented and locally verified on
-`docs/next-enhancements-draft`; read their completed reviews before changing or
-restarting them. Hosted rollout remains separate from implementation.
+Read docs/planning/next-enhancements.md for rationale. Both were implemented and
+verified in sequence, then deployed via PR #5 on 2026-10-17 UTC (merge e7991e0).
+Migrations 001–016 are recorded in production. Read the completed reviews before
+changing or restarting them; do not replay migrations. Real-account signed-in
+hosted browser acceptance remains separate from SQL/public browser verification.
 Record results in docs/reviews/05-research-sessions-and-briefs.md and
 docs/reviews/06-official-source-coverage.md; update STATUS, schema, architecture,
 decisions, backlog and recovery instructions to actual implementation.

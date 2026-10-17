@@ -1,6 +1,6 @@
 # FOUNDATION Architectural Decisions
 
-## Local 05/06 choices — 2026-10-17 UTC
+## Deployed 05/06 choices — 2026-10-17 UTC
 
 - Use transactional per-project counters, rather than wall clocks or a latest-100
   sample, for complete session changes. Explicit checkpoint CAS rejects stale tabs;
@@ -24,7 +24,8 @@
   and optional held-out rows. Withhold held-out rows from previews; label reused
   examples as tuning data. No measured recall or automatic rule/source changes.
 
-These choices are implemented locally; deployment is not part of this assignment.
+These choices were implemented and deployed under separate owner authorization;
+PR #5, merge e7991e0. Real-account signed-in hosted browser acceptance remains open.
 
 ## Accepted direction for Milestones 03/04 — 2026-10-16
 

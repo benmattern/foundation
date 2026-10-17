@@ -1,32 +1,33 @@
-## Local Milestones 05/06 implementation — 2026-10-17 UTC
+## Deployed Milestones 05/06 — 2026-10-17 UTC
 
-Milestones 05 and 06 are implemented locally on `docs/next-enhancements-draft` in
-that sequence. Milestone 05 acceptance was committed as `2c8f2b0`; subsequent
-coverage work also tightens view retry/schema handling, article fingerprints and
-initial overview loading. See [05 review](reviews/05-research-sessions-and-briefs.md)
-and [06 review](reviews/06-official-source-coverage.md) for exact behavior, tests,
-source evidence, demos and limits. Earlier deployed handoffs below remain the
-production record; these changes are **not deployed**.
+Milestones 05 and 06 are deployed through [PR #5](https://github.com/benmattern/foundation/pull/5),
+merge `e7991e091965ff82f8e8545cba0c64dde02ae470`, release head `dac9c1a`.
+[GitHub CI run 39002706427](https://github.com/benmattern/foundation/actions/runs/39002706427)
+passed every step. Render at https://foundation-ljfo.onrender.com serves assets
+byte-identical to the tested build; fourteen direct/refresh/auth-gate cases and
+desktop/mobile public checks pass without browser errors or failed requests.
 
-Continue research uses explicit transactional checkpoints and a paginated complete
-change journal. Saved Library/Inbox views are project scoped. Existing questions
-open bounded comparison and editable cited Markdown/standalone HTML brief exports.
-Ten official catalog records form optional overlapping packs; five feeds verified
-with the actual parser. Manual/blocked/stale entries are distinct. Sources now
-contains coverage observations, server-counted calibration and separate Useful/
-Not useful/held-out labels. Proposed rules preview against reused examples before
-explicit save; no AI, inferred confirmation or automatic review decisions.
+A fresh backup restored and upgraded with all 2,062 captured rows preserved across
+28 existing tables. Production migrations 015–016 committed atomically, preserving
+all 2,064 rows present at cutover (two normal collector-run rows arrived after backup).
+The ledger now includes 001–016. Do not replay migrations, reset data or reassign
+ownership. Hosted SQL checks cover checkpoint/CAS/view/brief/catalog/calibration
+behavior, owner/project isolation, direct writes and anonymous denial; all fictional
+verification writes rolled back. No Edge Function change was required; all three
+unchanged functions still reject anonymous POSTs with 401. The existing five-minute
+collector schedule remains active.
 
-Additive migrations 015 and 016 have not run on Supabase. Preserve the production
-001–014 ledger and existing owner/data. A future authorized rollout must back up,
-rehearse actual-schema upgrades, apply 015 then 016, release the frontend, and
-verify a real signed-in journey. No Edge Function change is required. The existing
-hosted signed-in acceptance gap remains; local mocks and SQL roles do not close it.
-Do not read private deployment files into tests or infer deployment permission.
+Research checkpoints, saved views, comparison, cited local brief downloads, optional
+official packs and calibration are released. See [05](reviews/05-research-sessions-and-briefs.md)
+and [06](reviews/06-official-source-coverage.md) reviews for demos and exact evidence.
+Real-account signed-in hosted browser acceptance remains unverified; public gates,
+SQL roles and mocked tests do not establish end-user Auth behavior. No password or
+user session was requested or created. Private backups/receipts remain ignored in
+.deployment.local/release05-06 and must never be printed, committed or used as tests.
 
 # FOUNDATION Recovery Prompt
 
-## Current deployed handoff - 2026-10-16
+## Previous deployed handoff - 2026-10-16
 
 Read AGENTS.md, current STATUS and updated [03](reviews/03-selective-intake.md)/
 [04](reviews/04-connected-research.md) reviews. Both milestones are deployed via

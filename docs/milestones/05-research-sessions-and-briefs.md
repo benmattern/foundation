@@ -1,6 +1,6 @@
 # Milestone 05: Research sessions and evidence-backed briefs
 
-Status: implemented and verified locally; see [review results](../reviews/05-research-sessions-and-briefs.md). Not deployed.
+Status: deployed via PR #5; see [review results](../reviews/05-research-sessions-and-briefs.md) for local and hosted verification boundaries.
 Prepared 2026-10-16. Baseline reviewed: 07ea5e85617d589fba4e3e3a278068cfe25c181d.
 Context: [next-enhancement proposals](../planning/next-enhancements.md).
 Prerequisite: preserve deployed 01-04; inspect actual code before implementation.
