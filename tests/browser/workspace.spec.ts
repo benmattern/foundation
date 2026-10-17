@@ -93,6 +93,20 @@ test("sign-in, project isolation, server search, bulk scope and recovery", async
         archived: false,
         rules,
       }));
+    } else if (url.pathname.endsWith("/rpc/session_window")) {
+      result = {
+        bound: 0,
+        reviewed: 0,
+        version: 0,
+        current_question: null,
+        first_visit: true,
+        items: [],
+        count: 0,
+        pending: 2,
+        later: 0,
+        cursor: 0,
+        has_more: false,
+      };
     } else if (url.pathname.endsWith("/rpc/search_candidates")) {
       const body = request.postDataJSON();
       const filtered = candidates.filter(
@@ -131,7 +145,11 @@ test("sign-in, project isolation, server search, bulk scope and recovery", async
     await route.fulfill({
       status: 200,
       json: result,
-      headers: { "access-control-allow-origin": "*", "content-range": "0-1/2" },
+      headers: {
+        "access-control-allow-origin": "*",
+        "access-control-expose-headers": "content-range",
+        "content-range": url.pathname.endsWith("/articles") ? "*/0" : "0-1/2",
+      },
     });
   });
   await page.goto("/ingestion");
@@ -150,6 +168,9 @@ test("sign-in, project isolation, server search, bulk scope and recovery", async
     0,
   );
   await page.getByLabel("Active project").selectOption(projects[1]);
+  await expect(
+    page.getByRole("heading", { name: "Project 2", exact: true }),
+  ).toBeVisible();
   await page.getByRole("link", { name: "Inbox", exact: true }).click();
   await expect(
     page.getByRole("checkbox", { name: "Project 2 item 1", exact: true }),

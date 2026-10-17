@@ -1,13 +1,14 @@
-import { saveSubscription, setSourceState } from "../services/projectService";
+import { useState } from "react";
+import {
+  sourceCatalog,
+  sourcePacks,
+  verificationStale,
+} from "../lib/sourceCatalog";
+import { selectCatalogSource } from "../services/coverageService";
 import type { RssFeed } from "../types/rssFeed";
 import type { Subscription } from "../types/project";
 import { Button } from "./ui/Button";
 import { Input, controlClass } from "./ui/Input";
-import { EmptyState } from "./ui/EmptyState";
-import { useState } from "react";
-import { sourceCatalog } from "../lib/sourceCatalog";
-import { enableCatalogFeed } from "../services/sourceService";
-
 export function SourceCatalog({
   onEnabled,
   feeds = [],
@@ -21,23 +22,74 @@ export function SourceCatalog({
   archived?: boolean;
   onAdd?: () => void;
 }) {
-  const [query, setQuery] = useState("");
-  const [region, setRegion] = useState("");
-  const [language, setLanguage] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState("");
+  const [query, setQuery] = useState(""),
+    [region, setRegion] = useState(""),
+    [language, setLanguage] = useState(""),
+    [pack, setPack] = useState(""),
+    [selected, setSelected] = useState<string[]>([]),
+    [busy, setBusy] = useState(false),
+    [message, setMessage] = useState("");
+  const visible = sourceCatalog.filter(
+    (s) =>
+      (!pack || s.packs.includes(pack)) &&
+      (!region || s.region === region) &&
+      (!language || s.language === language) &&
+      `${s.name} ${s.topics.join(" ")}`
+        .toLowerCase()
+        .includes(query.trim().toLowerCase()),
+  );
+  async function follow(ids: string[]) {
+    setBusy(true);
+    const outcomes: string[] = [];
+    for (const id of ids) {
+      const s = sourceCatalog.find((s) => s.id === id)!;
+      try {
+        await selectCatalogSource(s);
+        outcomes.push(
+          `${s.name}: selected. Existing pause/unfollow decisions and rules retained.`,
+        );
+      } catch (e) {
+        outcomes.push(`${s.name}: ${String(e)}`);
+      }
+    }
+    try {
+      await onEnabled();
+    } catch (e) {
+      outcomes.push(`Refresh failed: ${String(e)}`);
+    }
+    setMessage(outcomes.join("\n"));
+    setBusy(false);
+  }
   return (
-    <section className="space-y-3 rounded border border-slate-700 p-4 text-slate-300">
+    <section className="space-y-4 rounded-xl border border-slate-700 p-4">
       <h2 className="text-xl">Discover sources</h2>
       <p>
-        This small starter catalog covers US economics and UK defence, not
-        comprehensive regional coverage. Add other publishers and feeds
-        manually.
+        Optional official-source suggestions. Preview a pack, then select
+        individual publishers. No automatic subscription or claim of complete
+        coverage. Company and government releases represent their own
+        perspectives.
+      </p>
+      <label className="block">
+        Preview source pack
+        <select
+          className={controlClass}
+          value={pack}
+          onChange={(e) => setPack(e.target.value)}
+        >
+          <option value="">All packs / original entries</option>
+          {sourcePacks.map((p) => (
+            <option key={p}>{p}</option>
+          ))}
+        </select>
+      </label>
+      <p>
+        {visible.length} publisher records,{" "}
+        {visible.filter((s) => s.feedUrl).length} automatic feeds,{" "}
+        {visible.filter((s) => !s.feedUrl).length} manual-only.{" "}
+        {selected.length} selected across filters.
       </p>
       <Input
         label="Search catalog topics"
-        placeholder="Search publisher or topic"
-        className={controlClass}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
@@ -63,99 +115,104 @@ export function SourceCatalog({
           <option key={l}>{l}</option>
         ))}
       </select>
-      {sourceCatalog
-        .filter(
-          (s) =>
-            (!region || s.region === region) &&
-            (!language || s.language === language) &&
-            `${s.name} ${s.topics.join(" ")}`
-              .toLowerCase()
-              .includes(query.trim().toLowerCase()),
-        )
-        .map((source) => {
-          const feed = feeds.find((f) => f.feed_url === source.feedUrl);
-          const subscription = subscriptions.find(
-            (s) => s.feed_id === feed?.id,
-          );
-          const followed = !!subscription && subscription.followed !== false;
-          return (
-            <article
-              className="space-y-2 border-t border-slate-700 pt-3"
-              key={source.feedUrl}
+      <div className="flex flex-wrap gap-3">
+        <Button
+          disabled={busy || archived || !selected.length}
+          onClick={() => void follow(selected)}
+        >
+          Follow selected feeds / save manual sources ({selected.length})
+        </Button>
+        <Button onClick={() => setSelected([])}>Clear selection</Button>
+      </div>
+      {visible.map((s) => {
+        const feed = feeds.find((f) => f.feed_url === s.feedUrl),
+          sub = subscriptions.find((p) => p.feed_id === feed?.id),
+          followed = !!sub && sub.followed !== false;
+        return (
+          <article
+            key={s.id}
+            className="space-y-2 border-t border-slate-700 py-4"
+          >
+            <label className="flex min-h-11 items-center gap-3">
+              <input
+                type="checkbox"
+                checked={selected.includes(s.id)}
+                onChange={(e) =>
+                  setSelected((a) =>
+                    e.target.checked
+                      ? [...a, s.id]
+                      : a.filter((id) => id !== s.id),
+                  )
+                }
+              />
+              <span className="text-xl">{s.name}</span>
+            </label>
+            <p>
+              {s.topics.join(", ")} · {s.region} · {s.language}
+            </p>
+            <p>
+              {s.connector === "Manual"
+                ? "Manual-only — no automatic feed configured"
+                : `${s.connector} · available fields: ${s.fields.join(", ")}`}
+            </p>
+            <p>{s.limits}</p>
+            <p>Perspective: {s.perspective}</p>
+            <p>
+              Verified {s.verifiedOn} UTC{" "}
+              {verificationStale(s.verifiedOn)
+                ? "— STALE verification; recheck before relying on availability"
+                : ""}
+              . {s.check}
+            </p>
+            <details>
+              <summary>Access and use limits</summary>
+              <p>{s.use}</p>
+            </details>
+            <a
+              className="text-blue-300"
+              href={s.listedAt}
+              target="_blank"
+              rel="noreferrer"
             >
-              <h3>{source.name}</h3>
-              <p>
-                {source.topics.join(", ")} · {source.region} · {source.language}
-              </p>
-              <p>
-                {source.connector} · Metadata, excerpts and original links ·
-                Public feed, no login. Availability and health are shown in
-                Following after setup.
-              </p>
-              <a
-                href={source.listedAt}
-                target="_blank"
-                rel="noreferrer"
-                className="text-blue-300"
-              >
-                Publisher feed listing
-              </a>
-              <Button
-                className="ml-4"
-                disabled={busy || archived || followed}
-                onClick={async () => {
-                  setBusy(true);
-                  setMessage("");
-                  try {
-                    if (feed?.source_id && subscription?.followed === false)
-                      await setSourceState(feed.source_id, "following");
-                    else if (feed)
-                      await saveSubscription(
-                        feed.id,
-                        true,
-                        subscription?.rules ?? null,
-                        subscription?.rules ?? null,
-                      );
-                    else await enableCatalogFeed(source);
-                    await onEnabled();
-                    setMessage(
-                      `${source.name} followed in this project. Open Following to check for incoming items.`,
-                    );
-                  } catch (error) {
-                    setMessage(String(error));
-                  } finally {
-                    setBusy(false);
-                  }
-                }}
-              >
-                {followed
+              Publisher feed listing / official releases
+            </a>
+            <Button
+              className="ml-3"
+              disabled={busy || archived || followed}
+              onClick={() => void follow([s.id])}
+            >
+              {followed
+                ? sub.enabled
                   ? feed?.is_active
                     ? "Following"
                     : "Following - feed unavailable"
-                  : subscription
-                    ? "Resume following"
-                    : "Follow source"}
-              </Button>
-            </article>
-          );
-        })}
-      {!sourceCatalog.some(
-        (s) =>
-          (!region || s.region === region) &&
-          (!language || s.language === language) &&
-          (s.name + " " + s.topics.join(" "))
-            .toLowerCase()
-            .includes(query.trim().toLowerCase()),
-      ) && (
-        <EmptyState
-          title="No curated source matches"
-          action={onAdd && <Button onClick={onAdd}>Add source</Button>}
-        >
-          Try another topic or add a source you already use. This catalog is
-          deliberately small.
-        </EmptyState>
+                  : "Paused — retained"
+                : s.feedUrl
+                  ? "Follow source"
+                  : "Save manual source"}
+            </Button>
+            {sub?.followed === false && (
+              <p>
+                Unfollowed — retained. Use Following / saved source controls to
+                deliberately resume.
+              </p>
+            )}
+          </article>
+        );
+      })}
+      {!visible.length && (
+        <div>
+          <h3>No curated source matches</h3>
+          <p>
+            Try another filter or <Button onClick={onAdd}>Add source</Button>.
+          </p>
+        </div>
       )}
-      {message && <p role="status">{message}</p>}
+      {message && (
+        <p role="status" className="whitespace-pre-wrap">
+          {message}
+        </p>
+      )}
     </section>
   );
 }

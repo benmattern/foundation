@@ -25,6 +25,7 @@ import type { Source } from "../types/source";
 import type { Tag } from "../types/tag";
 
 export default function DashboardPage() {
+  const [insightsOpen, setInsightsOpen] = useState(false);
   const [sources, setSources] = useState<Source[]>([]);
   const [articles, setArticles] = useState<ArticleWithTags[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
@@ -33,6 +34,7 @@ export default function DashboardPage() {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
+    if (!insightsOpen) return;
     async function loadDashboardData() {
       try {
         const [sourceData, articleData, tagData, eventData] = await Promise.all(
@@ -58,7 +60,7 @@ export default function DashboardPage() {
     }
 
     loadDashboardData();
-  }, []);
+  }, [insightsOpen]);
 
   const eventListItems = toEventListItems(events);
   const dashboardMetrics = getDashboardMetrics({
@@ -76,7 +78,10 @@ export default function DashboardPage() {
   return (
     <>
       <ProjectOverview />
-      <details className="space-y-5">
+      <details
+        className="space-y-5"
+        onToggle={(e) => setInsightsOpen(e.currentTarget.open)}
+      >
         <summary>Research insights and events</summary>
         <PageHeader
           title="Research insights"

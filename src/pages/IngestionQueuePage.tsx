@@ -4,6 +4,8 @@ import { EmptyState } from "../components/ui/EmptyState";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { PageHeader } from "../components/PageHeader";
+import { WorkingViews } from "../components/WorkingViews";
+import { resolveView } from "../lib/workingViews";
 import { IngestionCandidateList } from "../components/IngestionCandidateList";
 import {
   IngestionCandidateReview,
@@ -60,7 +62,7 @@ export default function IngestionQueuePage() {
     source: params.get("source") ?? "all",
     importSource: params.get("import") ?? "all",
     tag: params.get("tag") ?? "",
-    since: params.get("since") ?? "",
+    since: resolveView(Object.fromEntries(params)).get("since") ?? "",
     until: params.get("until") ?? "",
     page: Math.max(0, Number(params.get("page")) || 0),
   };
@@ -69,6 +71,8 @@ export default function IngestionQueuePage() {
   const [result, setResult] = useState<Result | null>(null);
   const [sources, setSources] = useState<Source[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
+  const [sourcesLoaded, setSourcesLoaded] = useState(false),
+    [tagsLoaded, setTagsLoaded] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selection, setSelection] = useState<{ key: string; ids: string[] }>({
     key: "",
@@ -111,14 +115,20 @@ export default function IngestionQueuePage() {
     let active = true;
     getSources()
       .then((data) => {
-        if (active) setSources(data);
+        if (active) {
+          setSources(data);
+          setSourcesLoaded(true);
+        }
       })
       .catch((error) => {
         if (active) setError(String(error));
       });
     getTags()
       .then((data) => {
-        if (active) setTags(data);
+        if (active) {
+          setTags(data);
+          setTagsLoaded(true);
+        }
       })
       .catch((error) => {
         if (active) setError(String(error));
@@ -276,6 +286,19 @@ export default function IngestionQueuePage() {
   const count = result?.key === queryKey ? result.count : 0;
   return (
     <>
+      <WorkingViews surface="ingestion" />
+      {((filters.source &&
+        filters.source !== "all" &&
+        sourcesLoaded &&
+        !sources.some((s) => s.id === filters.source)) ||
+        (filters.tag &&
+          tagsLoaded &&
+          !tags.some((t) => t.id === filters.tag))) && (
+        <p role="alert">
+          A saved source or tag is unavailable. Clear or edit the view; its
+          filter has not been broadened.
+        </p>
+      )}
       <PageHeader
         title="Inbox"
         description="Incoming material awaits your review. Keeping adds it to Library."

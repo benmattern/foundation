@@ -8,15 +8,22 @@ docs/FOUNDATION_SCHEMA.md for architectural and data context.
 
 Milestones 01 through 04 are deployed; their reviews document verification and
 remaining real-account hosted checks.
-The owner approved the next two implementations on 2026-10-16:
-1. docs/milestones/03-selective-intake.md with docs/reviews/03-selective-intake.md.
-2. docs/milestones/04-connected-research.md with docs/reviews/04-connected-research.md.
-When assigned this sequence, implement 03 end to end, verify it, then continue
-to 04 without another routine planning-approval round. Both are now deployed via
-PR #3 (merge 849a09d); read their updated reviews for results, schema changes and
-remaining real-account signed-in browser acceptance. Inspect code before changes.
-Follow the user's active task. This handoff does not independently authorize
-merges, hosted mutations, deployment or use of account credentials.
+Active approved implementation sequence (owner approval 2026-10-16):
+1. docs/milestones/05-research-sessions-and-briefs.md.
+2. docs/milestones/06-official-source-coverage.md.
+Read docs/planning/next-enhancements.md for rationale. Complete 05 end to end
+and verify it, then continue to 06 without another routine planning-approval
+round. Both are now implemented and locally verified on
+`docs/next-enhancements-draft`; read their completed reviews before changing or
+restarting them. Hosted rollout remains separate from implementation.
+Record results in docs/reviews/05-research-sessions-and-briefs.md and
+docs/reviews/06-official-source-coverage.md; update STATUS, schema, architecture,
+decisions, backlog and recovery instructions to actual implementation.
+Make routine technical/layout choices independently. Report material deviations
+and test limits. Work on independently testable features if real-account hosted
+acceptance is unavailable; do not claim mocked tests establish live behavior.
+This instruction does not independently authorize merging, deployment, hosted
+data mutations, costs or sending material to others.
 
 ## Product principles
 - FOUNDATION is a research platform. Taiwan, Pacific geopolitics, and

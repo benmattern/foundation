@@ -1,5 +1,38 @@
 # FOUNDATION Schema
 
+## Local additions 015/016 — not deployed
+
+015 adds `research_heads` (transactional per-project sequence), immutable API-side
+`research_changes`, revision-guarded `research_sessions` and `saved_views`.
+Article inserts and research audit inserts allocate change IDs under the head row
+lock. Boundary reads wait for committed writers; explicit finishes retain later
+changes. Backfill covers all existing project audit rows as baseline. All tables
+enable RLS, revoke default browser writes/TRUNCATE and expose only intended RPCs.
+Only sessions/views have owner SELECT grants; changes are read through authorized
+50-row deterministic cursors. View filters validate surface/schema/references and
+support stable-request create retries, edit/delete revisions and fixed/relative dates.
+
+`question_choices` pages links/findings by ID; `question_packet` assembles one
+statement snapshot of at most six selected evidence links and twenty findings,
+including citation availability, article fingerprints and source/entity/event
+context. Export manifests stay local; no full export database or public reports.
+
+016 adds `sources.catalog_id` with owner-scoped uniqueness,
+`project_catalog_sources` (explicit selected topic/region labels), and revisioned
+`tuning_examples` (Useful/Not useful/held-out). Composite owner/project references,
+read-only owner RLS and guarded RPC grants apply. Catalog adoption serializes with
+source decisions before feed locks, reuses stable IDs and preserves existing states
+and overrides. Counts/pages deduplicate acquisition identity (fallback exact URL)
+within an authorized half-open collection period of at most 90 days. Page sizes
+25, or ten for disclosed convenience samples. First/current rule evaluations are
+shown without reconstructing unavailable history. Indexes support period/history
+lookups. No legacy IDs, original acquisition or research relationships are reset.
+
+Migrations **015 then 016** require an actual backup/upgrade rehearsal before a
+future authorized hosted rollout. Production remains on 001–014. See the
+[05](reviews/05-research-sessions-and-briefs.md) and
+[06](reviews/06-official-source-coverage.md) reviews for verification limits.
+
 ## Deployed migrations 012-014 - 2026-10-16
 
 Production ledger 001-014 verified. Fresh backup restore and production row/value

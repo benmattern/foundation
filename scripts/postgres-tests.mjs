@@ -405,6 +405,98 @@ try {
   console.log(
     "PASS: simultaneous create-request retries return one research object",
   );
+  // A boundary read waits behind an uncommitted research change. A later edit
+  // remains beyond that boundary even when Finish happens after its commit.
+  await a.query("begin");
+  await a.query("select save_question($1,$2)", [
+    p1,
+    JSON.stringify({ title: "Uncommitted session edit" }),
+  ]);
+  const windowRead = b.query("select session_window($1) as w", [p1]);
+  await waitsForLock(admin, b.processID);
+  await a.query("commit");
+  const window = (await windowRead).rows[0].w;
+  await a.query("select save_question($1,$2)", [
+    p1,
+    JSON.stringify({ title: "After captured boundary" }),
+  ]);
+  await b.query("select save_session($1,$2,$3)", [
+    p1,
+    window.version,
+    window.bound,
+  ]);
+  const after = (await a.query("select session_window($1) as w", [p1])).rows[0]
+    .w;
+  assert.equal(after.count, 2); // save_question records its insert and populated update
+  const finishes = await Promise.allSettled([
+    a.query("select save_session($1,$2,$3)", [p1, after.version, after.bound]),
+    b.query("select save_session($1,$2,$3)", [p1, after.version, after.bound]),
+  ]);
+  assert.equal(finishes.filter((r) => r.status === "fulfilled").length, 1);
+  assert.equal(
+    finishes.find((r) => r.status === "rejected").reason.code,
+    "40001",
+  );
+  console.log(
+    "PASS: session boundaries wait for committed writers, retain later edits and reject stale-tab finish",
+  );
+  const catalog = {
+    id: "concurrent-catalog",
+    name: "Fictional selected publisher",
+    url: "https://example.com/catalog-concurrency",
+    feedUrl: "https://example.com/catalog-concurrency/rss",
+    topics: ["trade"],
+    region: "Fictional",
+    language: "English",
+  };
+  const selected = await Promise.all([
+    a.query("select select_catalog_source($1,$2) id", [p1, catalog]),
+    b.query("select select_catalog_source($1,$2) id", [p1, catalog]),
+  ]);
+  assert.equal(selected[0].rows[0].id, selected[1].rows[0].id);
+  const catalogSource = selected[0].rows[0].id;
+  await a.query("begin");
+  await a.query("select set_source_state($1,$2,'paused')", [p1, catalogSource]);
+  const adoption = b.query("select select_catalog_source($1,$2)", [
+    p1,
+    catalog,
+  ]);
+  await waitsForLock(admin, b.processID);
+  await a.query("commit");
+  await adoption;
+  assert.equal(
+    (
+      await admin.query(
+        "select enabled from project_subscriptions s join rss_feeds f on f.id=s.feed_id where s.project_id=$1 and f.source_id=$2",
+        [p1, catalogSource],
+      )
+    ).rows[0].enabled,
+    false,
+  );
+  const tuningCandidate = (
+    await admin.query(
+      "select id from ingestion_candidates where project_id=$1 order by id limit 1",
+      [p1],
+    )
+  ).rows[0].id;
+  const labels = await Promise.allSettled([
+    a.query("select save_tuning_example($1,$2,true,false)", [
+      p1,
+      tuningCandidate,
+    ]),
+    b.query("select save_tuning_example($1,$2,false,true)", [
+      p1,
+      tuningCandidate,
+    ]),
+  ]);
+  assert.equal(labels.filter((r) => r.status === "fulfilled").length, 1);
+  assert.equal(
+    labels.find((r) => r.status === "rejected").reason.code,
+    "40001",
+  );
+  console.log(
+    "PASS: catalog selection retries deduplicate, concurrent Pause survives adoption and tuning labels reject stale edits",
+  );
 } finally {
   for (const client of connections) {
     await client.query("rollback").catch(() => {});

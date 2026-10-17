@@ -1,5 +1,31 @@
 # FOUNDATION Architectural Decisions
 
+## Local 05/06 choices — 2026-10-17 UTC
+
+- Use transactional per-project counters, rather than wall clocks or a latest-100
+  sample, for complete session changes. Explicit checkpoint CAS rejects stale tabs;
+  a captured upper bound leaves later commits new. Existing history is baseline.
+- Save browsing filters separately from intake rules. Fixed dates and relative UTC
+  periods have different stored semantics; missing references stay restrictive.
+- Extend existing questions with bounded selected comparison/brief packets. Freeze
+  object versions, article fingerprints and availability; do not silently merge
+  newer research into an edited draft. Export existing analyst text, with no AI.
+- Standalone HTML prints escaped preformatted draft text, including visible Markdown
+  syntax. React renders the same text inline. No renderer/PDF dependency, scripts,
+  external assets, credentials, sending or public hosting is required.
+- Curate ten stable official publisher records and three overlapping optional packs.
+  Five verified endpoints collect normally; five manual-only entries include blocked
+  METI documentation. No guessed feed or block bypass. Preserve existing decisions
+  when adopting a pack. Verification becomes visibly stale after 90 days.
+- Coverage describes chosen labels/configuration/availability, not completeness or
+  credibility. Keep rate uses only Keep + Dismiss decisions. Period totals describe
+  current decisions/routing for deduplicated acquisitions collected in that period.
+- Use deterministic disclosed convenience samples, independent usefulness labels
+  and optional held-out rows. Withhold held-out rows from previews; label reused
+  examples as tuning data. No measured recall or automatic rule/source changes.
+
+These choices are implemented locally; deployment is not part of this assignment.
+
 ## Accepted direction for Milestones 03/04 — 2026-10-16
 
 - Keep Discover as a curated catalog; simplify saved sources and move collection

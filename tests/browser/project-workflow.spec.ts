@@ -51,7 +51,7 @@ test("new project to source check to Keep to Library, with project switching and
   ).toContainText("0");
   await capture(page, "overview");
   await page.getByRole("link", { name: "Choose sources", exact: true }).click();
-  await page.getByLabel("Search catalog topics").fill("Taiwan");
+  await page.getByLabel("Search catalog topics").fill("not-a-curated-topic");
   await expect(
     page.getByText("No curated source matches", { exact: true }),
   ).toBeVisible();

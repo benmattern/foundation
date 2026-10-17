@@ -5,6 +5,11 @@ import type { RssFeed } from "../../src/types/rssFeed";
 import type { IngestionCandidate } from "../../src/types/ingestionCandidate";
 import type { CollectionRun } from "../../src/services/rssFeedService";
 import { sourceCatalog } from "../../src/lib/sourceCatalog";
+import type { WorkingView } from "../../src/types/session";
+import type {
+  CatalogSelection,
+  TuningExample,
+} from "../../src/services/coverageService";
 import type {
   Question,
   QuestionArticle,
@@ -80,6 +85,14 @@ export async function workflowFixture(page: Page) {
     mentions: [] as (Mention & { project_id: string })[],
     notes: [] as (ArticleNote & { project_id: string })[],
     failResearchSave: false,
+    catalogSelections: [] as (CatalogSelection & { project_id: string })[],
+    tuning: {} as Record<string, TuningExample>,
+    views: [] as (WorkingView & { project_id: string })[],
+    session: {
+      reviewed: 0,
+      version: 0,
+      current_question: null as string | null,
+    },
     previews: [] as {
       id: string;
       candidate_id: string;
@@ -124,10 +137,11 @@ export async function workflowFixture(page: Page) {
   await page.route("https://foundation-test.invalid/**", async (route) => {
     const request = route.request(),
       url = new URL(request.url());
-    const headers = {
+    const headers: Record<string, string> = {
       "access-control-allow-origin": "*",
       "access-control-allow-headers": "*",
       "access-control-allow-methods": "*",
+      "access-control-expose-headers":"content-range",
     };
     if (request.method() === "OPTIONS")
       return route.fulfill({ status: 200, headers });
@@ -163,6 +177,193 @@ export async function workflowFixture(page: Page) {
               refresh_token: "test-refresh",
               user,
             };
+    } else if (table === "project_catalog_sources") {
+      result = state.catalogSelections.filter((s) => s.project_id === project);
+    } else if (table === "select_catalog_source") {
+      const c = body.p_catalog;
+      let source = state.sources.find((s) => s.url === c.url);
+      if (!source) {
+        source = {
+          id: `catalog-source-${state.sources.length}`,
+          name: c.name,
+          url: c.url,
+          category: "Catalog",
+          notes: "",
+          created_at: now,
+        };
+        state.sources.push(source);
+      }
+      if (
+        !state.catalogSelections.some(
+          (s) => s.project_id === body.p_project && s.catalog_id === c.id,
+        )
+      )
+        state.catalogSelections.push({
+          project_id: body.p_project,
+          catalog_id: c.id,
+          source_id: source.id,
+          topics: c.topics,
+          region: c.region,
+        });
+      if (c.feedUrl) {
+        let feed = state.feeds.find((f) => f.feed_url === c.feedUrl);
+        if (!feed) {
+          feed = {
+            id: `catalog-feed-${state.feeds.length}`,
+            source_id: source.id,
+            title: c.name,
+            feed_url: c.feedUrl,
+            is_active: true,
+            last_checked_at: null,
+            last_success_at: null,
+            created_at: now,
+            updated_at: now,
+          };
+          state.feeds.push(feed);
+        }
+        if (
+          !state.subscriptions.some(
+            (s) => s.project_id === body.p_project && s.feed_id === feed.id,
+          )
+        )
+          state.subscriptions.push({
+            project_id: body.p_project,
+            feed_id: feed.id,
+            enabled: true,
+            rules: null,
+          });
+      }
+      result = source.id;
+    } else if (table === "save_tuning_example") {
+      const key = body.p_project + body.p_candidate;
+      state.tuning[key] = {
+        useful: body.p_useful,
+        held_out: body.p_held_out,
+        version: (state.tuning[key]?.version ?? 0) + 1,
+      };
+      result = state.tuning[key];
+    } else if (table === "calibration_window") {
+      const pop = state.candidates.filter(
+        (c) =>
+          c.project_id === body.p_project &&
+          Date.parse(c.created_at) >= Date.parse(body.p_since) &&
+          Date.parse(c.created_at) < Date.parse(body.p_until) &&
+          (!body.p_source || c.source_id === body.p_source),
+      );
+      const eligible = pop
+        .filter(
+          (c) =>
+            !body.p_sample ||
+            c.route === "outside_scope" ||
+            (c.rule_result?.score ?? 0) <= 1,
+        )
+        .sort((a, b) => a.id.localeCompare(b.id));
+      const items = eligible
+        .filter((c) => !body.p_after || c.id > body.p_after)
+        .slice(0, body.p_sample ? 10 : 25)
+        .map((c) => ({
+          ...c,
+          feedback: state.tuning[body.p_project + c.id] ?? null,
+          first_rule_result: c.rule_result,
+          current_project_rules: state.projects.find(
+            (p) => p.id === body.p_project,
+          )!.rules,
+          current_subscription_rules: null,
+        }));
+      result = {
+        as_of: now,
+        since: body.p_since,
+        until: body.p_until,
+        source_id: body.p_source,
+        collected: pop.length,
+        pending_route: pop.filter((c) => c.route === "pending").length,
+        outside: pop.filter((c) => c.route === "outside_scope").length,
+        kept: pop.filter((c) => c.status === "accepted").length,
+        dismissed: pop.filter((c) => c.status === "rejected").length,
+        deferred: pop.filter((c) => c.deferred).length,
+        unreviewed: pop.filter((c) => c.status === "pending").length,
+        duplicate: pop.filter((c) => c.status === "duplicate").length,
+        sample_population: eligible.length,
+        items,
+        has_more: eligible.some((c) => c.id > (items.at(-1)?.id ?? "z")),
+      };
+    } else if (table === "saved_views") {
+      result = state.views.filter((v) => v.project_id === project);
+    } else if (table === "save_working_view") {
+      const prior = state.views.find((v) => v.id === body.p_id);
+      if (body.p_delete)
+        state.views = state.views.filter((v) => v.id !== body.p_id);
+      else if (prior)
+        Object.assign(prior, {
+          name: body.p_name,
+          filters: body.p_filters,
+          version: prior.version + 1,
+        });
+      else
+        state.views.push({
+          id: body.p_id,
+          project_id: body.p_project,
+          name: body.p_name,
+          surface: body.p_surface,
+          filters: body.p_filters,
+          version: 1,
+        });
+      result = state.views.find((v) => v.id === body.p_id) ?? {};
+    } else if (table === "session_window") {
+      result = {
+        ...state.session,
+        bound: state.questions.length,
+        count: Math.max(0, state.questions.length - state.session.reviewed),
+        first_visit: !state.session.version,
+        items: [],
+        cursor: state.questions.length,
+        has_more: false,
+        pending: state.candidates.filter(
+          (c) => c.status === "pending" && !c.deferred,
+        ).length,
+        later: state.candidates.filter((c) => c.deferred).length,
+      };
+    } else if (table === "save_session") {
+      state.session.version++;
+      if (body.p_bound !== null) state.session.reviewed = body.p_bound;
+      if (body.p_question) state.session.current_question = body.p_question;
+      result = state.session;
+    } else if (table === "question_choices") {
+      result = {
+        links: state.links.filter(
+          (l) =>
+            l.project_id === body.p_project &&
+            l.question_id === body.p_question &&
+            (!body.p_after || l.id > body.p_after),
+        ),
+        findings: state.findings.filter(
+          (f) => f.question_id === body.p_question,
+        ),
+      };
+    } else if (table === "question_packet") {
+      result = {
+        as_of: now,
+        project: state.projects.find((p) => p.id === body.p_project),
+        question: state.questions.find((q) => q.id === body.p_question),
+        links: state.links
+          .filter(
+            (l) =>
+              l.question_id === body.p_question &&
+              (body.p_articles.includes(l.id) ||
+                body.p_articles.includes(l.article_id)),
+          )
+          .map((l) => ({
+            ...l,
+            article: state.articles.find((a) => a.id === l.article_id) ?? null,
+            source: "Legacy publisher",
+            entities: [],
+            events: [],
+          })),
+        findings: state.findings.filter(
+          (f) =>
+            f.question_id === body.p_question && body.p_findings.includes(f.id),
+        ),
+      };
     } else if (
       [
         "research_questions",
@@ -641,6 +842,9 @@ export async function workflowFixture(page: Page) {
       result = c;
     }
     if (Array.isArray(result)) {
+      if (request.headers()["prefer"]?.includes("count=exact"))
+        headers["content-range"] =
+          `0-${Math.max(0, result.length - 1)}/${result.length}`;
       const offset = Number(url.searchParams.get("offset") ?? 0);
       result = result.slice(
         offset,
