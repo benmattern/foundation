@@ -405,6 +405,41 @@ try {
   console.log(
     "PASS: simultaneous create-request retries return one research object",
   );
+  // A boundary read waits behind an uncommitted research change. A later edit
+  // remains beyond that boundary even when Finish happens after its commit.
+  await a.query("begin");
+  await a.query("select save_question($1,$2)", [
+    p1,
+    JSON.stringify({ title: "Uncommitted session edit" }),
+  ]);
+  const windowRead = b.query("select session_window($1) as w", [p1]);
+  await waitsForLock(admin, b.processID);
+  await a.query("commit");
+  const window = (await windowRead).rows[0].w;
+  await a.query("select save_question($1,$2)", [
+    p1,
+    JSON.stringify({ title: "After captured boundary" }),
+  ]);
+  await b.query("select save_session($1,$2,$3)", [
+    p1,
+    window.version,
+    window.bound,
+  ]);
+  const after = (await a.query("select session_window($1) as w", [p1])).rows[0]
+    .w;
+  assert.equal(after.count, 2); // save_question records its insert and populated update
+  const finishes = await Promise.allSettled([
+    a.query("select save_session($1,$2,$3)", [p1, after.version, after.bound]),
+    b.query("select save_session($1,$2,$3)", [p1, after.version, after.bound]),
+  ]);
+  assert.equal(finishes.filter((r) => r.status === "fulfilled").length, 1);
+  assert.equal(
+    finishes.find((r) => r.status === "rejected").reason.code,
+    "40001",
+  );
+  console.log(
+    "PASS: session boundaries wait for committed writers, retain later edits and reject stale-tab finish",
+  );
 } finally {
   for (const client of connections) {
     await client.query("rollback").catch(() => {});

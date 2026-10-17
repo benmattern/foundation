@@ -5,6 +5,7 @@ import type { RssFeed } from "../../src/types/rssFeed";
 import type { IngestionCandidate } from "../../src/types/ingestionCandidate";
 import type { CollectionRun } from "../../src/services/rssFeedService";
 import { sourceCatalog } from "../../src/lib/sourceCatalog";
+import type { WorkingView } from "../../src/types/session";
 import type {
   Question,
   QuestionArticle,
@@ -80,6 +81,12 @@ export async function workflowFixture(page: Page) {
     mentions: [] as (Mention & { project_id: string })[],
     notes: [] as (ArticleNote & { project_id: string })[],
     failResearchSave: false,
+    views: [] as (WorkingView & { project_id: string })[],
+    session: {
+      reviewed: 0,
+      version: 0,
+      current_question: null as string | null,
+    },
     previews: [] as {
       id: string;
       candidate_id: string;
@@ -163,6 +170,83 @@ export async function workflowFixture(page: Page) {
               refresh_token: "test-refresh",
               user,
             };
+    } else if (table === "saved_views") {
+      result = state.views.filter((v) => v.project_id === project);
+    } else if (table === "save_working_view") {
+      const prior = state.views.find((v) => v.id === body.p_id);
+      if (body.p_delete)
+        state.views = state.views.filter((v) => v.id !== body.p_id);
+      else if (prior)
+        Object.assign(prior, {
+          name: body.p_name,
+          filters: body.p_filters,
+          version: prior.version + 1,
+        });
+      else
+        state.views.push({
+          id: body.p_id,
+          project_id: body.p_project,
+          name: body.p_name,
+          surface: body.p_surface,
+          filters: body.p_filters,
+          version: 1,
+        });
+      result = state.views.find((v) => v.id === body.p_id) ?? {};
+    } else if (table === "session_window") {
+      result = {
+        ...state.session,
+        bound: state.questions.length,
+        count: Math.max(0, state.questions.length - state.session.reviewed),
+        first_visit: !state.session.version,
+        items: [],
+        cursor: state.questions.length,
+        has_more: false,
+        pending: state.candidates.filter(
+          (c) => c.status === "pending" && !c.deferred,
+        ).length,
+        later: state.candidates.filter((c) => c.deferred).length,
+      };
+    } else if (table === "save_session") {
+      state.session.version++;
+      if (body.p_bound !== null) state.session.reviewed = body.p_bound;
+      if (body.p_question) state.session.current_question = body.p_question;
+      result = state.session;
+    } else if (table === "question_choices") {
+      result = {
+        links: state.links.filter(
+          (l) =>
+            l.project_id === body.p_project &&
+            l.question_id === body.p_question &&
+            (!body.p_after || l.id > body.p_after),
+        ),
+        findings: state.findings.filter(
+          (f) => f.question_id === body.p_question,
+        ),
+      };
+    } else if (table === "question_packet") {
+      result = {
+        as_of: now,
+        project: state.projects.find((p) => p.id === body.p_project),
+        question: state.questions.find((q) => q.id === body.p_question),
+        links: state.links
+          .filter(
+            (l) =>
+              l.question_id === body.p_question &&
+              (body.p_articles.includes(l.id) ||
+                body.p_articles.includes(l.article_id)),
+          )
+          .map((l) => ({
+            ...l,
+            article: state.articles.find((a) => a.id === l.article_id) ?? null,
+            source: "Legacy publisher",
+            entities: [],
+            events: [],
+          })),
+        findings: state.findings.filter(
+          (f) =>
+            f.question_id === body.p_question && body.p_findings.includes(f.id),
+        ),
+      };
     } else if (
       [
         "research_questions",

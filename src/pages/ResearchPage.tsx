@@ -130,6 +130,12 @@ export default function ResearchPage() {
             )}
             {question && (
               <>
+                <Link
+                  className="inline-block rounded-lg border border-blue-500 p-3 text-blue-200"
+                  to={`/research/session?question=${question.id}`}
+                >
+                  Compare evidence / Create brief / Set current question
+                </Link>
                 <section className="space-y-4">
                   <h2 className="text-2xl font-semibold">
                     Evidence for this question

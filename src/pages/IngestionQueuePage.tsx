@@ -4,6 +4,8 @@ import { EmptyState } from "../components/ui/EmptyState";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { PageHeader } from "../components/PageHeader";
+import { WorkingViews } from "../components/WorkingViews";
+import { resolveView } from "../lib/workingViews";
 import { IngestionCandidateList } from "../components/IngestionCandidateList";
 import {
   IngestionCandidateReview,
@@ -60,7 +62,7 @@ export default function IngestionQueuePage() {
     source: params.get("source") ?? "all",
     importSource: params.get("import") ?? "all",
     tag: params.get("tag") ?? "",
-    since: params.get("since") ?? "",
+    since: resolveView(Object.fromEntries(params)).get("since") ?? "",
     until: params.get("until") ?? "",
     page: Math.max(0, Number(params.get("page")) || 0),
   };
@@ -276,6 +278,8 @@ export default function IngestionQueuePage() {
   const count = result?.key === queryKey ? result.count : 0;
   return (
     <>
+      <WorkingViews surface="ingestion" />
+      {((filters.source&&filters.source!=='all'&&sources.length&&!sources.some(s=>s.id===filters.source))||(filters.tag&&tags.length&&!tags.some(t=>t.id===filters.tag)))&&<p role="alert">A saved source or tag is unavailable. Clear or edit the view; its filter has not been broadened.</p>}
       <PageHeader
         title="Inbox"
         description="Incoming material awaits your review. Keeping adds it to Library."

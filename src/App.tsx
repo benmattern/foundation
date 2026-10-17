@@ -14,6 +14,7 @@ import TagsPage from "./pages/TagsPage";
 import { WorkspaceGate } from "./components/WorkspaceGate";
 import ProjectPage from "./pages/ProjectPage";
 import ResearchPage from "./pages/ResearchPage";
+import ResearchSessionPage from "./pages/ResearchSessionPage";
 import ArticleResearchPage from "./pages/ArticleResearchPage";
 
 export default function App() {
@@ -28,6 +29,7 @@ export default function App() {
             <Route path="/articles" element={<ArticlesPage />} />
             <Route path="/articles/:id" element={<ArticleResearchPage />} />
             <Route path="/research" element={<ResearchPage />} />
+            <Route path="/research/session" element={<ResearchSessionPage />} />
             <Route path="/tags" element={<TagsPage />} />
             <Route path="/events" element={<EventsPage />} />
             <Route path="/events/:id" element={<EventDetailPage />} />

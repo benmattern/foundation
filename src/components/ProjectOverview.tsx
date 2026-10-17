@@ -18,6 +18,7 @@ import { buttonClass } from "./ui/buttonStyles";
 import { EmptyState } from "./ui/EmptyState";
 import { PageHeader } from "./PageHeader";
 import type { Project } from "../types/project";
+import { ContinueResearch } from "./ContinueResearch";
 
 export function ProjectOverview() {
   const [data, setData] = useState<{
@@ -82,6 +83,7 @@ export function ProjectOverview() {
           "Choose sources, review incoming research, and build your library."
         }
       />
+      <ContinueResearch />
       {error ? (
         <EmptyState
           title="Overview could not load"

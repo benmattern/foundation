@@ -24,9 +24,11 @@ import type { Source } from "../types/source";
 import { getSources } from "../services/sourceService";
 import type { Tag } from "../types/tag";
 import { getTags } from "../services/tagService";
+import { WorkingViews } from "../components/WorkingViews";
+import { resolveView } from "../lib/workingViews";
 
 export default function ArticlesPage() {
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const [manualOpen, setManualOpen] = useState(false);
   const [error, setError] = useState("");
   const [captureMessage, setCaptureMessage] = useState("");
@@ -37,9 +39,18 @@ export default function ArticlesPage() {
   const [sources, setSources] = useState<Source[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedTagId, setSelectedTagId] = useState("");
-  const [selectedSourceId, setSelectedSourceId] = useState("");
+  const searchQuery = params.get("q") ?? "";
+  const selectedTagId = params.get("tag") ?? "";
+  const selectedSourceId = params.get("source") ?? "";
+  function filter(key: string, value: string) {
+    const next = new URLSearchParams(params);
+    if (value) next.set(key, value);
+    else next.delete(key);
+    setParams(next);
+  }
+  const setSearchQuery = (v: string) => filter("q", v);
+  const setSelectedTagId = (v: string) => filter("tag", v);
+  const setSelectedSourceId = (v: string) => filter("source", v);
   const [editingArticle, setEditingArticle] = useState<ArticleWithTags | null>(
     null,
   );
@@ -47,26 +58,47 @@ export default function ArticlesPage() {
     useState<ArticleFormDraftValues | null>(null);
 
   const normalizedSearchQuery = searchQuery.trim().toLowerCase();
-  const filteredArticles = articles.filter((article) => {
-    const matchesSearch =
-      normalizedSearchQuery === "" ||
-      article.title.toLowerCase().includes(normalizedSearchQuery) ||
-      (article.summary ?? "").toLowerCase().includes(normalizedSearchQuery);
+  const filteredArticles = articles
+    .filter((article) => {
+      const matchesSearch =
+        normalizedSearchQuery === "" ||
+        article.title.toLowerCase().includes(normalizedSearchQuery) ||
+        (article.summary ?? "").toLowerCase().includes(normalizedSearchQuery);
 
-    const matchesTag =
-      selectedTagId === "" ||
-      article.tags.some((tag) => tag.id === selectedTagId);
+      const matchesTag =
+        selectedTagId === "" ||
+        article.tags.some((tag) => tag.id === selectedTagId);
 
-    const matchesSource =
-      selectedSourceId === "" || article.source_id === selectedSourceId;
+      const matchesSource =
+        selectedSourceId === "" || article.source_id === selectedSourceId;
 
-    return matchesSearch && matchesTag && matchesSource;
-  });
+      const resolved = resolveView(Object.fromEntries(params));
+      const since = resolved.get("since"),
+        until = resolved.get("until");
+      const date = article.published_at ?? article.created_at;
+      return (
+        matchesSearch &&
+        matchesTag &&
+        matchesSource &&
+        (!since || new Date(date) >= new Date(since)) &&
+        (!until ||
+          new Date(date) < new Date(new Date(until).getTime() + 86400000))
+      );
+    })
+    .sort((a, b) =>
+      params.get("order") === "oldest"
+        ? a.created_at.localeCompare(b.created_at)
+        : b.created_at.localeCompare(a.created_at),
+    );
+  const missingReference = !!(
+    (selectedSourceId &&
+      selectedSourceId !== "all" &&
+      !sources.some((s) => s.id === selectedSourceId)) ||
+    (selectedTagId && !tags.some((t) => t.id === selectedTagId))
+  );
 
   function clearFilters() {
-    setSearchQuery("");
-    setSelectedTagId("");
-    setSelectedSourceId("");
+    setParams({});
   }
 
   async function loadArticles() {
@@ -214,6 +246,41 @@ export default function ArticlesPage() {
         title="Library"
         description="Articles you've kept for this project."
       />
+      <WorkingViews surface="articles" />
+      {missingReference && !loading && (
+        <p role="alert">
+          A saved source or tag is unavailable. No broader results have been
+          substituted. Clear filters or edit this view.
+        </p>
+      )}
+      <div className="mb-4 flex flex-wrap gap-3">
+        <label>
+          From (publication, otherwise kept date)
+          <input
+            type="date"
+            value={params.get("since")?.slice(0, 10) ?? ""}
+            onChange={(e) => filter("since", e.target.value)}
+          />
+        </label>
+        <label>
+          Through
+          <input
+            type="date"
+            value={params.get("until") ?? ""}
+            onChange={(e) => filter("until", e.target.value)}
+          />
+        </label>
+        <label>
+          Sort
+          <select
+            value={params.get("order") ?? "newest"}
+            onChange={(e) => filter("order", e.target.value)}
+          >
+            <option value="newest">Newest kept</option>
+            <option value="oldest">Oldest kept</option>
+          </select>
+        </label>
+      </div>
 
       {error && (
         <p role="alert" className="mb-4 text-red-300">
