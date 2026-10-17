@@ -1,5 +1,50 @@
 # Official source coverage and intake calibration: implementation review
 
+## Production deployment — 2026-10-17 UTC
+
+Deployed at [FOUNDATION](https://foundation-ljfo.onrender.com) via
+[PR #5](https://github.com/benmattern/foundation/pull/5), merge
+`e7991e091965ff82f8e8545cba0c64dde02ae470`; tested release head `dac9c1a`.
+Owner explicitly authorized deployment. [CI 39002706427](https://github.com/benmattern/foundation/actions/runs/39002706427)
+passed installation, lint, build, 69 tests, thirteen native PostgreSQL scenario
+groups, all Edge checks and ten Linux browser journeys.
+
+Fresh consistent public-schema/data/ledger backup restored into disposable local
+PostgreSQL. Migrations 015 then 016 preserved every captured row/value: **2,062 rows
+in 28 existing tables**. Production application was atomic with ledger entries;
+**2,064 original rows** at cutover were preserved exactly (two normal collector runs
+arrived between backup and cutover). Original core research remains 21 sources,
+59 articles, 12 tags, 54 article-tag links, six events and 19 article-event links.
+All public tables retain RLS and API-role TRUNCATE denial. The new tables begin
+empty, without automatically following any source pack or marking research reviewed.
+
+Hosted authenticated-role SQL tests passed for captured checkpoint boundaries,
+later-change retention, stale edits, stable saved-view retries/schema/project guards,
+selected packet/actual citations/article fingerprints, catalog rename/retry/Pause
+preservation, calibration counts and held-out labels, untouched review decisions,
+deleted-evidence snapshots, foreign-owner isolation and anonymous/direct-write denial.
+All fictional test writes rolled back; no test projects or feeds remain.
+
+Render's five entry assets match local tested files by SHA-256, including
+`/assets/index-qwjLb3Pn.js` and `/assets/index-DD_4w_R9.css`.
+Fourteen direct visit/refresh/auth-gate cases pass, including the question session
+and coverage query routes. Desktop 1440px/mobile 390px public sign-in checks and
+visual inspection pass; no console/page errors, failed requests or horizontal
+overflow. No Edge Function release was needed; anonymous POSTs to all three
+unchanged functions return 401. The five-minute collector job remains active.
+
+**Remaining boundary:** the real-account signed-in hosted browser journey is not
+verified. SQL role checks and public/mocked browser checks do not close that gap.
+No password, user session or login link was requested/generated. Public publisher
+availability remains transient; Finance feed size/truncation and missing ECB
+excerpts remain documented limits. The feature demos below are unchanged.
+Private backups, connection plans and receipts are ignored under
+`.deployment.local/release05-06`; do not print/commit or use them as test fixtures.
+
+<details>
+<summary>Implementation and local verification record before deployment</summary>
+
+
 Implemented locally on `docs/next-enhancements-draft` after Milestone 05 commit
 `2c8f2b0` passed local acceptance. Review date: 2026-10-17 UTC (October 16 local).
 No hosted mutation, merge, deployment, paid service or outbound delivery.
@@ -146,3 +191,4 @@ acceptance is claimed. Local fixtures use only an invalid API hostname and ficti
 SQL data. A future authorized rollout must back up/rehearse the actual database,
 apply additive 015 then 016 and exercise the real signed-in workflow. See the other
 milestone review for its demo, boundaries and supporting evidence.
+</details>

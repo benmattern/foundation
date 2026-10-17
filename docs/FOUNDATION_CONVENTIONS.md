@@ -1,5 +1,15 @@
 # FOUNDATION Conventions
 
+## Deployed 05/06 conventions — 2026-10-17 UTC
+
+Checkpoints advance explicitly through captured server bounds. Saved browsing views
+are distinct from intake rules. Briefs contain selected analyst prose/evidence,
+frozen versions and honest unavailable citations; downloads remain local. Catalog
+verification is dated, not ongoing health or credibility. Calibration counts are
+server scoped; usefulness/held-out labels never replace Keep/Dismiss decisions.
+Migrations 001–016 are deployed; do not replay them. Preserve the signed-in hosted
+acceptance boundary documented in reviews 05/06.
+
 ## Deployed 03/04 conventions - 2026-10-16
 
 Questions and findings are analyst reasoning, not article summaries. Keep original

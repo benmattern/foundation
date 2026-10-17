@@ -1,6 +1,6 @@
 # FOUNDATION Schema
 
-## Local additions 015/016 — not deployed
+## Deployed additions 015/016 — 2026-10-17 UTC
 
 015 adds `research_heads` (transactional per-project sequence), immutable API-side
 `research_changes`, revision-guarded `research_sessions` and `saved_views`.
@@ -28,8 +28,9 @@ within an authorized half-open collection period of at most 90 days. Page sizes
 shown without reconstructing unavailable history. Indexes support period/history
 lookups. No legacy IDs, original acquisition or research relationships are reset.
 
-Migrations **015 then 016** require an actual backup/upgrade rehearsal before a
-future authorized hosted rollout. Production remains on 001–014. See the
+Migrations **015 then 016** were rehearsed against a fresh actual-data backup and
+committed atomically in production with all existing rows preserved. The production
+ledger is 001–016. See the
 [05](reviews/05-research-sessions-and-briefs.md) and
 [06](reviews/06-official-source-coverage.md) reviews for verification limits.
 
