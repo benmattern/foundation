@@ -1,12 +1,20 @@
-## Milestone 07 local implementation - 2026-10-19
+## Milestone 07 deployed - 2026-10-19
 
-Approved Data Workspace implemented on `milestone-07-data-workspace` from clean
-main `8357bf5`. CSV/JSON import, DuckDB-Wasm queries, Perspective exploration,
-explicit browser-local datasets, saved definitions/notes and optional frozen
-snapshots are in local review. Local browser acceptance and required checks pass; see
-[07 review](reviews/07-data-workspace.md) for actual verification, limits and demo.
-Nothing has been merged or deployed. Production remains at the recorded 001-016
-migration baseline; no new migration, hosted storage or data mutation is needed.
+[Data Workspace](https://github.com/benmattern/foundation/pull/7) is deployed through GitHub main / Render auto-deployment,
+merge `0f57538d16228944ba5d793934e259ce494df278`, tested release head `155bc94`.
+[CI run 39297922425](https://github.com/benmattern/foundation/actions/runs/39297922425) passed all stages: 93 tests, 14 Linux browser journeys,
+thirteen native PostgreSQL groups and all three Edge Function checks.
+Hosted verification matches all twelve emitted assets by SHA-256, including three
+Wasm binaries and the worker. Fourteen direct/refresh/auth-gate checks and inspected
+1440px/390px sign-in screenshots pass without browser errors or horizontal overflow.
+No SQL migration, Edge deployment, hosted research write or service reconfiguration.
+
+Delivered: CSV/JSON import, typed fields/units/provenance, DuckDB SQL and Perspective
+exploration; session datasets, explicit browser saves, analysis definitions/notes,
+frozen snapshots and recovery. Browser-local storage is not a cloud backup.
+[Review](reviews/07-data-workspace.md) records the demo, limits and evidence.
+Real-account signed-in hosted acceptance remains unverified; public/mock checks
+are separate. Prior milestones and recorded migrations 001-016 are preserved.
 
 ## Deployed Milestones 05/06 — 2026-10-17 UTC
 

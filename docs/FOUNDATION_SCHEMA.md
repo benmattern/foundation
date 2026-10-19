@@ -1,4 +1,4 @@
-## Milestone 07 local schema (not deployed)
+## Milestone 07 browser storage (frontend deployed 2026-10-19)
 
 No SQL migration or hosted schema change. Browser IndexedDB `foundation-data-v1`
 has `workspaces` keyed by serialized [owner UUID, project UUID]. Format v1 holds

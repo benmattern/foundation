@@ -1,11 +1,40 @@
 # Milestone 07 review
 
+## Production deployment - 2026-10-19
+
+Owner authorized deployment after local review and clarified the existing GitHub
+main -> Render automatic release path. [PR #7](https://github.com/benmattern/foundation/pull/7) merged at
+`0f57538d16228944ba5d793934e259ce494df278`; tested release head `155bc944853258c0f9c5145ea433e705ebce38c7`.
+[CI run 39297922425](https://github.com/benmattern/foundation/actions/runs/39297922425) passed every stage on Linux, including 93 tests,
+14 browser journeys, 13 native PostgreSQL scenario groups and all Edge checks.
+The initial test-only sign-out race and its correction are recorded below.
+
+Live: https://foundation-ljfo.onrender.com/data. On 2026-10-19 at 17:57 UTC,
+all **12 emitted assets** matched local SHA-256 hashes: entry, React/Supabase,
+Data Workspace/explorer, CSS/runtime, DuckDB EH worker and all three Wasm binaries.
+Wasm responses have application/wasm MIME. Entry `/assets/index-FPjJV0_D.js` is live.
+Fourteen direct/refresh/anonymous-gate cases pass across /, /data, unavailable-data
+query, /research, /research/session, /sources and /articles. Inspected 1440px desktop
+and 390px mobile public sign-in screenshots show no horizontal overflow; no console,
+page or failed-request errors. Public receipts/screenshots are ignored under
+`artifacts.local/release07/`. This verifies actual deployed bytes/routes, not a
+real-account signed-in research journey. No password/session was requested or made.
+
+No SQL migration, Edge Function deployment, production research data write,
+Render service reconfiguration or new paid resource was needed. Existing backend
+and recorded migration baseline remain unchanged by this release. Imports and all
+analytical artifacts remain explicitly browser-local. Real-account hosted /data
+acceptance is the remaining external review step; local/mock tests do not close it.
+
+## Implementation review before deployment
+
 Date: 2026-10-19, America/Los_Angeles. Review branch
 `milestone-07-data-workspace`, baseline HEAD
 `8357bf5b8d854dcf14db58051e6081349abf19a0`. Reviewed implementation commit:
 `5fab44006a91bccd339478de0cd086837f927c05`; subsequent handoff commit changes only
 review bookkeeping and upstream-license whitespace.
-No merge, deployment, production migration, hosted data write or cost incurred.
+Initial implementation involved no merge/deployment, hosted data write or new costs;
+subsequent owner-authorized rollout is recorded above.
 
 Implementation and demo: [milestone 07](../milestones/07-data-workspace.md).
 

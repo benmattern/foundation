@@ -1,4 +1,4 @@
-## Milestone 07 choices - 2026-10-19 (local implementation)
+## Milestone 07 choices - 2026-10-19 (deployed via PR #7)
 
 - Keep the milestone browser-local: explicit session versus IndexedDB persistence,
   with no silent uploads or backend migration. Local saving is not managed durability.
@@ -12,7 +12,8 @@
   namespace keys prevent accidental cross-project display, not DevTools access.
 - Incremental evidence integration: project/source attribution and saved analysis
   now; shared evidence references/question/finding/entity/event links deferred.
-- No merge, deployment, hosted write or cost authorized; [07 review](reviews/07-data-workspace.md)
+- Owner authorized GitHub/Render release on 2026-10-19; no hosted data writes or
+  new paid services were needed. [07 review](reviews/07-data-workspace.md)
   retains real-account hosted acceptance as a separate external prerequisite.
 
 # FOUNDATION Architectural Decisions

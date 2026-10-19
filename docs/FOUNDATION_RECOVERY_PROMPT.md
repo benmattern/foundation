@@ -1,14 +1,18 @@
-## Milestone 07 local handoff - 2026-10-19
+## Milestone 07 deployed handoff - 2026-10-19
 
 Read [07 milestone](milestones/07-data-workspace.md) and
-[07 review](reviews/07-data-workspace.md), then inspect the working branch
-`milestone-07-data-workspace` (baseline `8357bf5`). The owner approved implementation
-of the complete DuckDB/Perspective Data Workspace; not merge/deployment/hosted
-writes/costs. Do not replay migrations 001-016. Browser-local import/datasets,
-queries, saved views/notes and frozen snapshots need no new SQL migration.
-Local checks and browser acceptance passed as recorded in the review; do not infer that build
-or SQL tests establish actual Perspective rendering or hosted sign-in behavior.
-Use only fictional fixtures and foundation-test.invalid in browser tests.
+[07 review](reviews/07-data-workspace.md). Released via [PR #7](https://github.com/benmattern/foundation/pull/7),
+merge `0f57538d16228944ba5d793934e259ce494df278`, tested head `155bc94`. Owner authorized GitHub main
+and existing Render auto-deployment. CI 39297922425 passed every stage; hosted
+assets match the tested build, public direct/refresh gates and desktop/mobile
+sign-in checks pass. Do not restart implementation or replay migrations 001-016.
+No database migration, Edge Function deployment or hosted data write was needed.
+
+Data Workspace datasets/definitions/snapshots stay browser-local; saves are explicit
+and project/owner namespaced. Keep original files for recovery and preserve the
+signed-in hosted acceptance boundary. Next: real-account user review on /data,
+without requesting account passwords or treating mocks as hosted Auth evidence.
+Public verification receipts/screenshots are ignored under artifacts.local/release07.
 
 ## Deployed Milestones 05/06 — 2026-10-17 UTC
 

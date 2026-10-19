@@ -2,7 +2,9 @@
 
 Approved implementation assignment, 2026-10-19 (America/Los_Angeles).
 Baseline: clean main `8357bf5b8d854dcf14db58051e6081349abf19a0`.
-Branch: `milestone-07-data-workspace`. No hosted changes authorized.
+Implementation branch: `milestone-07-data-workspace`. Owner subsequently authorized
+deployment via GitHub main; released through PR #7, merge `0f57538`, on 2026-10-19.
+See the review for CI/public hosted verification and the signed-in acceptance limit.
 
 ## Implementation contract
 

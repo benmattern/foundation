@@ -1,13 +1,13 @@
 # FOUNDATION Conventions
 
-## Milestone 07 local analysis conventions - 2026-10-19
+## Milestone 07 analysis conventions - 2026-10-19
 
 Structured data stays browser-local unless a future storage feature explicitly
 authorizes upload. Label session data, browser saves, analysis definitions and
 frozen result snapshots separately. Preserve attribution, schema/units and the
 executed SQL/configuration; unexecuted editor text is not a result. Keep local
-profile access/eviction limits visible. No new migration or hosted rollout is part
-of this implementation. See the Milestone 07 review for verified boundaries.
+profile access/eviction limits visible. Frontend deployed via PR #7 after owner authorization; no new migration or Edge
+Function release was required. See the Milestone 07 review for verified boundaries.
 
 ## Deployed 05/06 conventions — 2026-10-17 UTC
 

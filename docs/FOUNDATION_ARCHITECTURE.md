@@ -1,6 +1,7 @@
-## Data Workspace (local implementation, Milestone 07)
+## Data Workspace (deployed, Milestone 07 - 2026-10-19)
 
-`/data` extends authenticated project navigation. Import parsing/type validation
+`/data` extends authenticated project navigation. Released via PR #7, merge 0f57538;
+CI and hosted asset/public browser evidence are in the Milestone 07 review. Import parsing/type validation
 lives in dataImport; dataWorkspaceService checks the existing RLS project list,
 partitions session/IndexedDB work by owner/project and atomically guards durable
 writes by revision. Dataset metadata and rows are separate from analysis definitions
