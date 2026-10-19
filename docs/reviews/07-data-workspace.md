@@ -72,3 +72,14 @@ Wasm/workers/licenses), retain the SPA rewrite and correct MIME/compression if a
 future rollout is authorized. No SQL migration or Edge Function deployment needed.
 Merge/deployment and real-account hosted browser acceptance remain separate owner
 steps; no new paid services or consequential approval decisions are required here.
+
+## Authorized release preparation - 2026-10-19
+
+Owner requested hosted deployment via GitHub main auto-deployment to Render.
+PR #7: https://github.com/benmattern/foundation/pull/7. Initial Linux CI run
+39297409764 passed every stage except one sign-out browser assertion: navigating
+before sign-out completed could cancel the request. The test now waits for the
+sign-in screen before navigation; the corrected journey passes locally. The
+browser harness supports FOUNDATION_BROWSER_PORT so checks can run independently
+of an existing owner review preview. No application/Auth behavior was changed.
+Merge and hosted verification follow successful replacement CI.

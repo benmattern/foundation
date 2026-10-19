@@ -172,6 +172,7 @@ test("project switching and anonymous gate preserve local isolation", async ({
     page.getByLabel("Open dataset", { exact: true }).locator("option"),
   ).toContainText(["Choose a dataset", "private"]);
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeVisible();
   await page.goto("/data");
   await expect(
     page.getByRole("button", { name: "Sign in", exact: true }),

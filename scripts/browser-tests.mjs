@@ -7,12 +7,16 @@ const env = {
   VITE_SUPABASE_URL: "https://foundation-test.invalid",
   VITE_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_local_test_only",
 };
+const port = Number(process.env.FOUNDATION_BROWSER_PORT ?? 4173);
+if (!Number.isInteger(port) || port < 1024 || port > 65535) {
+  throw new Error("FOUNDATION_BROWSER_PORT must be an unprivileged TCP port.");
+}
 delete env.NO_COLOR;
 // Refuse to reuse an unrelated local server, which might have hosted credentials.
 await new Promise((resolve, reject) => {
   const probe = createServer();
   probe.on("error", reject);
-  probe.listen(4173, "127.0.0.1", () => probe.close(resolve));
+  probe.listen(port, "127.0.0.1", () => probe.close(resolve));
 });
 const server = spawn(process.execPath, [
   "node_modules/vite/bin/vite.js",
@@ -20,7 +24,7 @@ const server = spawn(process.execPath, [
   "--host",
   "127.0.0.1",
   "--port",
-  "4173",
+  String(port),
   "--strictPort",
 ], { env, stdio: "ignore", windowsHide: true });
 let serverError;
@@ -33,11 +37,11 @@ try {
     if (serverError) throw serverError;
     if (server.exitCode !== null) {
       throw new Error(
-        `Test server exited (${server.exitCode}); check port 4173 is unused.`,
+        `Test server exited (${server.exitCode}); check port ${port} is unused.`,
       );
     }
     try {
-      ready = (await fetch("http://127.0.0.1:4173", {
+      ready = (await fetch(`http://127.0.0.1:${port}`, {
         signal: AbortSignal.timeout(1000),
       })).ok;
     } catch { /* Wait for Vite startup. */ }

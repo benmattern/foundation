@@ -13,7 +13,7 @@ Branch: `milestone-07-data-workspace`. No hosted changes authorized.
 - [x] Perspective grid/pivots, filters, sorting, grouping, aggregates, bar/line controls.
 - [x] Saved analysis notes, source identity/fingerprint, source recovery and local JSON download.
 - [x] Bounded resources, interruption, failed-save recovery and stale-tab write protection.
-- [ ] Finish browser acceptance A–F and rendered desktop/mobile inspection; see review for actual results.
+- [x] Finish browser acceptance A–F and rendered desktop/mobile inspection; see review for actual results.
 - [x] Complete handoff documentation and local verification.
 
 ## Workflow and boundaries

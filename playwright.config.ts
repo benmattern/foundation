@@ -6,7 +6,7 @@ export default defineConfig({
   // keeps Playwright's normal worker selection.
   workers: process.platform === "win32" ? 1 : undefined,
   use: {
-    baseURL: "http://127.0.0.1:4173",
+    baseURL: `http://127.0.0.1:${process.env.FOUNDATION_BROWSER_PORT ?? 4173}`,
     headless: true,
     ...(process.platform === "win32" ? { channel: "msedge" } : {}),
   },
