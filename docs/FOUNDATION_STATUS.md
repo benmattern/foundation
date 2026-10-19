@@ -1,3 +1,15 @@
+## Milestone 08 implemented for review - 2026-10-19
+
+Research Timelines extends Events with a vertical project timeline, precise/partial/
+uncertain/range dates, explicit article/entity/question evidence, URL filters and
+bounded queries, attributed detail, guarded edits/deletion and retained audit.
+Development branch `milestone-08-research-timelines`, baseline `58a91ea`.
+**Not deployed.** Additive migration 017 is local only; production stays 001-016.
+Read [08 milestone](milestones/08-research-timelines.md) and
+[08 review](reviews/08-research-timelines.md) for implementation, tests, demo and
+remaining authorized-release/real-account prerequisites. M01-07 remain deployed.
+No merge, hosted research writes, paid resources or deployment are authorized here.
+
 ## Milestone 07 deployed - 2026-10-19
 
 [Data Workspace](https://github.com/benmattern/foundation/pull/7) is deployed through GitHub main / Render auto-deployment,

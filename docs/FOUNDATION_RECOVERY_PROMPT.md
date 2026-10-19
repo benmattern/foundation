@@ -1,3 +1,18 @@
+## Milestone 08 development handoff - 2026-10-19
+
+Read [08 milestone](milestones/08-research-timelines.md) and
+[08 review](reviews/08-research-timelines.md) before changing the timeline.
+Branch `milestone-08-research-timelines` extends deployed Events from main 58a91ea.
+**Implemented locally; not deployed.** Production ledger remains 001-016; 017
+`20261019222428_research_timelines.sql` has only run in disposable fictional databases.
+Do not apply it, merge or deploy without separate authorization. No new dependency,
+AI, Edge release or Data Workspace change. Review exact test/release boundaries in
+08 review; rerun its fictional browser demo without hosted credentials. Event date
+precision and evidence snapshots are intentional; do not replace them with creation
+or publication dates. Existing /events routes now show Timeline. Future authorized
+rollout needs backup rehearsal, additive migration first, frontend release and
+real-account acceptance; legacy versionless edits/deletes reject safely after 017.
+
 ## Milestone 07 deployed handoff - 2026-10-19
 
 Read [07 milestone](milestones/07-data-workspace.md) and

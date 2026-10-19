@@ -497,6 +497,83 @@ try {
   console.log(
     "PASS: catalog selection retries deduplicate, concurrent Pause survives adoption and tuning labels reject stale edits",
   );
+  const eventRequest = crypto.randomUUID();
+  const eventValues = {
+    title: "Fictional concurrent timeline event",
+    date_start: "2024-02",
+    request_id: eventRequest,
+  };
+  await a.query("begin");
+  const savedEvent = (
+    await a.query("select * from save_event($1,$2)", [p1, eventValues])
+  ).rows[0];
+  const retryEvent = b.query("select * from save_event($1,$2)", [
+    p1,
+    eventValues,
+  ]);
+  await waitsForLock(admin, b.processID);
+  await a.query("commit");
+  assert.equal((await retryEvent).rows[0].id, savedEvent.id);
+  assert.equal(
+    (
+      await admin.query(
+        "select count(*)::int n from research_history where object_id=$1",
+        [savedEvent.id],
+      )
+    ).rows[0].n,
+    1,
+  );
+  await a.query("begin");
+  await a.query("select save_event($1,$2,$3)", [
+    p1,
+    {
+      version: 1,
+      title: "Fictional first writer",
+      request_id: crypto.randomUUID(),
+    },
+    savedEvent.id,
+  ]);
+  const staleEvent = b.query("select save_event($1,$2,$3)", [
+    p1,
+    {
+      version: 1,
+      title: "Fictional stale writer",
+      request_id: crypto.randomUUID(),
+    },
+    savedEvent.id,
+  ]);
+  // Attach a rejection handler before releasing the lock to avoid unhandled rejections.
+  const staleResult = Promise.allSettled([staleEvent]);
+  await waitsForLock(admin, b.processID);
+  await a.query("commit");
+  assert.equal((await staleResult)[0].reason.code, "40001");
+  const deleteRequest = crypto.randomUUID();
+  await a.query("begin");
+  await a.query("select remove_timeline_event($1,$2,2,$3)", [
+    p1,
+    savedEvent.id,
+    deleteRequest,
+  ]);
+  const retryDelete = b.query("select remove_timeline_event($1,$2,2,$3)", [
+    p1,
+    savedEvent.id,
+    deleteRequest,
+  ]);
+  await waitsForLock(admin, b.processID);
+  await a.query("commit");
+  await retryDelete;
+  assert.equal(
+    (
+      await admin.query(
+        "select count(*)::int n from research_history where object_id=$1 and after_state->>'deleted'='true'",
+        [savedEvent.id],
+      )
+    ).rows[0].n,
+    1,
+  );
+  console.log(
+    "PASS: timeline concurrent create/delete retries deduplicate and stale editors reject after row-lock waits",
+  );
 } finally {
   for (const client of connections) {
     await client.query("rollback").catch(() => {});

@@ -1,3 +1,14 @@
+## Milestone 08 review branch - 2026-10-19
+
+Implemented research timelines, explicit evidence associations, partial/range dates,
+server filters/paging and guarded CRUD on `milestone-08-research-timelines`.
+[Specification/demo](milestones/08-research-timelines.md), [review](reviews/08-research-timelines.md).
+Not deployed; 017 remains local. Next external steps require separate release
+approval: fresh backup/upgrade rehearsal, 017 plus frontend release, signed-in
+hosted acceptance. Future work: durable structured analytical evidence, measured
+keyset pagination/receipt retention, entity relationship mapping and richer time
+navigation. No Gantt, maps, automatic extraction or AI descriptions in this scope.
+
 ## Milestone 07 released - 2026-10-19
 
 Data Workspace is deployed via [PR #7](https://github.com/benmattern/foundation/pull/7), merge `0f57538`, after full CI

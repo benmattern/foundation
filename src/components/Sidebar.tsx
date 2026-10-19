@@ -8,7 +8,7 @@ const navItems = [
   { label: "Research", to: "/research" },
   { label: "Data Workspace", to: "/data" },
   { label: "Entities", to: "/entities" },
-  { label: "Events", to: "/events" },
+  { label: "Timeline", to: "/events" },
   { label: "Tags", to: "/tags" },
   { label: "Project settings", to: "/project" },
 ];

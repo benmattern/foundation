@@ -537,7 +537,7 @@ function ArticleResearchWorkspace({ id }: { id?: string }) {
                   </li>
                 ))}
             </ul>
-            <Link to="/events" className="text-blue-300">
+            <Link to={`/events?article=${id}`} className="text-blue-300">
               Manage existing event links
             </Link>
           </section>

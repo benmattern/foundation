@@ -1,184 +1,174 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { PageHeader } from "../components/PageHeader";
 import { EventForm } from "../components/EventForm";
-import type { EventFormValues } from "../components/EventForm";
-import { EventFilters } from "../components/EventFilters";
-import { EventList } from "../components/EventList";
-import { EventStatusOverview } from "../components/EventStatusOverview";
-import type { Article } from "../types/article";
-import { getArticles } from "../services/articleService";
-import type {
-  EventListItem,
-  EventSortOption,
-  EventStatus,
-  FoundationEventWithArticles,
-} from "../types/event";
-import { getEventDate, getLastActivityDate } from "../lib/eventMetrics";
+import { TimelineFilters } from "../components/TimelineFilters";
+import { ResearchTimeline } from "../components/ResearchTimeline";
+import { Button } from "../components/ui/Button";
+import { Dialog } from "../components/ui/Dialog";
+import { EmptyState } from "../components/ui/EmptyState";
+import { emptyTimelineFilters, readTimelineFilters } from "../lib/timeline";
 import {
-  createEvent as createEventRecord,
-  getEventsWithArticles,
-} from "../services/eventService";
-
+  getTimelinePage,
+  saveTimelineEvent,
+} from "../services/timelineService";
+import type { TimelinePage } from "../types/timeline";
 export default function EventsPage() {
-  const [events, setEvents] = useState<FoundationEventWithArticles[]>([]);
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState<"" | EventStatus>("");
-  const [selectedEventType, setSelectedEventType] = useState("");
-  const [selectedSort, setSelectedSort] = useState<EventSortOption>(
-    "newest_activity",
+  const [params, setParams] = useSearchParams();
+  const [data, setData] = useState<TimelinePage | null>(null),
+    [error, setError] = useState(""),
+    [creating, setCreating] = useState(false),
+    [saving, setSaving] = useState(false),
+    [attempt, setAttempt] = useState(0);
+  const navigate = useNavigate(),
+    query = params.toString();
+  const page = Math.max(
+    0,
+    Math.min(20000, Math.floor(Number(params.get("page")) || 0)),
   );
-
-  const normalizedSearchQuery = searchQuery.trim().toLowerCase();
-  const eventListItems = events.map<EventListItem>((event) => ({
-    ...event,
-    supportingArticleCount: event.articles.length,
-    lastActivityAt: getLastActivityDate(event, event.articles),
-  }));
-
-  const filteredEvents = eventListItems.filter((event) => {
-    const matchesSearch = normalizedSearchQuery === "" ||
-      event.title.toLowerCase().includes(normalizedSearchQuery) ||
-      (event.description ?? "").toLowerCase().includes(normalizedSearchQuery);
-
-    const matchesStatus = selectedStatus === "" ||
-      event.status === selectedStatus;
-
-    const matchesEventType = selectedEventType === "" ||
-      event.event_type === selectedEventType;
-
-    return matchesSearch && matchesStatus && matchesEventType;
-  });
-  const sortedEvents = sortEvents(filteredEvents, selectedSort);
-
-  function clearFilters() {
-    setSearchQuery("");
-    setSelectedStatus("");
-    setSelectedEventType("");
-  }
-
-  async function loadEventsPageData() {
-    try {
-      const [eventData, articleData] = await Promise.all([
-        getEventsWithArticles(),
-        getArticles(),
-      ]);
-
-      setEvents(eventData);
-      setArticles(articleData);
-    } catch (error) {
-      console.error("Error loading events page data:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
+  const returnTo = `/events${query ? `?${query}` : ""}`;
   useEffect(() => {
     let active = true;
-    Promise.all([getEventsWithArticles(), getArticles()]).then(
-      ([eventData, articleData]) => {
+    getTimelinePage(readTimelineFilters(new URLSearchParams(query)), page * 50)
+      .then((result) => {
         if (active) {
-          setEvents(eventData);
-          setArticles(articleData);
+          setData(result);
+          setError("");
         }
-      },
-    ).catch((error: unknown) => {
-      if (active) console.error(error);
-    }).finally(() => {
-      if (active) setLoading(false);
-    });
+      })
+      .catch((e) => {
+        if (active) setError(String(e));
+      });
     return () => {
       active = false;
     };
-  }, []);
-
-  async function createEvent(event: EventFormValues) {
-    try {
-      await createEventRecord(event);
-      await loadEventsPageData();
-    } catch (error) {
-      console.error("Error creating event:", error);
-      throw error;
-    }
+  }, [query, page, attempt]);
+  function change(next: URLSearchParams) {
+    setData(null);
+    setError("");
+    setParams(next);
   }
-
   return (
-    <>
+    <section className="space-y-6">
       <PageHeader
-        title="Events"
-        description="Create and manage analyst-defined developments linked to source articles."
+        title="Research timeline"
+        description="What happened, when it happened and which evidence informs the account. Occurrence dates are separate from publication, collection and analyst edits."
       />
-
-      {loading
-        ? <p className="text-slate-400">Loading events...</p>
-        : (
-          <div className="space-y-6">
-            <EventStatusOverview events={events} />
-
-            <EventFilters
-              searchQuery={searchQuery}
-              selectedStatus={selectedStatus}
-              selectedEventType={selectedEventType}
-              selectedSort={selectedSort}
-              resultCount={sortedEvents.length}
-              totalCount={events.length}
-              onSearchQueryChange={setSearchQuery}
-              onSelectedStatusChange={setSelectedStatus}
-              onSelectedEventTypeChange={setSelectedEventType}
-              onSelectedSortChange={setSelectedSort}
-              onClearFilters={clearFilters}
-            />
-
-            <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-              <EventForm articles={articles} onSubmit={createEvent} />
-              <EventList
-                events={sortedEvents}
-                emptyMessage="No events match the current filters."
-              />
-            </div>
+      <div className="flex flex-wrap gap-3">
+        <Button variant="primary" onClick={() => setCreating(true)}>
+          Create event
+        </Button>
+        <Button
+          onClick={() => {
+            setData(null);
+            setAttempt((v) => v + 1);
+          }}
+        >
+          Refresh timeline
+        </Button>
+        <Button onClick={() => change(new URLSearchParams())}>
+          Clear all filters
+        </Button>
+      </div>
+      <TimelineFilters
+        key={query}
+        value={readTimelineFilters(params)}
+        onChange={(filters) =>
+          change(
+            new URLSearchParams(
+              Object.entries(filters).filter(
+                ([key, value]) =>
+                  value !==
+                  emptyTimelineFilters[
+                    key as keyof typeof emptyTimelineFilters
+                  ],
+              ),
+            ),
+          )
+        }
+      />
+      {error && (
+        <p role="alert" className="text-red-300">
+          {error}{" "}
+          <Button onClick={() => setAttempt((v) => v + 1)}>
+            Retry timeline
+          </Button>
+        </p>
+      )}
+      {!data && !error && <p role="status">Loading timeline…</p>}
+      {data && (
+        <>
+          <p role="status">
+            {data.matched} matching events · {data.total} project events · page{" "}
+            {page + 1} (up to 50 records)
+          </p>
+          {!data.items.length ? (
+            <EmptyState
+              title={
+                data.total === 0
+                  ? "No project events yet"
+                  : "No events match these filters"
+              }
+            >
+              {data.total === 0
+                ? "Create a dated or undated event and explicitly connect research evidence."
+                : "Adjust dates or associations, clear filters, or return to the first page. Missing references never broaden a filter."}
+            </EmptyState>
+          ) : (
+            <ResearchTimeline events={data.items} returnTo={returnTo} />
+          )}
+          <div className="flex gap-3">
+            <Button
+              disabled={page === 0}
+              onClick={() => {
+                const next = new URLSearchParams(params);
+                next.set("page", String(page - 1));
+                change(next);
+              }}
+            >
+              Previous events
+            </Button>
+            <Button
+              disabled={!data.has_more}
+              onClick={() => {
+                const next = new URLSearchParams(params);
+                next.set("page", String(page + 1));
+                change(next);
+              }}
+            >
+              Next events
+            </Button>
           </div>
-        )}
-    </>
+        </>
+      )}
+      {creating && (
+        <Dialog
+          title="New timeline event"
+          busy={saving}
+          onClose={() => setCreating(false)}
+        >
+          <EventForm
+            onCancel={() => setCreating(false)}
+            onSubmit={async (values, request) => {
+              setSaving(true);
+              try {
+                const saved = await saveTimelineEvent(values, request);
+                setCreating(false);
+                navigate(
+                  `/events/${saved.id}?returnTo=${encodeURIComponent(returnTo)}`,
+                );
+              } finally {
+                setSaving(false);
+              }
+            }}
+          />
+        </Dialog>
+      )}
+      <p className="text-sm text-slate-400">
+        Associations are analyst choices, not inferred causal relationships or
+        independent corroboration. Browser-local Data Workspace artifacts are
+        not durable event citations.
+      </p>
+    </section>
   );
-}
-
-function sortEvents(
-  events: EventListItem[],
-  sortOption: EventSortOption,
-): EventListItem[] {
-  return [...events].sort((a, b) => {
-    if (sortOption === "most_supporting_articles") {
-      return (
-        b.supportingArticleCount - a.supportingArticleCount ||
-        compareDatesDescending(getEventDate(a), getEventDate(b))
-      );
-    }
-
-    if (sortOption === "oldest_event") {
-      return compareDatesAscending(getEventDate(a), getEventDate(b));
-    }
-
-    if (sortOption === "newest_event") {
-      return compareDatesDescending(getEventDate(a), getEventDate(b));
-    }
-
-    return compareDatesDescending(a.lastActivityAt, b.lastActivityAt);
-  });
-}
-
-function compareDatesDescending(a: Date | null, b: Date | null): number {
-  if (!a && !b) return 0;
-  if (!a) return 1;
-  if (!b) return -1;
-
-  return b.getTime() - a.getTime();
-}
-
-function compareDatesAscending(a: Date | null, b: Date | null): number {
-  if (!a && !b) return 0;
-  if (!a) return 1;
-  if (!b) return -1;
-
-  return a.getTime() - b.getTime();
 }

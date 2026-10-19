@@ -1,3 +1,17 @@
+## Milestone 08 timeline conventions - 2026-10-19 (development only)
+
+Use existing event IDs/routes/project context. Enter YYYY, YYYY-MM or YYYY-MM-DD;
+keep partial precision and uncertainty visible. Bounds are sorting/filtering aids,
+not newly asserted occurrence days. Unknown dates stay unknown. Legacy timestamps
+retain original values with explicit UTC grouping. Never substitute publication,
+collection, approval or analyst edit time for occurrence. Sort start bounds then
+UUID, undated last in both directions; range filters overlap. Explicit references
+are analyst choices, with publisher snapshots and separate notes/classification;
+article counts do not establish independent corroboration. Suggested mentions and
+browser-local datasets are never promoted to durable event evidence. Event writes
+use timelineService with version and stable request UUID; preserve drafts on failure.
+Migration 017 is not deployed. See [08](milestones/08-research-timelines.md).
+
 # FOUNDATION Conventions
 
 ## Milestone 07 analysis conventions - 2026-10-19

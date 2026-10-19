@@ -29,6 +29,11 @@ export const eventTypeOptions = [
 ];
 
 export type FoundationEvent = {
+  date_start?: string | null;
+  date_end?: string | null;
+  date_approximate?: boolean;
+  date_origin?: "explicit" | "legacy_timestamp";
+  timeline_start?: string | null;
   id: string;
   title: string;
   description: string | null;

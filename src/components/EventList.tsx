@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { formatDate, getEventDate } from "../lib/eventMetrics";
+import { formatDate, formatEventOccurrence } from "../lib/eventMetrics";
 import type { EventListItem } from "../types/event";
 import { Card } from "./ui/Card";
 
@@ -14,9 +14,7 @@ export function EventList({
 }: Props) {
   return (
     <Card>
-      <h2 className="mb-6 text-2xl font-semibold text-white">
-        Events
-      </h2>
+      <h2 className="mb-6 text-2xl font-semibold text-white">Events</h2>
 
       {events.length === 0 ? (
         <p className="text-slate-400">{emptyMessage}</p>
@@ -44,11 +42,9 @@ export function EventList({
               </div>
 
               <div className="mt-3 grid grid-cols-1 gap-2 text-xs text-slate-500 sm:grid-cols-2">
-                <span>
-                  Supporting articles: {event.supportingArticleCount}
-                </span>
+                <span>Supporting articles: {event.supportingArticleCount}</span>
                 <span>Last activity: {formatDate(event.lastActivityAt)}</span>
-                <span>Occurred: {formatDate(getEventDate(event))}</span>
+                <span>Occurred: {formatEventOccurrence(event)}</span>
                 {event.event_type && <span>Type: {event.event_type}</span>}
                 {event.location && <span>Location: {event.location}</span>}
               </div>
