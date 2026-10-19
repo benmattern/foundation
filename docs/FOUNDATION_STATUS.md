@@ -8,6 +8,9 @@ Development branch `milestone-08-research-timelines`, baseline `58a91ea`.
 Read [08 milestone](milestones/08-research-timelines.md) and
 [08 review](reviews/08-research-timelines.md) for implementation, tests, demo and
 remaining authorized-release/real-account prerequisites. M01-07 remain deployed.
+Local verification: clean install, lint/build, 103 SQL/unit tests, 16 browser
+journeys, 14 native PostgreSQL concurrency groups and all 3 Edge checks passed;
+1440px/390px timeline and mobile evidence-detail views inspected.
 No merge, hosted research writes, paid resources or deployment are authorized here.
 
 ## Milestone 07 deployed - 2026-10-19

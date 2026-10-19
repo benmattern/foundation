@@ -2,8 +2,9 @@
 
 Status: implemented and locally verified for development review; **not deployed**.
 Branch `milestone-08-research-timelines`, baseline main `58a91ea`.
-The reviewed implementation is the branch's `feat: add project research timelines`
-commit; the following documentation handoff commit records that exact hash below.
+Reviewed implementation: `109c16bfa491c052ddeece68e2a5b126549f62d1`
+(`feat: add project research timelines`). The subsequent handoff commit changes
+documentation only.
 No merge, push, hosted mutation, production migration or deployment was performed.
 
 ## Scope and decisions
