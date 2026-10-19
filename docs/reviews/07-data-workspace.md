@@ -2,7 +2,9 @@
 
 Date: 2026-10-19, America/Los_Angeles. Review branch
 `milestone-07-data-workspace`, baseline HEAD
-`8357bf5b8d854dcf14db58051e6081349abf19a0`; working implementation not committed yet.
+`8357bf5b8d854dcf14db58051e6081349abf19a0`. Reviewed implementation commit:
+`5fab44006a91bccd339478de0cd086837f927c05`; subsequent handoff commit changes only
+review bookkeeping and upstream-license whitespace.
 No merge, deployment, production migration, hosted data write or cost incurred.
 
 Implementation and demo: [milestone 07](../milestones/07-data-workspace.md).
@@ -38,7 +40,7 @@ this local-only implementation; deployment remains separately authorized.
 | C: SQL | Real DuckDB SELECT/group totals, saved executed SQL, invalid-field binder error then successful SUM; extra statements/external reader names rejected; quoted reader bypass reaches engine and is denied with zero network reads. |
 | D: Recovery | Browser navigation/reload preserves explicit IndexedDB save, named view reruns; confirmed source deletion leaves frozen snapshot inspectable; exact-file hash plus matching field types/units supports tested reimport reconnection. Session-only import disappears after reload. Definitions alone never claim stored results. |
 | E: Isolation | Real local browser project switch hides dataset, switching back retains session data, sign-out restores anonymous gate. Unit mocks test foreign-owner/project authorization rejection and separate owner/project storage keys. Existing PGlite migration/RLS and native PostgreSQL tests pass unchanged. No new hosted table/API exists; this is not a test of real hosted Auth. |
-| F: Failures | Malformed JSON/CSV, duplicates/reserved fields, nested records, encoding, precision/type, byte/row limits; actual browser storage unavailable, typed import failure/recovery, worker interruption then next query, SQL error/recovery, 5,000-row truncation and external-access denial. IndexedDB test rejects stale revision and preserves prior commit. |
+| F: Failures | Malformed JSON/CSV, duplicates/reserved fields, nested records, encoding, precision/type, byte/row limits; actual browser storage unavailable, typed import failure/recovery, worker interruption then next query, SQL error/recovery, 5,000-row truncation and external-access denial. IndexedDB tests reject stale revisions; two simultaneous save transactions yield exactly one winner and preserve its commit. |
 
 Screenshots are ignored under `artifacts.local/data-workspace/`; fixtures are
 committed under `docs/fixtures/data-workspace/`. No private research or deployment
