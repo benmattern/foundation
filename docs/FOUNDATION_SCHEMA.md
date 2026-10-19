@@ -1,3 +1,15 @@
+## Milestone 07 local schema (not deployed)
+
+No SQL migration or hosted schema change. Browser IndexedDB `foundation-data-v1`
+has `workspaces` keyed by serialized [owner UUID, project UUID]. Format v1 holds
+revision, datasets (validated rows/schema/units/attribution/import fingerprint)
+and analyses (source ID/fingerprint/provenance, executed SQL, Perspective config,
+analyst note, optional bounded frozen rows/schema/time/truncation). CAS occurs in
+one IndexedDB transaction. Namespacing is application isolation, not encryption or
+protection against local profile access. Existing server RLS authorizes projects;
+there are no new browser data-table grants or database endpoints. Production's
+historically verified ledger remains 001-016. See [07](milestones/07-data-workspace.md).
+
 # FOUNDATION Schema
 
 ## Deployed additions 015/016 — 2026-10-17 UTC

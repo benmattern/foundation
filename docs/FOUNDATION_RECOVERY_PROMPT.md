@@ -1,3 +1,15 @@
+## Milestone 07 local handoff - 2026-10-19
+
+Read [07 milestone](milestones/07-data-workspace.md) and
+[07 review](reviews/07-data-workspace.md), then inspect the working branch
+`milestone-07-data-workspace` (baseline `8357bf5`). The owner approved implementation
+of the complete DuckDB/Perspective Data Workspace; not merge/deployment/hosted
+writes/costs. Do not replay migrations 001-016. Browser-local import/datasets,
+queries, saved views/notes and frozen snapshots need no new SQL migration.
+Local checks and browser acceptance passed as recorded in the review; do not infer that build
+or SQL tests establish actual Perspective rendering or hosted sign-in behavior.
+Use only fictional fixtures and foundation-test.invalid in browser tests.
+
 ## Deployed Milestones 05/06 — 2026-10-17 UTC
 
 Milestones 05 and 06 are deployed through [PR #5](https://github.com/benmattern/foundation/pull/5),
