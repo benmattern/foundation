@@ -1,3 +1,4 @@
+import { eventDateLabel } from "./timeline";
 import type { Article } from "../types/article";
 import type { FoundationEvent } from "../types/event";
 
@@ -18,19 +19,30 @@ export function getEffectiveArticleDate(article: Article): Date | null {
 }
 
 export function getEventDate(event: FoundationEvent): Date | null {
-  return getValidDate(event.occurred_at ?? event.created_at);
+  const chronology = event as FoundationEvent & {
+    timeline_start?: string | null;
+  };
+  return getValidDate(
+    "timeline_start" in chronology
+      ? (chronology.timeline_start ?? null)
+      : event.occurred_at,
+  );
 }
 
 export function getNewestArticle<T extends Article>(articles: T[]): T | null {
-  return getDatedArticles(articles).sort(
-    (a, b) => b.date.getTime() - a.date.getTime()
-  )[0]?.article ?? null;
+  return (
+    getDatedArticles(articles).sort(
+      (a, b) => b.date.getTime() - a.date.getTime(),
+    )[0]?.article ?? null
+  );
 }
 
 export function getOldestArticle<T extends Article>(articles: T[]): T | null {
-  return getDatedArticles(articles).sort(
-    (a, b) => a.date.getTime() - b.date.getTime()
-  )[0]?.article ?? null;
+  return (
+    getDatedArticles(articles).sort(
+      (a, b) => a.date.getTime() - b.date.getTime(),
+    )[0]?.article ?? null
+  );
 }
 
 export function getTimelineArticles<T extends Article>(articles: T[]): T[] {
@@ -48,7 +60,7 @@ export function getTimelineArticles<T extends Article>(articles: T[]): T[] {
 
 export function getLastActivityDate(
   event: FoundationEvent,
-  articles: Article[]
+  articles: Article[],
 ): Date | null {
   const eventUpdatedAt = getValidDate(event.updated_at);
   const newestArticle = getNewestArticle(articles);
@@ -85,7 +97,7 @@ export function getRelativeDateLabel(dateValue: string | null): string {
   const today = new Date();
   const millisecondsPerDay = 1000 * 60 * 60 * 24;
   const dayDifference = Math.round(
-    (today.getTime() - date.getTime()) / millisecondsPerDay
+    (today.getTime() - date.getTime()) / millisecondsPerDay,
   );
 
   if (dayDifference === 0) return "Today";
@@ -103,7 +115,19 @@ function getDatedArticles<T extends Article>(articles: T[]) {
       article,
       date: getEffectiveArticleDate(article),
     }))
-    .filter(
-      (item): item is { article: T; date: Date } => item.date !== null
-    );
+    .filter((item): item is { article: T; date: Date } => item.date !== null);
+}
+
+export function formatEventOccurrence(event: FoundationEvent): string {
+  if ("date_start" in event)
+    return eventDateLabel({
+      date_start: event.date_start ?? null,
+      date_end: event.date_end ?? null,
+      date_approximate: event.date_approximate ?? false,
+      date_origin: event.date_origin ?? "explicit",
+      occurred_at: event.occurred_at,
+    });
+  return event.occurred_at
+    ? `Legacy timestamp: ${event.occurred_at}`
+    : "Date unknown";
 }

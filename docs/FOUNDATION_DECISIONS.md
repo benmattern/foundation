@@ -1,3 +1,23 @@
+## Milestone 08 choices - 2026-10-19 (implemented; not deployed)
+
+- Extend events, original joins and /events routes; label navigation Timeline.
+- Preserve user calendar precision as text with validated generated sort bounds;
+  mark uncertainty separately. UTC-group legacy timestamps without changing their
+  values or original analyst timestamps. Unknown is never creation/publication time.
+- Sort range start bounds then UUID; keep unknown dates last in either direction;
+  server overlap filters and bounded offset pages. No arbitrary confidence ordering.
+- Explicit article/entity/question associations only, server-derived first-link
+  attribution and retained target identity. Never infer confirmation from article
+  counts, suggested mentions or browser-local analytical snapshots.
+- Keep existing owner-wide entities; authorize each event association via its
+  project, and same-project article/question targets. No new generic evidence layer.
+- Extend save_event with revision/request locks; guarded deletion preserves research,
+  receipt retries and research_history. Older versionless mutations fail safely;
+  backend-first rollout must coordinate that editor transition window.
+- Owner authorized local implementation/tests/docs only. 017 is unapplied hosted;
+  migration rehearsal/release and real-account acceptance need separate approval.
+  [08 review](reviews/08-research-timelines.md) documents the evidence boundary.
+
 ## Milestone 07 choices - 2026-10-19 (deployed via PR #7)
 
 - Keep the milestone browser-local: explicit session versus IndexedDB persistence,

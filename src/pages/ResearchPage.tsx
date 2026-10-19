@@ -59,6 +59,14 @@ export default function ResearchPage() {
         </p>
       )}
       {message && <p role="status">{message}</p>}
+      {question && (
+        <Link
+          className="text-blue-300 underline"
+          to={`/events?question=${question.id}`}
+        >
+          View associated timeline events
+        </Link>
+      )}
       {!data && !error && <p role="status">Loading research...</p>}
       {data && (
         <div className="grid items-start gap-6 xl:grid-cols-[18rem_minmax(0,1fr)]">

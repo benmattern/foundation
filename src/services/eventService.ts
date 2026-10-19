@@ -5,23 +5,10 @@ import { getArticles, getArticlesWithTags } from "./articleService";
 import type { Article, ArticleWithTags } from "../types/article";
 import type {
   ArticleEvent,
-  EventStatus,
   FoundationEvent,
   FoundationEventWithArticles,
   FoundationEventWithArticleTags,
 } from "../types/event";
-
-export type CreateEventInput = {
-  title: string;
-  description: string;
-  event_type: string;
-  status: EventStatus;
-  occurred_at: string;
-  location: string;
-  article_ids?: string[];
-};
-
-export type UpdateEventInput = CreateEventInput;
 
 export function getEvents(): Promise<FoundationEvent[]> {
   const project = activeProjectId();
@@ -71,28 +58,6 @@ export async function getEventWithArticleTagsById(
   return composeEventsWithArticleTags([event], articleEvents, articles)[0];
 }
 
-async function saveEvent(
-  event: CreateEventInput,
-  id: string | null,
-): Promise<FoundationEvent> {
-  const { data, error } = await supabase.rpc("save_event", {
-    p_project: activeProjectId(),
-    p_values: event,
-    p_id: id,
-  });
-  if (error) throw error;
-  return data;
-}
-export const createEvent = (event: CreateEventInput) => saveEvent(event, null);
-export const updateEvent = (id: string, event: UpdateEventInput) =>
-  saveEvent(event, id);
-export async function deleteEvent(id: string): Promise<void> {
-  const { error } = await supabase.rpc("remove_event", {
-    p_project: activeProjectId(),
-    p_id: id,
-  });
-  if (error) throw error;
-}
 async function getEventById(id: string): Promise<FoundationEvent> {
   const { data, error } = await supabase
     .from("events")

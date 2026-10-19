@@ -40,6 +40,14 @@ export default function EntitiesPage() {
         </p>
       )}
       {message && <p role="status">{message}</p>}
+      {entity && (
+        <Link
+          className="text-blue-300 underline"
+          to={`/events?entity=${entity.id}`}
+        >
+          View explicitly associated timeline events
+        </Link>
+      )}
       {!data && !error && <p role="status">Loading entities...</p>}
       {data && (
         <div className="grid items-start gap-6 xl:grid-cols-[18rem_minmax(0,1fr)]">

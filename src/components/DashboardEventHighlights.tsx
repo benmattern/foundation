@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { formatDate, getEventDate } from "../lib/eventMetrics";
+import { formatDate, formatEventOccurrence } from "../lib/eventMetrics";
 import type { EventListItem } from "../types/event";
 import { Card } from "./ui/Card";
 
@@ -44,7 +44,7 @@ export function DashboardEventHighlights({
               <div className="mt-3 grid grid-cols-1 gap-2 text-xs text-slate-500 sm:grid-cols-3">
                 <span>Articles: {event.supportingArticleCount}</span>
                 <span>Activity: {formatDate(event.lastActivityAt)}</span>
-                <span>Occurred: {formatDate(getEventDate(event))}</span>
+                <span>Occurred: {formatEventOccurrence(event)}</span>
               </div>
             </Link>
           ))}

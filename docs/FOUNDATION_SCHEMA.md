@@ -1,3 +1,33 @@
+## Milestone 08 additive schema (017, local only - 2026-10-19)
+
+Live catalogs were checked read-only before implementation: deployed ledger 001-016,
+events/article_events constraints, grants, RLS, triggers and RPC definitions match
+that baseline. Migration `20261019222428_research_timelines.sql` is independently
+reviewable and tested in isolated fixtures, **not applied to production**.
+
+- events adds version, date_start/date_end precision text, date_approximate/date_note,
+  date_origin, generated timeline_start/timeline_end, claim_kind and analyst_notes.
+  Existing occurred_at/created_at/updated_at/IDs remain unchanged on upgrade; old
+  timestamp backfill uses UTC with legacy provenance. Generated bounds validate
+  calendar/range; index(project_id,timeline_start,id).
+- event_references has event/project/owner, kind, persistent target_id, nullable
+  article/entity/question FKs, immutable first-link metadata snapshot, disposition,
+  note and linked. Unique(event,kind,target), project/owner and composite target FKs;
+  target deletion nulls only live FK, event deletion cascades only reference rows.
+  Existing article_events backfill is additive; save_event maintains original joins.
+- event_requests keeps owner/request unique receipts (project,event,operation,hash,
+  response,time) after event deletion. No expiry currently. Both new tables permit
+  authenticated owner SELECT through RLS, service administration, no browser writes.
+- save_event retains signature with new CAS/request semantics; retired remove_event
+  rejects versionless deletion. remove_timeline_event requires expected version and
+  request UUID; both writes append existing research_history with event snapshots.
+- timeline_page (50 records), timeline_event (20 history entries), timeline_options
+  (25 records) authorize require_project first. Internal helpers timeline_date,
+  timeline_snapshot and event_state revoke public/anonymous/authenticated EXECUTE.
+
+See [08](milestones/08-research-timelines.md) for exact date, ownership, limits and
+rollout contract. No dataset/analytical artifact is made into a durable citation.
+
 ## Milestone 07 browser storage (frontend deployed 2026-10-19)
 
 No SQL migration or hosted schema change. Browser IndexedDB `foundation-data-v1`
