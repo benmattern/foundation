@@ -1,3 +1,13 @@
+## Milestone 07 local implementation - 2026-10-19
+
+Approved Data Workspace implemented on `milestone-07-data-workspace` from clean
+main `8357bf5`. CSV/JSON import, DuckDB-Wasm queries, Perspective exploration,
+explicit browser-local datasets, saved definitions/notes and optional frozen
+snapshots are in local review. Local browser acceptance and required checks pass; see
+[07 review](reviews/07-data-workspace.md) for actual verification, limits and demo.
+Nothing has been merged or deployed. Production remains at the recorded 001-016
+migration baseline; no new migration, hosted storage or data mutation is needed.
+
 ## Deployed Milestones 05/06 — 2026-10-17 UTC
 
 Milestones 05 and 06 are deployed through [PR #5](https://github.com/benmattern/foundation/pull/5),

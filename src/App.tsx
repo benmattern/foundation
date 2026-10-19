@@ -16,6 +16,8 @@ import ProjectPage from "./pages/ProjectPage";
 import ResearchPage from "./pages/ResearchPage";
 import ResearchSessionPage from "./pages/ResearchSessionPage";
 import ArticleResearchPage from "./pages/ArticleResearchPage";
+import { lazy, Suspense } from "react";
+const DataWorkspacePage = lazy(() => import("./pages/DataWorkspacePage"));
 
 export default function App() {
   return (
@@ -40,6 +42,14 @@ export default function App() {
             />
             <Route path="/project" element={<ProjectPage />} />
             <Route path="/entities" element={<EntitiesPage />} />
+            <Route
+              path="/data"
+              element={
+                <Suspense fallback={<p>Loading Data Workspace…</p>}>
+                  <DataWorkspacePage />
+                </Suspense>
+              }
+            />
           </Route>
         </Routes>
       </WorkspaceGate>

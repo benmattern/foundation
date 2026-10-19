@@ -1,3 +1,17 @@
+## Data Workspace (local implementation, Milestone 07)
+
+`/data` extends authenticated project navigation. Import parsing/type validation
+lives in dataImport; dataWorkspaceService checks the existing RLS project list,
+partitions session/IndexedDB work by owner/project and atomically guards durable
+writes by revision. Dataset metadata and rows are separate from analysis definitions
+and optional frozen result snapshots. All remain browser-local; no records upload.
+AnalyticalEngine creates one fresh DuckDB-Wasm worker per query, loads only the
+selected dataset and disables external access/extensions before read-only SQL.
+DataExplorer owns Perspective's typed table/view/worker and supported configuration
+save/restore. Tools/Wasm load lazily from the same origin. No Supabase schema or
+function changes. See [07](milestones/07-data-workspace.md) for resource/lifecycle,
+research-reference deferrals and deployment requirements; review records tests.
+
 # FOUNDATION Architecture
 
 ## Deployed research sessions and official coverage — 2026-10-17 UTC

@@ -1,3 +1,20 @@
+## Milestone 07 choices - 2026-10-19 (local implementation)
+
+- Keep the milestone browser-local: explicit session versus IndexedDB persistence,
+  with no silent uploads or backend migration. Local saving is not managed durability.
+- Separate saved definitions from opt-in frozen result input rows; retain source
+  metadata/hash and analyst note when original data is unavailable.
+- Use stable DuckDB-Wasm 1.32.0 over npm's prerelease latest; maintained matching
+  Perspective 5.6.0 packages and official Vite Wasm bootstrap. No forks/new backend.
+- Fresh single-dataset DuckDB workers, disabled external access/extensions and
+  locked settings, SELECT/CTE guard, output/timeout limits and worker termination.
+- Atomic IndexedDB revision comparison prevents stale-tab overwrites. Browser
+  namespace keys prevent accidental cross-project display, not DevTools access.
+- Incremental evidence integration: project/source attribution and saved analysis
+  now; shared evidence references/question/finding/entity/event links deferred.
+- No merge, deployment, hosted write or cost authorized; [07 review](reviews/07-data-workspace.md)
+  retains real-account hosted acceptance as a separate external prerequisite.
+
 # FOUNDATION Architectural Decisions
 
 ## Deployed 05/06 choices — 2026-10-17 UTC

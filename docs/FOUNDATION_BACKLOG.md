@@ -1,3 +1,12 @@
+## Current implementation: Milestone 07 - 2026-10-19
+
+Data Workspace is locally implemented on `milestone-07-data-workspace`; local acceptance complete; see
+browser evidence and review handoff per [07](milestones/07-data-workspace.md).
+Do not deploy or modify hosted resources without separate authorization. Later:
+managed/customer storage, cross-device/shared saved analyses, common structured
+evidence citations into questions/findings, remote SQL and larger-than-browser
+execution. No AI, maps, financial charting or dashboard builder in this milestone.
+
 ## Deployed Milestones 05/06 — 2026-10-17 UTC
 
 Milestones 05 and 06 are deployed through [PR #5](https://github.com/benmattern/foundation/pull/5),

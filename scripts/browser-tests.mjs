@@ -16,6 +16,7 @@ await new Promise((resolve, reject) => {
 });
 const server = spawn(process.execPath, [
   "node_modules/vite/bin/vite.js",
+  ...(process.env.FOUNDATION_BROWSER_PREVIEW === "1" ? ["preview"] : []),
   "--host",
   "127.0.0.1",
   "--port",
