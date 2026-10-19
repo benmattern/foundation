@@ -6,14 +6,16 @@ docs/FOUNDATION_BACKLOG.md, and docs/FOUNDATION_CONVENTIONS.md, then inspect
 the code relevant to the task. Use docs/FOUNDATION_DECISIONS.md and
 docs/FOUNDATION_SCHEMA.md for architectural and data context.
 
-Milestones 01 through 06 are deployed; their reviews document verification and
+Milestones 01 through 08 are deployed; their reviews document verification and
 remaining real-account hosted checks.
 Completed approved implementation sequence (owner approval 2026-10-16):
 1. docs/milestones/05-research-sessions-and-briefs.md.
 2. docs/milestones/06-official-source-coverage.md.
 Read docs/planning/next-enhancements.md for rationale. Both were implemented and
 verified in sequence, then deployed via PR #5 on 2026-10-17 UTC (merge e7991e0).
-Migrations 001–016 are recorded in production. Read the completed reviews before
+Milestone 07 released via PR #7; Milestone 08 via PR #8 on 2026-10-19 (merge 627aec6).
+Read docs/reviews/08-research-timelines.md for current verification and remaining
+signed-in hosted acceptance. Migrations 001–017 are recorded in production. Read the completed reviews before
 changing or restarting them; do not replay migrations. Real-account signed-in
 hosted browser acceptance remains separate from SQL/public browser verification.
 Record results in docs/reviews/05-research-sessions-and-briefs.md and

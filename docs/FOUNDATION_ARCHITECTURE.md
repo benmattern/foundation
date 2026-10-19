@@ -1,4 +1,4 @@
-## Research Timelines (Milestone 08 development branch - 2026-10-19)
+## Research Timelines (Milestone 08 deployed - 2026-10-19)
 
 Existing /events and /events/:id orchestrate timelineService RPCs, shared controls,
 ResearchTimeline, filters and the enhanced EventForm. Timeline queries cap at 50,
@@ -7,7 +7,7 @@ existing article/entity/question screens. Active-project remounting remains owne
 by ProjectChooser. Existing dashboard/read services retain article_events composition;
 occurrence labels preserve the new precision instead of printing generated bounds.
 
-Local migration 017 extends events with calendar text, generated bounds, version,
+Deployed migration 017 extends events with calendar text, generated bounds, version,
 classification and analyst notes; adds event-specific references and retry receipts.
 Existing save_event handles parent row CAS, request advisory locks, target ownership,
 metadata capture, old join synchronization and research_history in one transaction.
@@ -15,7 +15,8 @@ New guarded deletion leaves research intact and retains audit snapshots. Authori
 read RPCs enforce project access before filtering; internal helpers are not browser
 entry points. RLS allows owner reads, browser writes go through guarded RPCs.
 No general evidence framework, new worker, AI or analytical workspace redesign.
-Not deployed: production migrations remain 001-016. [08](milestones/08-research-timelines.md)
+Released via PR #8 / existing Render auto-deploy, merge 627aec6. Production
+migrations are 001-017; backup rehearsal and hosted SQL/public frontend checks passed. [08](milestones/08-research-timelines.md)
 and [review](reviews/08-research-timelines.md) define release sequencing and limits.
 
 ## Data Workspace (deployed, Milestone 07 - 2026-10-19)

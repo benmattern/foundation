@@ -1,4 +1,4 @@
-## Milestone 08 choices - 2026-10-19 (implemented; not deployed)
+## Milestone 08 choices - 2026-10-19 (deployed via PR #8)
 
 - Extend events, original joins and /events routes; label navigation Timeline.
 - Preserve user calendar precision as text with validated generated sort bounds;
@@ -14,8 +14,9 @@
 - Extend save_event with revision/request locks; guarded deletion preserves research,
   receipt retries and research_history. Older versionless mutations fail safely;
   backend-first rollout must coordinate that editor transition window.
-- Owner authorized local implementation/tests/docs only. 017 is unapplied hosted;
-  migration rehearsal/release and real-account acceptance need separate approval.
+- Owner separately authorized deployment. Backup/restore rehearsal passed, 017
+  committed atomically and PR #8 merged as 627aec6 for Render auto-deploy. Hosted
+  SQL/public frontend verification passed; real-account browser acceptance remains.
   [08 review](reviews/08-research-timelines.md) documents the evidence boundary.
 
 ## Milestone 07 choices - 2026-10-19 (deployed via PR #7)

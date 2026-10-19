@@ -1,4 +1,4 @@
-## Milestone 08 timeline conventions - 2026-10-19 (development only)
+## Milestone 08 timeline conventions - 2026-10-19 (deployed via PR #8)
 
 Use existing event IDs/routes/project context. Enter YYYY, YYYY-MM or YYYY-MM-DD;
 keep partial precision and uncertainty visible. Bounds are sorting/filtering aids,
@@ -10,7 +10,8 @@ are analyst choices, with publisher snapshots and separate notes/classification;
 article counts do not establish independent corroboration. Suggested mentions and
 browser-local datasets are never promoted to durable event evidence. Event writes
 use timelineService with version and stable request UUID; preserve drafts on failure.
-Migration 017 is not deployed. See [08](milestones/08-research-timelines.md).
+Migration 017 is deployed after an authorized backup rehearsal and atomic upgrade;
+do not replay it. Signed-in hosted acceptance remains separate from SQL/public checks. See [08](milestones/08-research-timelines.md).
 
 # FOUNDATION Conventions
 

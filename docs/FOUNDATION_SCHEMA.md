@@ -1,9 +1,13 @@
-## Milestone 08 additive schema (017, local only - 2026-10-19)
+## Milestone 08 additive schema (017, deployed - 2026-10-19)
 
 Live catalogs were checked read-only before implementation: deployed ledger 001-016,
 events/article_events constraints, grants, RLS, triggers and RPC definitions match
 that baseline. Migration `20261019222428_research_timelines.sql` is independently
-reviewable and tested in isolated fixtures, **not applied to production**.
+reviewable, rehearsed against a fresh restored backup and applied atomically to
+production after owner authorization. Ledger now includes 001-017; all 4,319
+original rows/values survived across 34 tables, including six events and 19 joins.
+Nineteen event_references were backfilled. Hosted SQL and anonymous REST checks
+passed; fictional writes rolled back. Do not replay 017.
 
 - events adds version, date_start/date_end precision text, date_approximate/date_note,
   date_origin, generated timeline_start/timeline_end, claim_kind and analyst_notes.

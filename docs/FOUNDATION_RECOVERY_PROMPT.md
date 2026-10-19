@@ -1,17 +1,22 @@
-## Milestone 08 development handoff - 2026-10-19
+## Milestone 08 deployed handoff - 2026-10-19
 
-Read [08 milestone](milestones/08-research-timelines.md) and
-[08 review](reviews/08-research-timelines.md) before changing the timeline.
-Branch `milestone-08-research-timelines` extends deployed Events from main 58a91ea.
-**Implemented locally; not deployed.** Production ledger remains 001-016; 017
-`20261019222428_research_timelines.sql` has only run in disposable fictional databases.
-Do not apply it, merge or deploy without separate authorization. No new dependency,
-AI, Edge release or Data Workspace change. Review exact test/release boundaries in
-08 review; rerun its fictional browser demo without hosted credentials. Event date
-precision and evidence snapshots are intentional; do not replace them with creation
-or publication dates. Existing /events routes now show Timeline. Future authorized
-rollout needs backup rehearsal, additive migration first, frontend release and
-real-account acceptance; legacy versionless edits/deletes reject safely after 017.
+Read [08 milestone](milestones/08-research-timelines.md) and [08 review](reviews/08-research-timelines.md).
+Owner authorized deployment after implementation review. [PR #8](https://github.com/benmattern/foundation/pull/8)
+merged as `627aec6c1cdbdd32cfb1715ea607eb5da284bf22`, release head `d1a5b57`.
+Fresh actual-data backup/restore rehearsal and atomic production migration preserved
+4,319 original rows across 34 tables. Production ledger is 001-017; do not replay,
+reset events, reassign ownership or restart this milestone. Existing timestamps,
+six event IDs and 19 article joins survived; 19 explicit evidence references added.
+
+GitHub release CI passed all stages. Render's existing auto-deploy serves all 12
+emitted assets byte-identical to the tested build; 22 public route/refresh gates,
+inspected desktop/mobile sign-in and hosted SQL/anonymous REST checks pass. All
+fictional hosted checks rolled back. This does not establish signed-in browser
+acceptance. Next: owner review at /events with their own account, without requesting
+passwords. No Edge Function release or new services. Private backup/SQL receipts
+are ignored under .deployment.local/release08; public receipts/screenshots under
+artifacts.local/release08. Preserve calendar precision, frozen attribution, version
+and retry guards. Browser-local analytical artifacts remain separate from citations.
 
 ## Milestone 07 deployed handoff - 2026-10-19
 

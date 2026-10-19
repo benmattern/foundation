@@ -1,17 +1,24 @@
-## Milestone 08 implemented for review - 2026-10-19
+## Milestone 08 deployed - 2026-10-19
 
-Research Timelines extends Events with a vertical project timeline, precise/partial/
-uncertain/range dates, explicit article/entity/question evidence, URL filters and
-bounded queries, attributed detail, guarded edits/deletion and retained audit.
-Development branch `milestone-08-research-timelines`, baseline `58a91ea`.
-**Not deployed.** Additive migration 017 is local only; production stays 001-016.
-Read [08 milestone](milestones/08-research-timelines.md) and
-[08 review](reviews/08-research-timelines.md) for implementation, tests, demo and
-remaining authorized-release/real-account prerequisites. M01-07 remain deployed.
-Local verification: clean install, lint/build, 103 SQL/unit tests, 16 browser
-journeys, 14 native PostgreSQL concurrency groups and all 3 Edge checks passed;
-1440px/390px timeline and mobile evidence-detail views inspected.
-No merge, hosted research writes, paid resources or deployment are authorized here.
+Research Timelines is deployed via [PR #8](https://github.com/benmattern/foundation/pull/8),
+merge `627aec6c1cdbdd32cfb1715ea607eb5da284bf22`, tested release head `d1a5b57`.
+[Release CI](https://github.com/benmattern/foundation/actions/runs/39337127210)
+passed install, lint/build, 103 SQL/unit tests, 16 browser journeys, 14 native
+PostgreSQL concurrency groups and all 3 Edge checks. A fresh private backup restored
+and upgraded with all 4,319 rows preserved across 34 original tables; production
+017 then committed atomically with all original values/relationships preserved.
+Ledger is now 001-017. Six original events and 19 article links remain; 19 evidence
+references were backfilled without changing original analyst timestamps.
+
+Live: https://foundation-ljfo.onrender.com/events. All 12 emitted frontend assets
+match local SHA-256, including Wasm/worker assets. Twenty-two public route/refresh/
+auth-gate checks and inspected 1440px/390px sign-in views pass without browser errors
+or overflow. Hosted SQL checks cover date/filter/reference/CAS/retry/delete behavior,
+project/owner isolation, direct writes and anonymous denial; fictional verification
+writes all rolled back. Four REST endpoints also reject anonymous requests.
+No Edge release, new infrastructure or paid resources. Real-account signed-in hosted
+timeline acceptance remains separate and unverified. See [08](milestones/08-research-timelines.md)
+and [review](reviews/08-research-timelines.md); do not replay migration 017.
 
 ## Milestone 07 deployed - 2026-10-19
 

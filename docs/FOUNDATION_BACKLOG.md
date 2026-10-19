@@ -1,13 +1,13 @@
-## Milestone 08 review branch - 2026-10-19
+## Milestone 08 deployed - 2026-10-19
 
-Implemented research timelines, explicit evidence associations, partial/range dates,
-server filters/paging and guarded CRUD on `milestone-08-research-timelines`.
-[Specification/demo](milestones/08-research-timelines.md), [review](reviews/08-research-timelines.md).
-Not deployed; 017 remains local. Next external steps require separate release
-approval: fresh backup/upgrade rehearsal, 017 plus frontend release, signed-in
-hosted acceptance. Future work: durable structured analytical evidence, measured
-keyset pagination/receipt retention, entity relationship mapping and richer time
-navigation. No Gantt, maps, automatic extraction or AI descriptions in this scope.
+Research Timelines released via [PR #8](https://github.com/benmattern/foundation/pull/8),
+merge `627aec6`, after backup/upgrade rehearsal, atomic migration 017, passing CI,
+hosted SQL verification and byte-identical public frontend checks. Production
+ledger is 001-017. [Specification/demo](milestones/08-research-timelines.md),
+[review evidence](reviews/08-research-timelines.md). Next external acceptance:
+real-account signed-in /events desktop/mobile review. Future work: durable structured
+analytical evidence, measured keyset pagination/receipt retention, entity relationship
+mapping and richer time navigation. Gantt/maps/automatic extraction/AI remain deferred.
 
 ## Milestone 07 released - 2026-10-19
 

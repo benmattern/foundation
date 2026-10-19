@@ -1,9 +1,10 @@
 # Milestone 08: Research Timelines
 
-Implemented for development review, **not deployed**. Branch:
-`milestone-08-research-timelines`, based on main `58a91ea` (Milestones 01–07).
-The owner authorized implementation, isolated tests and documentation only.
-See [review evidence](../reviews/08-research-timelines.md).
+Deployed 2026-10-19 through [PR #8](https://github.com/benmattern/foundation/pull/8),
+merge `627aec6`, after separate owner deployment authorization. Migration 017 was
+rehearsed against a fresh private backup and applied atomically before the frontend.
+[Review evidence](../reviews/08-research-timelines.md) records CI, preservation and
+hosted verification. Real-account signed-in acceptance remains outstanding.
 
 ## Delivered checklist
 
@@ -23,7 +24,7 @@ See [review evidence](../reviews/08-research-timelines.md).
   existing active-project context, shared controls, desktop/mobile layout.
 - [x] Fictional SQL/browser acceptance and real PostgreSQL concurrency checks.
 - [x] Documentation and runnable demonstration workflow.
-- [ ] Authorized backup/upgrade rehearsal, production migration and deployment.
+- [x] Authorized backup/upgrade rehearsal, production migration and deployment.
 - [ ] Real-account signed-in hosted acceptance after an authorized release.
 
 ## Event/date contract
@@ -133,7 +134,7 @@ Screenshots appear under ignored `test-results/timeline-*.png`.
 For interactive real persistence, first provision an **isolated local/development**
 Supabase database using migrations 001–017, configure only its URL/publishable key
 in an ignored `.env.local`, create a local Auth user and run `npm.cmd run dev`.
-Do not point this branch at production: production intentionally lacks 017.
+Production now includes 017; use isolated credentials for regression tests.
 Existing isolated SQL tests need no hosted project or Auth password. A standalone
 SQL-only PostgreSQL test database is not a Supabase Auth/PostgREST app backend.
 
@@ -156,18 +157,20 @@ SQL-only PostgreSQL test database is not a Supabase Auth/PostgREST app backend.
 
 ## Release requirements and limits
 
-No deployment is authorized by this milestone assignment. A future authorized
-release must capture a fresh backup, rehearse 017 against an isolated restored
-baseline, compare preserved original event columns/joins, review grants/RLS and
-apply only the new migration atomically. Existing 001–016 must not be replayed.
-Apply 017 before releasing its frontend; the old deployed editor's versionless
-edits/deletes will fail safely in the brief transition. Coordinate that window;
+The original assignment excluded deployment; the owner subsequently authorized it.
+The 2026-10-19 release captured a fresh backup, rehearsed 017 on an isolated restore,
+compared all original values/joins, checked grants/RLS and applied only 017 atomically.
+Production ledger is now 001-017. These remain requirements for future migrations.
+Existing 001–017 must not be replayed.
+The release applied 017 before its frontend; the old deployed editor's versionless
+edits/deletes rejected safely during the brief transition. For future rollbacks,
 a frontend rollback alone cannot restore legacy mutations. Prefer forward fixes
 and preserve new audit/reference data. No Edge Function deployment is needed.
 
-After release, verify migration ledger, emitted frontend assets, existing article
-links and authorized signed-in mobile/desktop flows with the owner. Mock browser
-or isolated SQL tests do not establish hosted Auth/PostgREST/real-account behavior.
+Release verification confirmed the ledger, all emitted asset hashes, preserved
+article joins, hosted SQL and public routes. Owner signed-in mobile/desktop
+acceptance is still outstanding. Mock browser or isolated SQL tests do not establish
+hosted Auth/PostgREST/real-account behavior.
 Exact filtered counts and offset pagination can become expensive at very large
 scale and can shift during concurrent inserts; keyset pagination/approximate
 counts can follow measured need. Filters currently show selected record UUIDs;
